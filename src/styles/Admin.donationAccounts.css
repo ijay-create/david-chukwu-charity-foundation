@@ -1,0 +1,1552 @@
+/* ==========================================================================
+   ADMIN DONATION ACCOUNTS
+   ========================================================================== */
+
+/*
+|---------------------------------------------------------------------------
+| ROOT SECTION
+|---------------------------------------------------------------------------
+*/
+
+.admin-donation-accounts {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 10px 0 50px;
+  color: #132b46;
+  font-family: "Open Sans", sans-serif;
+  box-sizing: border-box;
+}
+
+.admin-donation-accounts *,
+.admin-donation-accounts *::before,
+.admin-donation-accounts *::after {
+  box-sizing: border-box;
+}
+
+
+/*
+|---------------------------------------------------------------------------
+| HEADER
+|---------------------------------------------------------------------------
+*/
+
+.admin-donation-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 30px;
+  margin-bottom: 28px;
+}
+
+.admin-donation-header > div:first-child {
+  min-width: 0;
+}
+
+.admin-donation-eyebrow {
+  display: inline-block;
+  margin-bottom: 8px;
+  color: #dca336;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+}
+
+.admin-donation-header h2 {
+  margin: 0;
+  color: #132b46;
+  font-family: "Poppins", sans-serif;
+  font-size: 1.85rem;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.admin-donation-header p {
+  max-width: 620px;
+  margin: 8px 0 0;
+  color: #6b7280;
+  font-size: 0.92rem;
+  line-height: 1.65;
+}
+
+
+/*
+|---------------------------------------------------------------------------
+| HEADER ACTIONS
+|---------------------------------------------------------------------------
+*/
+
+.admin-donation-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.admin-donation-actions button,
+.admin-donation-form-actions button,
+.admin-account-actions button,
+.admin-donation-missing button,
+.admin-donation-empty button {
+  font-family: "Open Sans", sans-serif;
+}
+
+
+/*
+|---------------------------------------------------------------------------
+| REFRESH BUTTON
+|---------------------------------------------------------------------------
+*/
+
+.admin-donation-refresh {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 17px;
+  color: #132b46;
+  background: #ffffff;
+  border: 1px solid #d9dee5;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.admin-donation-refresh svg {
+  flex-shrink: 0;
+}
+
+.admin-donation-refresh:hover:not(:disabled) {
+  color: #132b46;
+  background: #f4f1ea;
+  border-color: #dca336;
+  transform: translateY(-1px);
+}
+
+.admin-donation-refresh:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+
+/*
+|---------------------------------------------------------------------------
+| ADD ACCOUNT BUTTON
+|---------------------------------------------------------------------------
+*/
+
+.admin-donation-add {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 18px;
+  color: #ffffff;
+  background: #132b46;
+  border: 1px solid #132b46;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.admin-donation-add svg {
+  flex-shrink: 0;
+}
+
+.admin-donation-add:hover:not(:disabled) {
+  background: #1d3b5b;
+  border-color: #1d3b5b;
+  transform: translateY(-1px);
+  box-shadow: 0 7px 18px rgba(19, 43, 70, 0.14);
+}
+
+.admin-donation-add:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+
+/*
+|---------------------------------------------------------------------------
+| ACCOUNT LIMIT / CONFIGURATION BAR
+|---------------------------------------------------------------------------
+*/
+
+.admin-donation-limit {
+  width: 100%;
+  min-height: 76px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px 20px;
+  margin-bottom: 22px;
+  background: #fdf6e8;
+  border: 1px solid #eadfca;
+  border-radius: 10px;
+}
+
+.admin-donation-limit-icon {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #dca336;
+  background: #ffffff;
+  border: 1px solid #eadfca;
+  border-radius: 50%;
+}
+
+.admin-donation-limit-icon svg {
+  width: 19px;
+  height: 19px;
+}
+
+.admin-donation-limit > div:nth-child(2) {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.admin-donation-limit strong {
+  color: #132b46;
+  font-family: "Poppins", sans-serif;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.admin-donation-limit span {
+  color: #6b7280;
+  font-size: 0.78rem;
+}
+
+.admin-donation-limit-status {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 0 12px;
+  color: #8a6517;
+  background: #fffaf0;
+  border: 1px solid #e8d5a9;
+  border-radius: 20px;
+  font-size: 0.76rem;
+  font-weight: 600;
+}
+
+.admin-donation-limit-status svg {
+  flex-shrink: 0;
+}
+
+
+/*
+|---------------------------------------------------------------------------
+| ALERTS
+|---------------------------------------------------------------------------
+*/
+
+.admin-donation-alert {
+  width: 100%;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 14px;
+  margin-bottom: 18px;
+  border-radius: 8px;
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.admin-donation-alert > svg {
+  flex-shrink: 0;
+}
+
+.admin-donation-alert > span {
+  flex: 1;
+  min-width: 0;
+}
+
+.admin-donation-alert button {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.admin-donation-alert.error {
+  color: #991b1b;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+}
+
+.admin-donation-alert.error button {
+  color: #991b1b;
+  background: transparent;
+}
+
+.admin-donation-alert.error button:hover {
+  background: #fee2e2;
+}
+
+.admin-donation-alert.success {
+  color: #166534;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+}
+
+.admin-donation-alert.success button {
+  color: #166534;
+  background: transparent;
+}
+
+.admin-donation-alert.success button:hover {
+  background: #dcfce7;
+}
+
+
+/*
+|---------------------------------------------------------------------------
+| FORM CARD
+|---------------------------------------------------------------------------
+*/
+
+.admin-donation-form-card {
+  width: 100%;
+  margin-bottom: 25px;
+  padding: 28px;
+  background: #ffffff;
+  border: 1px solid #e1e5ea;
+  border-radius: 12px;
+  box-shadow: 0 10px 35px rgba(19, 43, 70, 0.07);
+  animation: donationFormReveal 0.25s ease-out;
+}
+
+.admin-donation-form-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 25px;
+  padding-bottom: 22px;
+  margin-bottom: 25px;
+  border-bottom: 1px solid #edf0f3;
+}
+
+.admin-donation-form-header > div:first-child {
+  min-width: 0;
+}
+
+.admin-form-eyebrow {
+  display: inline-block;
+  margin-bottom: 7px;
+  color: #dca336;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+}
+
+.admin-donation-form-header h3 {
+  margin: 0;
+  color: #132b46;
+  font-family: "Poppins", sans-serif;
+  font-size: 1.3rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.admin-donation-form-header p {
+  margin: 6px 0 0;
+  color: #6b7280;
+  font-size: 0.84rem;
+  line-height: 1.55;
+}
+
+
+/*
+|---------------------------------------------------------------------------
+| FORM CLOSE
+|---------------------------------------------------------------------------
+*/
+
+.admin-donation-form-close {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  color: #4b5563;
+  background: #f3f4f6;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.admin-donation-form-close:hover:not(:disabled) {
+  color: #ffffff;
+  background: #132b46;
+  transform: rotate(90deg);
+}
+
+.admin-donation-form-close:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+
+/*
+|---------------------------------------------------------------------------
+| FORM
+|---------------------------------------------------------------------------
+*/
+
+.admin-donation-form {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 20px;
+  row-gap: 20px;
+}
+
+.admin-form-group {
+  min-width: 0;
+}
+
+.admin-form-group:nth-child(3) {
+  grid-column: span 2;
+}
+
+.admin-form-group:nth-child(4) {
+  grid-column: span 2;
+  max-width: 50%;
+}
+
+.admin-form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #132b46;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.admin-input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.admin-input-wrapper > svg {
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  width: 18px;
+  height: 18px;
+  color: #7b8794;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+.admin-input-wrapper input {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 14px 0 43px;
+  color: #132b46;
+  background: #ffffff;
+  border: 1px solid #d8dee6;
+  border-radius: 8px;
+  outline: none;
+  font-family: "Open Sans", sans-serif;
+  font-size: 0.88rem;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.admin-input-wrapper input::placeholder {
+  color: #a0a8b2;
+}
+
+.admin-input-wrapper input:hover:not(:disabled) {
+  border-color: #b9c2cc;
+}
+
+.admin-input-wrapper input:focus {
+  border-color: #dca336;
+  box-shadow: 0 0 0 3px rgba(220, 163, 54, 0.12);
+}
+
+.admin-input-wrapper input:disabled {
+  color: #8b949e;
+  background: #f5f6f7;
+  cursor: not-allowed;
+}
+
+.admin-form-group small,
+.admin-donation-active-control small {
+  display: block;
+  margin-top: 6px;
+  color: #7b8794;
+  font-size: 0.72rem;
+  line-height: 1.5;
+}
+
+
+/*
+|---------------------------------------------------------------------------
+| SELECT
+|---------------------------------------------------------------------------
+*/
+
+.admin-form-group select {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 40px 0 14px;
+  color: #132b46;
+  background-color: #ffffff;
+  border: 1px solid #d8dee6;
+  border-radius: 8px;
+  outline: none;
+  font-family: "Open Sans", sans-serif;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.admin-form-group select:hover:not(:disabled) {
+  border-color: #b9c2cc;
+}
+
+.admin-form-group select:focus {
+  border-color: #dca336;
+  box-shadow: 0 0 0 3px rgba(220, 163, 54, 0.12);
+}
+
+.admin-form-group select:disabled {
+  color: #8b949e;
+  background: #f5f6f7;
+  cursor: not-allowed;
+}
+
+
+/*
+|---------------------------------------------------------------------------
+| ACTIVE ACCOUNT CONTROL
+|---------------------------------------------------------------------------
+*/
+
+.admin-donation-active-control {
+  grid-column: span 2;
+  padding: 16px 18px;
+  background: #f8fafb;
+  border: 1px solid #e3e8ed;
+  border-radius: 9px;
+}
+
+.admin-donation-active-control label {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #132b46;
+  font-size: 0.86rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.admin-donation-active-control input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: #dca336;
+  cursor: pointer;
+}
+
+.admin-donation-active-control input[type="checkbox"]:disabled {
+  cursor: not-allowed;
+}
+
+
+/*
+|---------------------------------------------------------------------------
+| FORM ACTIONS
+|---------------------------------------------------------------------------
+*/
+
+.admin-donation-form-actions {
+  grid-column: span 2;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 5px;
+}
+
+.admin-donation-cancel {
+  min-height: 44px;
+  padding: 0 20px;
+  color: #4b5563;
+  background: #ffffff;
+  border: 1px solid #d5dbe2;
+  border-radius: 8px;
+  font-size: 0.86rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.admin-donation-cancel:hover:not(:disabled) {
+  color: #132b46;
+  background: #f3f4f6;
+  border-color: #bfc7d0;
+}
+
+.admin-donation-save {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 20px;
+  color: #ffffff;
+  background: #dca336;
+  border: 1px solid #dca336;
+  border-radius: 8px;
+  font-size: 0.86rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.admin-donation-save:hover:not(:disabled) {
+  background: #c8922c;
+  border-color: #c8922c;
+  transform: translateY(-1px);
+  box-shadow: 0 7px 18px rgba(220, 163, 54, 0.2);
+}
+
+.admin-donation-save:disabled,
+.admin-donation-cancel:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+
+/*
+|---------------------------------------------------------------------------
+| DONATION ACCOUNT LIST
+|---------------------------------------------------------------------------
+*/
+
+.admin-donation-list {
+  width: 100%;
+  padding: 28px;
+  background: #ffffff;
+  border: 1px solid #e1e5ea;
+  border-radius: 12px;
+}
+
+.admin-donation-list-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 25px;
+  padding-bottom: 22px;
+  margin-bottom: 25px;
+  border-bottom: 1px solid #edf0f3;
+}
+
+.admin-donation-list-header > div:first-child {
+  min-width: 0;
+}
+
+.admin-donation-list-header h3 {
+  margin: 0;
+  color: #132b46;
+  font-family: "Poppins", sans-serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.admin-donation-list-header p {
+  margin: 6px 0 0;
+  color: #6b7280;
+  font-size: 0.83rem;
+  line-height: 1.55;
+}
+
+
+/*
+|---------------------------------------------------------------------------
+| ACCOUNT COUNT
+|---------------------------------------------------------------------------
+*/
+
+.admin-donation-count {
+  min-width: 62px;
+  height: 58px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #132b46;
+  background: #fdf6e8;
+  border: 1px solid #eadfca;
+  border-radius: 10px;
+  font-family: "Poppins", sans-serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.admin-donation-count span {
+  margin-left: 2px;
+  color: #8b929a;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+
+/*
+|---------------------------------------------------------------------------
+| ACCOUNT GRID
+|---------------------------------------------------------------------------
+*/
+
+.admin-donation-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+
+/*
+|---------------------------------------------------------------------------
+| ACCOUNT CARD
+|---------------------------------------------------------------------------
+*/
+
+.admin-account-card {
+  position: relative;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 23px;
+  background: #ffffff;
+  border: 1px solid #dfe4e9;
+  border-radius: 11px;
+  overflow: hidden;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.admin-account-card:hover {
+  border-color: #d6bd83;
+  box-shadow: 0 10px 28px rgba(19, 43, 70, 0.07);
+  transform: translateY(-2px);
+}
+
+.admin-account-card.is-active {
+  border-top: 3px solid #dca336;
+}
+
+.admin-account-card.is-inactive {
+  border-top: 3px solid #9ca3af;
+}
+
+
+/*
+|---------------------------------------------------------------------------
+| CARD HEADER
+|---------------------------------------------------------------------------
+*/
+
+.admin-account-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 17px;
+  margin-bottom: 19px;
+  border-bottom: 1px solid #edf0f3;
+}
+
+.admin-account-number {
+  color: #dca336;
+  font-size: 0.69rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+}
+
+.admin-account-status {
+  min-height: 27px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 0 9px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.admin-account-status.active {
+  color: #166534;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+}
+
+.admin-account-status.inactive {
+  color: #6b7280;
+  background: #f3f4f6;
+  border: 1px solid #dfe3e7;
+}
+
+
+/*
+|---------------------------------------------------------------------------
+| BANK INFORMATION
+|---------------------------------------------------------------------------
+*/
+
+.admin-account-bank {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-width: 0;
+  padding-bottom: 19px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid #edf0f3;
+}
+
+.admin-account-icon {
+  width: 43px;
+  height: 43px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #dca336;
+  background: #fdf6e8;
+  border: 1px solid #eadfca;
+  border-radius: 9px;
+}
+
+.admin-account-icon svg {
+  width: 21px;
+  height: 21px;
+}
+
+.admin-account-bank > div:last-child {
+  min-width: 0;
+}
+
+.admin-account-bank span {
+  display: block;
+  margin-bottom: 3px;
+  color: #7b8794;
+  font-size: 0.7rem;
+  font-weight: 500;
+}
+
+.admin-account-bank strong {
+  display: block;
+  overflow-wrap: anywhere;
+  color: #132b46;
+  font-family: "Poppins", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+
+/*
+|---------------------------------------------------------------------------
+| ACCOUNT DETAILS
+|---------------------------------------------------------------------------
+*/
+
+.admin-account-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 11px 0;
+  border-bottom: 1px solid #f0f2f4;
+}
+
+.admin-account-detail > span {
+  color: #7b8794;
+  font-size: 0.71rem;
+  font-weight: 500;
+}
+
+.admin-account-detail > strong {
+  overflow-wrap: anywhere;
+  color: #132b46;
+  font-size: 0.84rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.admin-account-detail .account-number-value {
+  color: #132b46;
+  font-family: "Poppins", sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+
+/*
+|---------------------------------------------------------------------------
+| PUBLIC STATUS
+|---------------------------------------------------------------------------
+*/
+
+.admin-account-public-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  margin-top: 15px;
+  padding: 9px 11px;
+  background: #f8fafb;
+  border-radius: 7px;
+  color: #66717d;
+  font-size: 0.71rem;
+  line-height: 1.4;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-radius: 50%;
+}
+
+.status-dot.active {
+  background: #16a34a;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+}
+
+.status-dot.inactive {
+  background: #9ca3af;
+}
+
+
+/*
+|---------------------------------------------------------------------------
+| ACCOUNT ACTIONS
+|---------------------------------------------------------------------------
+*/
+
+.admin-account-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px;
+  margin-top: 17px;
+}
+
+.admin-account-actions button {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 10px;
+  border-radius: 7px;
+  font-size: 0.77rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+
+/*
+|---------------------------------------------------------------------------
+| ACTIVATE
+|---------------------------------------------------------------------------
+*/
+
+.admin-account-actions button.activate {
+  color: #166534;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+}
+
+.admin-account-actions button.activate:hover {
+  color: #ffffff;
+  background: #15803d;
+  border-color: #15803d;
+  transform: translateY(-1px);
+}
+
+
+/*
+|---------------------------------------------------------------------------
+| DEACTIVATE
+|---------------------------------------------------------------------------
+*/
+
+.admin-account-actions button.deactivate {
+  color: #b45309;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+}
+
+.admin-account-actions button.deactivate:hover {
+  color: #ffffff;
+  background: #b45309;
+  border-color: #b45309;
+  transform: translateY(-1px);
+}
+
+
+/*
+|---------------------------------------------------------------------------
+| EDIT
+|---------------------------------------------------------------------------
+*/
+
+.admin-account-actions button.edit {
+  color: #132b46;
+  background: #ffffff;
+  border: 1px solid #d5dbe2;
+}
+
+.admin-account-actions button.edit:hover {
+  color: #ffffff;
+  background: #132b46;
+  border-color: #132b46;
+  transform: translateY(-1px);
+}
+
+
+/*
+|---------------------------------------------------------------------------
+| EMPTY / LOADING STATE
+|---------------------------------------------------------------------------
+*/
+
+.admin-donation-empty {
+  min-height: 250px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 35px 20px;
+  text-align: center;
+  color: #6b7280;
+  background: #fafbfc;
+  border: 1px dashed #d7dde4;
+  border-radius: 10px;
+}
+
+.admin-donation-empty > svg {
+  color: #dca336;
+  margin-bottom: 14px;
+}
+
+.admin-empty-icon {
+  width: 66px;
+  height: 66px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+  color: #dca336;
+  background: #fdf6e8;
+  border: 1px solid #eadfca;
+  border-radius: 50%;
+}
+
+.admin-empty-icon svg {
+  width: 32px;
+  height: 32px;
+}
+
+.admin-donation-empty h4 {
+  margin: 0;
+  color: #132b46;
+  font-family: "Poppins", sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.admin-donation-empty p {
+  max-width: 470px;
+  margin: 7px auto 18px;
+  color: #7b8794;
+  font-size: 0.81rem;
+  line-height: 1.6;
+}
+
+.admin-donation-empty .admin-donation-add {
+  min-height: 42px;
+}
+
+
+/*
+|---------------------------------------------------------------------------
+| SECOND ACCOUNT MISSING
+|---------------------------------------------------------------------------
+*/
+
+.admin-donation-missing {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 20px;
+  padding: 16px 18px;
+  background: #fffbeb;
+  border: 1px solid #f1dfae;
+  border-radius: 10px;
+}
+
+.admin-donation-missing-icon {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #b7791f;
+  background: #fff8dc;
+  border-radius: 50%;
+}
+
+.admin-donation-missing > div:nth-child(2) {
+  min-width: 0;
+  flex: 1;
+}
+
+.admin-donation-missing strong {
+  display: block;
+  margin-bottom: 3px;
+  color: #7c5a15;
+  font-size: 0.83rem;
+  font-weight: 700;
+}
+
+.admin-donation-missing p {
+  margin: 0;
+  color: #8a6b2b;
+  font-size: 0.76rem;
+  line-height: 1.5;
+}
+
+.admin-donation-missing button {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  flex-shrink: 0;
+  padding: 0 15px;
+  color: #ffffff;
+  background: #132b46;
+  border: 1px solid #132b46;
+  border-radius: 7px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.admin-donation-missing button:hover {
+  background: #1d3b5b;
+  transform: translateY(-1px);
+}
+
+
+/*
+|---------------------------------------------------------------------------
+| SPINNER
+|---------------------------------------------------------------------------
+*/
+
+.admin-spin {
+  animation: adminDonationSpin 0.9s linear infinite;
+}
+
+
+/*
+|---------------------------------------------------------------------------
+| ANIMATIONS
+|---------------------------------------------------------------------------
+*/
+
+@keyframes adminDonationSpin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes donationFormReveal {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+/*
+|---------------------------------------------------------------------------
+| TABLET
+|---------------------------------------------------------------------------
+*/
+
+@media (max-width: 900px) {
+
+  .admin-donation-accounts {
+    padding-bottom: 35px;
+  }
+
+  .admin-donation-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .admin-donation-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .admin-donation-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-form-group:nth-child(4) {
+    max-width: 100%;
+  }
+
+}
+
+
+/*
+|---------------------------------------------------------------------------
+| MOBILE
+|---------------------------------------------------------------------------
+*/
+
+@media (max-width: 768px) {
+
+  .admin-donation-accounts {
+    padding: 5px 0 30px;
+  }
+
+  .admin-donation-header {
+    gap: 20px;
+    margin-bottom: 22px;
+  }
+
+  .admin-donation-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .admin-donation-header p {
+    font-size: 0.84rem;
+  }
+
+  .admin-donation-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+  }
+
+  .admin-donation-refresh,
+  .admin-donation-add {
+    width: 100%;
+    padding: 0 12px;
+  }
+
+  .admin-donation-limit {
+    align-items: flex-start;
+    padding: 14px;
+  }
+
+  .admin-donation-limit-status {
+    align-self: center;
+    padding: 0 9px;
+    font-size: 0.7rem;
+  }
+
+  .admin-donation-form-card,
+  .admin-donation-list {
+    padding: 20px;
+  }
+
+  .admin-donation-form {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-form-group:nth-child(3),
+  .admin-form-group:nth-child(4),
+  .admin-donation-active-control,
+  .admin-donation-form-actions {
+    grid-column: span 1;
+  }
+
+  .admin-donation-list-header {
+    align-items: center;
+  }
+
+  .admin-donation-list-header h3 {
+    font-size: 1.08rem;
+  }
+
+  .admin-donation-count {
+    min-width: 55px;
+    height: 52px;
+  }
+
+  .admin-donation-missing {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .admin-donation-missing > div:nth-child(2) {
+    flex: 1;
+  }
+
+  .admin-donation-missing button {
+    width: 100%;
+    margin-left: 54px;
+  }
+
+}
+
+
+/*
+|---------------------------------------------------------------------------
+| SMALL MOBILE
+|---------------------------------------------------------------------------
+*/
+
+@media (max-width: 500px) {
+
+  .admin-donation-header h2 {
+    font-size: 1.35rem;
+  }
+
+  .admin-donation-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-donation-limit {
+    flex-wrap: wrap;
+  }
+
+  .admin-donation-limit-icon {
+    width: 38px;
+    height: 38px;
+  }
+
+  .admin-donation-limit > div:nth-child(2) {
+    flex: 1;
+  }
+
+  .admin-donation-limit-status {
+    width: 100%;
+    margin-left: 0;
+    justify-content: flex-start;
+  }
+
+  .admin-donation-form-card,
+  .admin-donation-list {
+    padding: 16px;
+    border-radius: 9px;
+  }
+
+  .admin-donation-form-header {
+    gap: 12px;
+    padding-bottom: 17px;
+    margin-bottom: 20px;
+  }
+
+  .admin-donation-form-header h3 {
+    font-size: 1.08rem;
+  }
+
+  .admin-donation-form-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .admin-donation-cancel,
+  .admin-donation-save {
+    width: 100%;
+  }
+
+  .admin-donation-list-header {
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .admin-donation-list-header h3 {
+    font-size: 1rem;
+  }
+
+  .admin-donation-count {
+    min-width: 50px;
+    height: 48px;
+    font-size: 1.05rem;
+  }
+
+  .admin-account-card {
+    padding: 19px 16px;
+  }
+
+  .admin-account-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-account-actions button {
+    width: 100%;
+  }
+
+  .admin-donation-missing {
+    padding: 14px;
+  }
+
+  .admin-donation-missing button {
+    margin-left: 0;
+  }
+
+}
+
+
+/*
+|---------------------------------------------------------------------------
+| VERY SMALL SCREENS
+|---------------------------------------------------------------------------
+*/
+
+@media (max-width: 360px) {
+
+  .admin-donation-header h2 {
+    font-size: 1.22rem;
+  }
+
+  .admin-donation-eyebrow {
+    font-size: 0.65rem;
+  }
+
+  .admin-donation-limit strong {
+    font-size: 0.84rem;
+  }
+
+  .admin-donation-limit span {
+    font-size: 0.72rem;
+  }
+
+  .admin-account-card-top {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .admin-account-status {
+    align-self: flex-start;
+  }
+
+  .admin-account-bank {
+    align-items: flex-start;
+  }
+
+  .admin-account-public-status {
+    align-items: flex-start;
+  }
+
+}
+
+
+/*
+|---------------------------------------------------------------------------
+| ACCESSIBILITY
+|---------------------------------------------------------------------------
+*/
+
+.admin-donation-accounts button:focus-visible,
+.admin-donation-accounts input:focus-visible,
+.admin-donation-accounts select:focus-visible {
+  outline: 2px solid #dca336;
+  outline-offset: 2px;
+}
+
+
+/*
+|---------------------------------------------------------------------------
+| REDUCED MOTION
+|---------------------------------------------------------------------------
+*/
+
+@media (prefers-reduced-motion: reduce) {
+
+  .admin-donation-accounts *,
+  .admin-donation-accounts *::before,
+  .admin-donation-accounts *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+
+}

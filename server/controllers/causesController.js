@@ -1,0 +1,494 @@
+const Causes = require("../models/Causes");
+
+
+// ========================================
+// DEFAULT CAUSES
+// ========================================
+
+const defaultCauses = [
+  {
+    number: "01",
+    title: "Widows Support & Empowerment",
+    description:
+      "Helping widows access practical support, resources and opportunities for greater independence.",
+    imageUrl: "",
+    order: 1
+  },
+
+  {
+    number: "02",
+    title: "Orphanage Support & Child Welfare",
+    description:
+      "Supporting the well-being, education and development of vulnerable children.",
+    imageUrl: "",
+    order: 2
+  },
+
+  {
+    number: "03",
+    title: "Special Needs Awareness & Support",
+    description:
+      "Supporting individuals with special needs through care, awareness and meaningful opportunities.",
+    imageUrl: "",
+    order: 3
+  },
+
+  {
+    number: "04",
+    title: "Elderly People Care & Community Support",
+    description:
+      "Providing care and support that promotes dignity and well-being among elderly people.",
+    imageUrl: "",
+    order: 4
+  },
+
+  {
+    number: "05",
+    title: "Community Outreach & Humanitarian Assistance",
+    description:
+      "Extending practical assistance to individuals and communities in need.",
+    imageUrl: "",
+    order: 5
+  }
+];
+
+
+// ========================================
+// GET CAUSES
+// ========================================
+
+const getCauses = async (req, res) => {
+
+  try {
+
+    let causes = await Causes.findOne();
+
+
+    // ------------------------------------
+    // CREATE INITIAL DOCUMENT
+    // ------------------------------------
+
+    if (!causes) {
+
+      causes = await Causes.create({
+
+        hero: {
+          title: "Our Causes",
+
+          description:
+            "Supporting people and communities where care is needed most.",
+
+          imageUrl: ""
+        },
+
+
+        intro: {
+          eyebrow:
+            "WHAT WE CARE ABOUT",
+
+          title:
+            "Creating Change Where It Matters",
+
+          description:
+            "Our work focuses on providing care, support and opportunities to vulnerable individuals and communities."
+        },
+
+
+        causes: defaultCauses,
+
+
+        approach: {
+          eyebrow:
+            "OUR APPROACH",
+
+          title:
+            "Compassion in Action",
+
+          description:
+            "We work through care, empowerment, advocacy and community partnerships to create meaningful change.",
+
+          imageUrl: ""
+        },
+
+
+        cta: {
+          eyebrow:
+            "MAKE A DIFFERENCE",
+
+          title:
+            "Be Part of the Change",
+
+          description:
+            "Your support can help us reach those who need it most.",
+
+          donateText:
+            "DONATE NOW",
+
+          involvedText:
+            "GET INVOLVED"
+        }
+
+      });
+
+    }
+
+
+    // ------------------------------------
+    // RETURN DATA
+    // ------------------------------------
+
+    return res.status(200).json({
+
+      success: true,
+
+      causes
+
+    });
+
+  } catch (error) {
+
+    console.error(
+      "GET CAUSES ERROR:",
+      error
+    );
+
+
+    return res.status(500).json({
+
+      success: false,
+
+      message:
+        "Unable to fetch causes."
+
+    });
+
+  }
+
+};
+
+
+
+// ========================================
+// UPDATE CAUSES
+// ========================================
+
+const updateCauses = async (req, res) => {
+
+  try {
+
+    // ------------------------------------
+    // FIND EXISTING DOCUMENT
+    // ------------------------------------
+
+    let causes =
+      await Causes.findOne();
+
+
+    // ------------------------------------
+    // CREATE IF NOT EXISTS
+    // ------------------------------------
+
+    if (!causes) {
+
+      causes =
+        new Causes();
+
+    }
+
+
+    // ====================================
+    // TEXT DATA
+    // ====================================
+
+    if (req.body.hero) {
+
+      causes.hero =
+        JSON.parse(
+          req.body.hero
+        );
+
+    }
+
+
+    if (req.body.intro) {
+
+      causes.intro =
+        JSON.parse(
+          req.body.intro
+        );
+
+    }
+
+
+    if (req.body.causes) {
+
+      causes.causes =
+        JSON.parse(
+          req.body.causes
+        );
+
+    }
+
+
+    if (req.body.approach) {
+
+      causes.approach =
+        JSON.parse(
+          req.body.approach
+        );
+
+    }
+
+
+    if (req.body.cta) {
+
+      causes.cta =
+        JSON.parse(
+          req.body.cta
+        );
+
+    }
+
+
+    // ====================================
+    // HERO IMAGE
+    // ====================================
+
+    if (
+      req.files?.heroImage?.[0]
+    ) {
+
+      const heroFile =
+        req.files.heroImage[0];
+
+
+      causes.hero.imageUrl =
+        `/uploads/causes/${heroFile.filename}`;
+
+    }
+
+
+    // ====================================
+    // APPROACH IMAGE
+    // ====================================
+
+    if (
+      req.files?.approachImage?.[0]
+    ) {
+
+      const approachFile =
+        req.files.approachImage[0];
+
+
+      causes.approach.imageUrl =
+        `/uploads/causes/${approachFile.filename}`;
+
+    }
+
+
+    // ====================================
+    // CAUSE IMAGES
+    // ====================================
+    //
+    // IMPORTANT:
+    //
+    // Multer is configured with:
+    //
+    // causeImage_0
+    // causeImage_1
+    // causeImage_2
+    // causeImage_3
+    // etc.
+    //
+    // Therefore req.files is an OBJECT:
+    //
+    // {
+    //   heroImage: [...],
+    //   approachImage: [...],
+    //   causeImage_0: [...],
+    //   causeImage_1: [...],
+    //   causeImage_2: [...]
+    // }
+    //
+    // We must loop through the object
+    // and find the causeImage_X fields.
+    // ====================================
+
+    if (req.files) {
+
+      Object.keys(req.files).forEach(
+        (fieldName) => {
+
+          // --------------------------------
+          // Ignore non-cause images
+          // --------------------------------
+
+          if (
+            !fieldName.startsWith(
+              "causeImage_"
+            )
+          ) {
+
+            return;
+
+          }
+
+
+          // --------------------------------
+          // Extract index
+          // --------------------------------
+
+          const index =
+            Number(
+              fieldName.replace(
+                "causeImage_",
+                ""
+              )
+            );
+
+
+          // --------------------------------
+          // Validate index
+          // --------------------------------
+
+          if (
+            Number.isNaN(index)
+          ) {
+
+            return;
+
+          }
+
+
+          // --------------------------------
+          // Get uploaded file
+          // --------------------------------
+
+          const file =
+            req.files[fieldName]?.[0];
+
+
+          if (!file) {
+
+            return;
+
+          }
+
+
+          // --------------------------------
+          // Make sure cause exists
+          // --------------------------------
+
+          if (
+            !causes.causes ||
+            !causes.causes[index]
+          ) {
+
+            return;
+
+          }
+
+
+          // --------------------------------
+          // SAVE IMAGE URL
+          // --------------------------------
+
+          causes.causes[index].imageUrl =
+            `/uploads/causes/${file.filename}`;
+
+        }
+      );
+
+    }
+
+
+    // ====================================
+    // NORMALIZE CAUSE ORDER
+    // ====================================
+
+    if (
+      Array.isArray(causes.causes)
+    ) {
+
+      causes.causes =
+        causes.causes.map(
+          (cause, index) => ({
+
+            ...cause,
+
+            number:
+              cause.number ||
+              String(
+                index + 1
+              ).padStart(
+                2,
+                "0"
+              ),
+
+            order:
+              cause.order ||
+              index + 1
+
+          })
+        );
+
+    }
+
+
+    // ====================================
+    // SAVE DATABASE
+    // ====================================
+
+    await causes.save();
+
+
+    // ====================================
+    // RETURN UPDATED DATA
+    // ====================================
+
+    return res.status(200).json({
+
+      success: true,
+
+      message:
+        "Causes updated successfully.",
+
+      causes
+
+    });
+
+  } catch (error) {
+
+    console.error(
+      "UPDATE CAUSES ERROR:",
+      error
+    );
+
+
+    return res.status(500).json({
+
+      success: false,
+
+      message:
+        error.message ||
+        "Unable to update causes."
+
+    });
+
+  }
+
+};
+
+
+
+// ========================================
+// EXPORT
+// ========================================
+
+module.exports = {
+
+  getCauses,
+
+  updateCauses
+
+};

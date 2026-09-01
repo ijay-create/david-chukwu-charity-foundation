@@ -1,0 +1,218 @@
+/* ========================================
+   ADMIN LAYOUT
+======================================== */
+
+.admin-layout {
+  width: 100%;
+  min-height: 100vh;
+
+  display: flex;
+
+  background: #f6f7f9;
+}
+
+
+/* ========================================
+   ADMIN MAIN
+======================================== */
+
+.admin-main {
+  width: calc(100% - 260px);
+
+  min-height: 100vh;
+
+  margin-left: 260px;
+
+  display: flex;
+  flex-direction: column;
+
+  box-sizing: border-box;
+}
+
+
+/* ========================================
+   ADMIN HEADER
+======================================== */
+
+.admin-header {
+  width: 100%;
+
+  min-height: 88px;
+
+  padding: 0 32px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  background: #ffffff;
+
+  border-bottom:
+    1px solid #e5e7eb;
+}
+
+
+.admin-header-left {
+  display: flex;
+  align-items: center;
+
+  gap: 16px;
+}
+
+
+.admin-page-title {
+  display: flex;
+  flex-direction: column;
+
+  gap: 3px;
+}
+
+
+.admin-page-title h1 {
+  margin: 0;
+
+  color: #172033;
+
+  font-size: 22px;
+  font-weight: 650;
+}
+
+
+.admin-page-title span {
+  color: #8a919d;
+
+  font-size: 12px;
+}
+
+
+/* ========================================
+   HEADER RIGHT
+======================================== */
+
+.admin-header-right {
+  display: flex;
+  align-items: center;
+
+  gap: 18px;
+}
+
+
+.admin-header-foundation {
+  color: #667085;
+
+  font-size: 13px;
+  font-weight: 500;
+}
+
+
+/* ========================================
+   MOBILE MENU BUTTON
+======================================== */
+
+.admin-menu-button {
+  display: none;
+
+  width: 40px;
+  height: 40px;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border:
+    1px solid #e5e7eb;
+
+  border-radius: 7px;
+
+  background: #ffffff;
+
+  color: #172033;
+
+  cursor: pointer;
+}
+
+
+.admin-menu-button:hover {
+  background: #f6f7f9;
+}
+
+
+/* ========================================
+   ADMIN CONTENT
+======================================== */
+
+.admin-content {
+  flex: 1;
+
+  width: 100%;
+
+  padding: 32px;
+
+  box-sizing: border-box;
+}
+
+
+/* ========================================
+   MOBILE
+======================================== */
+
+@media (max-width: 991px) {
+
+  .admin-main {
+    width: 100%;
+
+    margin-left: 0;
+  }
+
+
+  .admin-menu-button {
+    display: flex;
+  }
+
+
+  .admin-header {
+    padding: 0 20px;
+  }
+
+
+  .admin-content {
+    padding: 24px 20px;
+  }
+
+
+  .admin-header-foundation {
+    display: none;
+  }
+
+}
+
+
+/* ========================================
+   SMALL MOBILE
+======================================== */
+
+@media (max-width: 600px) {
+
+  .admin-header {
+    min-height: 72px;
+  }
+
+
+  .admin-page-title h1 {
+    font-size: 18px;
+  }
+
+
+  .admin-page-title span {
+    display: none;
+  }
+
+
+  .admin-content {
+    padding: 20px 15px;
+  }
+
+}

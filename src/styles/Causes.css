@@ -1,0 +1,106 @@
+.causes {
+  background: #f4f1ea;
+}
+
+.causes-header {
+  max-width: 650px;
+  margin: 0 auto 45px;
+  text-align: center;
+}
+
+.causes-header h2 {
+  color: #132b46;
+  font-family: "Poppins", sans-serif;
+  font-size: 2.4rem;
+  margin-bottom: 10px;
+}
+
+.causes-header p {
+  color: #4b5563;
+  font-family: "Open Sans", sans-serif;
+  line-height: 1.7;
+}
+
+.causes-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 22px;
+}
+
+.cause-card {
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  transition: transform .3s ease, box-shadow .3s ease;
+}
+
+.cause-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 30px rgba(19,43,70,.12);
+}
+
+.cause-card img {
+  display: block;
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+}
+
+.cause-card-content {
+  padding: 20px;
+}
+
+.cause-card h3 {
+  color: #132b46;
+  font-family: "Poppins", sans-serif;
+  font-size: 1.2rem;
+  margin-bottom: 7px;
+}
+
+.cause-card p {
+  color: #6b7280;
+  font-family: "Open Sans", sans-serif;
+  font-size: .84rem;
+  line-height: 1.5;
+}
+
+.cause-card {
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  transition: transform .35s ease, box-shadow .35s ease;
+}
+
+.cause-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 15px 35px rgba(19, 43, 70, .15);
+}
+
+.cause-card img {
+  display: block;
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  transition: transform .5s ease;
+}
+
+.cause-card:hover img {
+  transform: scale(1.04);
+}
+
+@media (max-width: 992px) {
+  .causes-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .causes-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .causes-header h2 {
+    font-size: 2rem;
+  }
+}
+

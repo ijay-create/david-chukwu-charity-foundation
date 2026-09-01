@@ -1,0 +1,307 @@
+/* ============================================================
+   NEWSLETTER
+   David Chukwu Charity Foundation
+   ============================================================ */
+
+.newsletter-section {
+  width: 100%;
+  background: #132b46;
+  padding: 70px 24px;
+  box-sizing: border-box;
+}
+
+.newsletter-container {
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+/* ============================================================
+   LABEL
+   ============================================================ */
+
+.newsletter-label {
+  display: block;
+
+  margin-bottom: 10px;
+
+  color: #dca336;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  letter-spacing: 1.8px;
+
+  text-transform: uppercase;
+}
+
+/* ============================================================
+   HEADING
+   ============================================================ */
+
+.newsletter-heading {
+  margin: 0 0 14px;
+
+  color: #ffffff;
+
+  font-size: 32px;
+  font-weight: 700;
+
+  line-height: 1.25;
+
+  letter-spacing: -0.4px;
+}
+
+/* ============================================================
+   DESCRIPTION
+   ============================================================ */
+
+.newsletter-description {
+  max-width: 620px;
+
+  margin: 0 auto 30px;
+
+  color: rgba(255, 255, 255, 0.78);
+
+  font-size: 15px;
+
+  line-height: 1.7;
+}
+
+/* ============================================================
+   FORM
+   ============================================================ */
+
+.newsletter-form {
+  width: 100%;
+}
+
+/* ============================================================
+   INPUT GROUP
+   ============================================================ */
+
+.newsletter-input-group {
+  display: flex;
+  align-items: stretch;
+
+  gap: 10px;
+
+  width: 100%;
+}
+
+/* ============================================================
+   INPUT
+   ============================================================ */
+
+.newsletter-input {
+  flex: 1;
+
+  min-width: 0;
+
+  height: 52px;
+
+  padding: 0 17px;
+
+  box-sizing: border-box;
+
+  border: 2px solid transparent;
+
+  border-radius: 8px;
+
+  background: #ffffff;
+
+  color: #132b46;
+
+  font-size: 14px;
+
+  outline: none;
+
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.newsletter-input::placeholder {
+  color: #94a3b8;
+}
+
+.newsletter-input:focus {
+  border-color: #dca336;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(220, 163, 54, 0.18);
+}
+
+.newsletter-input:disabled {
+  opacity: 0.7;
+
+  cursor: not-allowed;
+}
+
+/* ============================================================
+   BUTTON
+   ============================================================ */
+
+.newsletter-button {
+  flex-shrink: 0;
+
+  min-width: 135px;
+
+  height: 52px;
+
+  padding: 0 24px;
+
+  border: none;
+
+  border-radius: 8px;
+
+  background: #dca336;
+
+  color: #ffffff;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background 0.25s ease,
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.newsletter-button:hover:not(:disabled) {
+  background: #c6922d;
+
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 8px 18px
+    rgba(0, 0, 0, 0.18);
+}
+
+.newsletter-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.newsletter-button:disabled {
+  opacity: 0.65;
+
+  cursor: not-allowed;
+
+  transform: none;
+
+  box-shadow: none;
+}
+
+/* ============================================================
+   MESSAGE
+   ============================================================ */
+
+.newsletter-message {
+  margin: 15px 0 0;
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+  line-height: 1.5;
+}
+
+.newsletter-message.success {
+  color: #86efac;
+}
+
+.newsletter-message.error {
+  color: #fca5a5;
+}
+
+/* ============================================================
+   FOCUS ACCESSIBILITY
+   ============================================================ */
+
+.newsletter-button:focus-visible {
+  outline: 3px solid #ffffff;
+
+  outline-offset: 3px;
+}
+
+/* ============================================================
+   TABLET
+   ============================================================ */
+
+@media (max-width: 768px) {
+
+  .newsletter-section {
+    padding: 60px 20px;
+  }
+
+  .newsletter-heading {
+    font-size: 28px;
+  }
+
+  .newsletter-description {
+    font-size: 14px;
+  }
+}
+
+/* ============================================================
+   MOBILE
+   ============================================================ */
+
+@media (max-width: 600px) {
+
+  .newsletter-section {
+    padding: 50px 18px;
+  }
+
+  .newsletter-heading {
+    font-size: 25px;
+  }
+
+  .newsletter-input-group {
+    flex-direction: column;
+  }
+
+  .newsletter-input,
+  .newsletter-button {
+    width: 100%;
+  }
+
+  .newsletter-button {
+    min-width: 0;
+  }
+}
+
+/* ============================================================
+   SMALL MOBILE
+   ============================================================ */
+
+@media (max-width: 400px) {
+
+  .newsletter-section {
+    padding: 45px 15px;
+  }
+
+  .newsletter-heading {
+    font-size: 23px;
+  }
+
+  .newsletter-description {
+    font-size: 13px;
+  }
+}
+
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .newsletter-input,
+  .newsletter-button {
+    transition: none;
+  }
+}

@@ -1,0 +1,780 @@
+/* =========================================================
+   ADMIN DONATIONS
+   ========================================================= */
+
+.admin-page {
+  width: 100%;
+  max-width: 1380px;
+  margin: 0 auto;
+  padding: 32px;
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   PAGE HEADER
+   ========================================================= */
+
+.admin-page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+
+.admin-page-header h1 {
+  margin: 0;
+  color: #20252b;
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.4px;
+}
+
+.admin-page-header p {
+  margin: 8px 0 0;
+  color: #737a82;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* =========================================================
+   PRIMARY / SECONDARY BUTTONS
+   ========================================================= */
+
+.btn-primary,
+.btn-secondary {
+  min-height: 42px;
+  padding: 0 17px;
+  border-radius: 7px;
+  border: 1px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.btn-primary {
+  background: #26352d;
+  color: #ffffff;
+}
+
+.btn-primary:hover {
+  background: #1d2923;
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: #ffffff;
+  color: #444b52;
+  border-color: #dfe3e6;
+}
+
+.btn-secondary:hover {
+  background: #f6f7f7;
+  border-color: #cfd4d8;
+}
+
+/* =========================================================
+   DONATION SUMMARY
+   ========================================================= */
+
+.admin-donation-summary {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.admin-summary-card {
+  min-width: 0;
+  min-height: 108px;
+  padding: 20px;
+  background: #ffffff;
+  border: 1px solid #e5e8e6;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  box-sizing: border-box;
+  box-shadow: 0 2px 8px rgba(20, 30, 25, 0.035);
+}
+
+.admin-summary-icon {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  border-radius: 8px;
+  background: #eef3ef;
+  color: #3f5c4b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-summary-card > div:last-child {
+  min-width: 0;
+}
+
+.admin-summary-card span {
+  display: block;
+  margin-bottom: 5px;
+  color: #7a8187;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.admin-summary-card strong {
+  display: block;
+  color: #242a2e;
+  font-size: 22px;
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+/* =========================================================
+   TOOLBAR
+   ========================================================= */
+
+.admin-toolbar {
+  width: 100%;
+  min-height: 64px;
+  padding: 11px 13px;
+  margin-bottom: 18px;
+  background: #ffffff;
+  border: 1px solid #e5e8e6;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  box-sizing: border-box;
+}
+
+.admin-search {
+  width: min(100%, 500px);
+  height: 40px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 0 12px;
+  border: 1px solid #dfe3e1;
+  border-radius: 7px;
+  background: #fafbfa;
+  color: #8a9197;
+  box-sizing: border-box;
+}
+
+.admin-search:focus-within {
+  border-color: #899c90;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(91, 116, 99, 0.08);
+}
+
+.admin-search svg {
+  flex: 0 0 auto;
+}
+
+.admin-search input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #30363b;
+  font: inherit;
+  font-size: 13px;
+}
+
+.admin-search input::placeholder {
+  color: #9ca2a7;
+}
+
+/* =========================================================
+   FILTERS
+   ========================================================= */
+
+.admin-filters {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-filter-select {
+  height: 40px;
+  min-width: 145px;
+  padding: 0 34px 0 11px;
+  border: 1px solid #dfe3e1;
+  border-radius: 7px;
+  background: #ffffff;
+  color: #444b50;
+  font-size: 13px;
+  outline: none;
+  cursor: pointer;
+}
+
+.admin-filter-select:focus {
+  border-color: #899c90;
+}
+
+/* =========================================================
+   TABLE
+   ========================================================= */
+
+.admin-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  background: #ffffff;
+  border: 1px solid #e5e8e6;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(20, 30, 25, 0.035);
+}
+
+.admin-table {
+  width: 100%;
+  min-width: 920px;
+  border-collapse: collapse;
+  table-layout: auto;
+}
+
+.admin-table thead {
+  background: #f7f8f7;
+}
+
+.admin-table th {
+  padding: 13px 16px;
+  border-bottom: 1px solid #e3e6e4;
+  color: #70777d;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: left;
+  text-transform: uppercase;
+  letter-spacing: 0.45px;
+  white-space: nowrap;
+}
+
+.admin-table td {
+  padding: 15px 16px;
+  border-bottom: 1px solid #edf0ee;
+  color: #4c5358;
+  font-size: 13px;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.admin-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.admin-table tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+.admin-table tbody tr:hover {
+  background: #fafcfb;
+}
+
+.admin-table td:first-child strong {
+  color: #353c40;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* =========================================================
+   DONOR INFORMATION
+   ========================================================= */
+
+.donor-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 150px;
+}
+
+.donor-info strong {
+  color: #30363a;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.donor-info span {
+  color: #858c91;
+  font-size: 11px;
+}
+
+/* =========================================================
+   STATUS BADGES
+   ========================================================= */
+
+.admin-status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 78px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.admin-status-badge.completed {
+  background: #e9f5ed;
+  color: #327148;
+}
+
+.admin-status-badge.pending {
+  background: #fff5df;
+  color: #9a6a16;
+}
+
+.admin-status-badge.failed {
+  background: #fbeaea;
+  color: #a53f3f;
+}
+
+/* =========================================================
+   TABLE ACTION
+   ========================================================= */
+
+.admin-icon-btn {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid #dfe3e1;
+  border-radius: 6px;
+  background: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.admin-icon-btn.view {
+  color: #566b5e;
+}
+
+.admin-icon-btn.view:hover {
+  background: #eef3ef;
+  border-color: #cbd7cf;
+  transform: translateY(-1px);
+}
+
+/* =========================================================
+   EMPTY STATE
+   ========================================================= */
+
+.admin-empty-state {
+  height: 170px;
+  padding: 30px !important;
+  color: #858c91 !important;
+  text-align: center !important;
+  vertical-align: middle !important;
+  font-size: 13px !important;
+}
+
+/* =========================================================
+   MODAL OVERLAY
+   ========================================================= */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  padding: 25px;
+  background: rgba(22, 28, 25, 0.48);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   DONATION DETAILS MODAL
+   ========================================================= */
+
+.donation-details-modal {
+  width: min(100%, 650px);
+  max-height: calc(100vh - 50px);
+  overflow-y: auto;
+  padding: 0;
+  background: #ffffff;
+  border: 1px solid #e1e5e2;
+  border-radius: 12px;
+  box-shadow: 0 18px 60px rgba(20, 30, 25, 0.18);
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   MODAL HEADER
+   ========================================================= */
+
+.admin-modal-header {
+  min-height: 82px;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e8ebe9;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  box-sizing: border-box;
+}
+
+.admin-modal-header > div {
+  min-width: 0;
+}
+
+.admin-modal-header h2 {
+  margin: 8px 0 0;
+  color: #272e32;
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.admin-modal-close {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  border: 1px solid #e0e4e2;
+  border-radius: 7px;
+  background: #ffffff;
+  color: #737a7f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.admin-modal-close:hover {
+  background: #f4f6f5;
+  color: #30363a;
+}
+
+/* =========================================================
+   CATEGORY BADGE
+   ========================================================= */
+
+.admin-category-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 9px;
+  border-radius: 5px;
+  background: #edf3ef;
+  color: #4a6755;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+/* =========================================================
+   DONATION DETAIL SECTIONS
+   ========================================================= */
+
+.donation-detail-section {
+  padding: 20px 24px;
+  border-bottom: 1px solid #edf0ee;
+}
+
+.donation-detail-section:last-of-type {
+  border-bottom: 0;
+}
+
+.donation-detail-section h3 {
+  margin: 0 0 14px;
+  color: #343b3f;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* =========================================================
+   DETAIL GRID
+   ========================================================= */
+
+.donation-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.donation-detail-grid > div {
+  min-width: 0;
+  padding: 13px 14px;
+  background: #f8faf9;
+  border: 1px solid #e8ece9;
+  border-radius: 7px;
+}
+
+.donation-detail-grid span {
+  display: block;
+  margin-bottom: 5px;
+  color: #858c90;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.35px;
+}
+
+.donation-detail-grid strong {
+  display: block;
+  overflow: hidden;
+  color: #343b3f;
+  font-size: 13px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+}
+
+/* =========================================================
+   STATUS BUTTONS
+   ========================================================= */
+
+.donation-status-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.donation-status-buttons button {
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid #dfe3e1;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #656d72;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.donation-status-buttons button:hover {
+  background: #f6f8f7;
+  border-color: #cbd2ce;
+}
+
+.donation-status-buttons button.active {
+  background: #edf4ef;
+  border-color: #aebfb3;
+  color: #3c6048;
+}
+
+/* =========================================================
+   FORM INPUT
+   ========================================================= */
+
+.form-input {
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px solid #dfe3e1;
+  border-radius: 7px;
+  background: #ffffff;
+  color: #343a3e;
+  font-family: inherit;
+  font-size: 13px;
+  outline: none;
+  resize: vertical;
+  box-sizing: border-box;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.form-input:focus {
+  border-color: #899c90;
+  box-shadow: 0 0 0 3px rgba(91, 116, 99, 0.08);
+}
+
+/* =========================================================
+   SAVE NOTES
+   ========================================================= */
+
+.admin-save-notes {
+  margin-top: 10px;
+  min-height: 37px;
+  font-size: 12px;
+}
+
+/* =========================================================
+   MODAL FOOTER
+   ========================================================= */
+
+.admin-form-actions {
+  padding: 16px 24px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 9px;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1100px) {
+  .admin-page {
+    padding: 26px;
+  }
+
+  .admin-donation-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .admin-search {
+    width: 100%;
+  }
+
+  .admin-filters {
+    width: 100%;
+  }
+
+  .admin-filter-select {
+    flex: 1;
+  }
+}
+
+@media (max-width: 700px) {
+  .admin-page {
+    padding: 20px 15px;
+  }
+
+  .admin-page-header {
+    flex-direction: column;
+    margin-bottom: 22px;
+  }
+
+  .admin-page-header h1 {
+    font-size: 25px;
+  }
+
+  .admin-page-header .btn-primary {
+    width: 100%;
+  }
+
+  .admin-donation-summary {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .admin-summary-card {
+    min-height: 92px;
+    padding: 16px;
+  }
+
+  .admin-summary-card strong {
+    font-size: 20px;
+  }
+
+  .admin-filters {
+    flex-direction: column;
+  }
+
+  .admin-filter-select {
+    width: 100%;
+  }
+
+  .admin-table-wrapper {
+    border-radius: 8px;
+  }
+
+  .admin-table {
+    min-width: 850px;
+  }
+
+  .modal-overlay {
+    padding: 12px;
+    align-items: flex-start;
+  }
+
+  .donation-details-modal {
+    max-height: calc(100vh - 24px);
+    margin-top: 0;
+    border-radius: 10px;
+  }
+
+  .admin-modal-header {
+    padding: 17px;
+  }
+
+  .admin-modal-header h2 {
+    font-size: 18px;
+  }
+
+  .donation-detail-section {
+    padding: 17px;
+  }
+
+  .donation-detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-form-actions {
+    padding: 14px 17px 18px;
+  }
+}
+
+@media (max-width: 450px) {
+  .admin-page {
+    padding: 16px 12px;
+  }
+
+  .admin-page-header h1 {
+    font-size: 23px;
+  }
+
+  .admin-toolbar {
+    padding: 10px;
+  }
+
+  .admin-summary-card {
+    padding: 14px;
+  }
+
+  .admin-summary-icon {
+    width: 38px;
+    height: 38px;
+    flex-basis: 38px;
+  }
+
+  .admin-summary-card strong {
+    font-size: 19px;
+  }
+
+  .donation-status-buttons {
+    flex-direction: column;
+  }
+
+  .donation-status-buttons button {
+    width: 100%;
+  }
+
+  .admin-form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .admin-form-actions button {
+    width: 100%;
+  }
+}

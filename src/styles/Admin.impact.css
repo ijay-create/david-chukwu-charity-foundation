@@ -1,0 +1,1303 @@
+/* =========================================================
+   ADMIN IMPACT PAGE
+   David Chukwu Charity Foundation
+   ========================================================= */
+
+
+/* =========================================================
+   DESIGN TOKENS
+   ========================================================= */
+
+.admin-impact-page {
+  --impact-navy: #132b46;
+  --impact-navy-dark: #0d2035;
+  --impact-navy-light: #1c3b5c;
+
+  --impact-gold: #dca336;
+  --impact-gold-dark: #b9821f;
+  --impact-gold-light: #f2d28a;
+
+  --impact-beige: #f4f1ea;
+  --impact-beige-dark: #e9e4da;
+
+  --impact-white: #ffffff;
+  --impact-surface: #ffffff;
+  --impact-background: #f7f8fa;
+
+  --impact-text: #253446;
+  --impact-text-dark: #172536;
+  --impact-muted: #6b7280;
+  --impact-muted-light: #9ca3af;
+
+  --impact-border: #e3e7ec;
+  --impact-border-dark: #d3d9e1;
+
+  --impact-success: #287a55;
+  --impact-success-bg: #edf8f2;
+
+  --impact-danger: #b84b4b;
+  --impact-danger-bg: #fff2f2;
+
+  --impact-shadow-sm:
+    0 2px 8px rgba(19, 43, 70, 0.05);
+
+  --impact-shadow:
+    0 8px 24px rgba(19, 43, 70, 0.07);
+
+  --impact-shadow-lg:
+    0 16px 40px rgba(19, 43, 70, 0.1);
+
+  --impact-radius-sm: 8px;
+  --impact-radius: 12px;
+  --impact-radius-lg: 16px;
+
+  width: 100%;
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 32px;
+  color: var(--impact-text);
+}
+
+
+/* =========================================================
+   PAGE HEADER
+   ========================================================= */
+
+.admin-impact-page .admin-page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 32px;
+  margin-bottom: 28px;
+  padding-bottom: 26px;
+  border-bottom: 1px solid var(--impact-border);
+}
+
+.admin-impact-page .admin-page-header > div:first-child {
+  min-width: 0;
+}
+
+.admin-impact-page .admin-page-header h1 {
+  margin: 7px 0 8px;
+  color: var(--impact-navy);
+  font-size: clamp(28px, 3vw, 38px);
+  line-height: 1.15;
+  font-weight: 700;
+  letter-spacing: -0.7px;
+}
+
+.admin-impact-page .admin-page-header p {
+  max-width: 700px;
+  margin: 0;
+  color: var(--impact-muted);
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.admin-impact-page .admin-section-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--impact-gold-dark);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.admin-impact-page .admin-section-eyebrow::before {
+  content: "";
+  display: inline-block;
+  width: 22px;
+  height: 2px;
+  background: var(--impact-gold);
+}
+
+
+/* =========================================================
+   HEADER ACTIONS
+   ========================================================= */
+
+.admin-impact-header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+.admin-impact-page button {
+  font-family: inherit;
+}
+
+.admin-impact-page .btn-primary,
+.admin-impact-page .btn-secondary,
+.admin-impact-page .btn-danger-outline {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 17px;
+  border-radius: var(--impact-radius-sm);
+  border: 1px solid transparent;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.admin-impact-page .btn-primary {
+  color: var(--impact-white);
+  background: var(--impact-navy);
+  border-color: var(--impact-navy);
+  box-shadow: 0 4px 12px rgba(19, 43, 70, 0.15);
+}
+
+.admin-impact-page .btn-primary:hover:not(:disabled) {
+  background: var(--impact-navy-dark);
+  border-color: var(--impact-navy-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 7px 17px rgba(19, 43, 70, 0.2);
+}
+
+.admin-impact-page .btn-secondary {
+  color: var(--impact-navy);
+  background: var(--impact-white);
+  border-color: var(--impact-border-dark);
+}
+
+.admin-impact-page .btn-secondary:hover:not(:disabled) {
+  color: var(--impact-navy-dark);
+  background: var(--impact-beige);
+  border-color: #c6ccd4;
+  transform: translateY(-1px);
+}
+
+.admin-impact-page .btn-danger-outline {
+  color: var(--impact-danger);
+  background: var(--impact-white);
+  border-color: #e6baba;
+}
+
+.admin-impact-page .btn-danger-outline:hover:not(:disabled) {
+  color: #ffffff;
+  background: var(--impact-danger);
+  border-color: var(--impact-danger);
+}
+
+.admin-impact-page button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+
+/* =========================================================
+   ALERTS
+   ========================================================= */
+
+.admin-impact-page .admin-alert {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 22px;
+  padding: 14px 17px;
+  border-radius: var(--impact-radius-sm);
+  font-size: 14px;
+  line-height: 1.5;
+  border: 1px solid transparent;
+}
+
+.admin-impact-page .admin-alert strong {
+  flex-shrink: 0;
+  font-weight: 800;
+}
+
+.admin-impact-page .admin-alert-error {
+  color: #8e3434;
+  background: var(--impact-danger-bg);
+  border-color: #efcaca;
+}
+
+.admin-impact-page .admin-alert-success {
+  color: #216344;
+  background: var(--impact-success-bg);
+  border-color: #c8e8d7;
+}
+
+
+/* =========================================================
+   FORM
+   ========================================================= */
+
+.admin-impact-page .admin-impact-form {
+  width: 100%;
+}
+
+.admin-impact-page .admin-impact-form > * + * {
+  margin-top: 24px;
+}
+
+
+/* =========================================================
+   MAIN SECTIONS
+   ========================================================= */
+
+.admin-impact-page .admin-impact-section {
+  position: relative;
+  overflow: hidden;
+  background: var(--impact-surface);
+  border: 1px solid var(--impact-border);
+  border-radius: var(--impact-radius-lg);
+  box-shadow: var(--impact-shadow-sm);
+}
+
+.admin-impact-page .admin-impact-section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    var(--impact-gold),
+    rgba(220, 163, 54, 0.2)
+  );
+}
+
+.admin-impact-page .admin-impact-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 24px 26px;
+  border-bottom: 1px solid var(--impact-border);
+  background: #fcfcfd;
+}
+
+.admin-impact-page .admin-impact-section-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  min-width: 0;
+}
+
+.admin-impact-page .admin-impact-section-heading > span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  border-radius: 50%;
+  color: var(--impact-gold-dark);
+  background: var(--impact-beige);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+.admin-impact-page .admin-impact-section-heading h2 {
+  margin: 0 0 5px;
+  color: var(--impact-navy);
+  font-size: 19px;
+  line-height: 1.3;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+}
+
+.admin-impact-page .admin-impact-section-heading p {
+  max-width: 650px;
+  margin: 0;
+  color: var(--impact-muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+
+/* =========================================================
+   FORM GRID
+   ========================================================= */
+
+.admin-impact-page .admin-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  padding: 26px;
+}
+
+
+/* =========================================================
+   FORM GROUPS
+   ========================================================= */
+
+.admin-impact-page .form-group {
+  min-width: 0;
+}
+
+.admin-impact-page .form-label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--impact-text-dark);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+.admin-impact-page .form-input {
+  width: 100%;
+  min-height: 44px;
+  box-sizing: border-box;
+  padding: 11px 13px;
+  color: var(--impact-text-dark);
+  background: var(--impact-white);
+  border: 1px solid var(--impact-border-dark);
+  border-radius: var(--impact-radius-sm);
+  outline: none;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.admin-impact-page textarea.form-input {
+  min-height: 130px;
+  resize: vertical;
+}
+
+.admin-impact-page select.form-input {
+  cursor: pointer;
+  appearance: auto;
+}
+
+.admin-impact-page .form-input::placeholder {
+  color: var(--impact-muted-light);
+}
+
+.admin-impact-page .form-input:hover {
+  border-color: #b8c0ca;
+}
+
+.admin-impact-page .form-input:focus {
+  border-color: var(--impact-gold);
+  box-shadow: 0 0 0 3px rgba(220, 163, 54, 0.12);
+  background: #fffdfa;
+}
+
+
+/* =========================================================
+   HERO IMAGE EDITOR
+   ========================================================= */
+
+.admin-impact-page .admin-impact-image-editor {
+  display: grid;
+  grid-template-columns: minmax(300px, 1.25fr) minmax(260px, 0.75fr);
+  gap: 28px;
+  align-items: center;
+  padding: 26px;
+}
+
+.admin-impact-page .admin-impact-large-image-preview {
+  position: relative;
+  overflow: hidden;
+  min-height: 300px;
+  border-radius: var(--impact-radius);
+  border: 1px solid var(--impact-border);
+  background:
+    linear-gradient(
+      135deg,
+      #f0f2f5 0%,
+      #e7ebef 100%
+    );
+}
+
+.admin-impact-page .admin-impact-large-image-preview img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 300px;
+  max-height: 400px;
+  object-fit: cover;
+}
+
+.admin-impact-page .admin-impact-image-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.admin-impact-page .admin-impact-image-info h3 {
+  margin: 8px 0 7px;
+  color: var(--impact-navy);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.admin-impact-page .admin-impact-image-info p {
+  margin: 0 0 12px;
+  color: var(--impact-muted);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.admin-impact-page .admin-upload-note {
+  display: inline-block;
+  margin-bottom: 17px;
+  color: var(--impact-muted-light);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+
+/* =========================================================
+   IMAGE EMPTY STATE
+   ========================================================= */
+
+.admin-impact-page .admin-impact-image-empty {
+  width: 100%;
+  height: 100%;
+  min-height: inherit;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #9ca5af;
+  background:
+    repeating-linear-gradient(
+      45deg,
+      #f7f8fa,
+      #f7f8fa 10px,
+      #f2f4f6 10px,
+      #f2f4f6 20px
+    );
+}
+
+.admin-impact-page .admin-impact-image-empty svg {
+  opacity: 0.65;
+}
+
+.admin-impact-page .admin-impact-image-empty span {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+
+/* =========================================================
+   IMPACT LIST
+   ========================================================= */
+
+.admin-impact-page .admin-impact-list,
+.admin-impact-page .admin-impact-testimonials-list,
+.admin-impact-page .admin-impact-stats-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 22px 26px 26px;
+}
+
+
+/* =========================================================
+   PROJECT / TESTIMONIAL CARD
+   ========================================================= */
+
+.admin-impact-page .admin-impact-card,
+.admin-impact-page .admin-impact-testimonial-card {
+  overflow: hidden;
+  border: 1px solid var(--impact-border);
+  border-radius: var(--impact-radius);
+  background: var(--impact-white);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.admin-impact-page .admin-impact-card:hover,
+.admin-impact-page .admin-impact-testimonial-card:hover {
+  border-color: #cfd6df;
+  box-shadow: var(--impact-shadow-sm);
+}
+
+
+/* =========================================================
+   CARD HEADER
+   ========================================================= */
+
+.admin-impact-page .admin-impact-card-header {
+  min-height: 64px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 15px;
+  padding: 12px 17px;
+  background: #fafbfc;
+  border-bottom: 1px solid var(--impact-border);
+}
+
+.admin-impact-page .admin-impact-card-drag {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--impact-muted-light);
+}
+
+.admin-impact-page .admin-impact-card-drag svg {
+  cursor: grab;
+}
+
+.admin-impact-page .admin-impact-card-drag span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 31px;
+  height: 31px;
+  border-radius: 7px;
+  color: var(--impact-gold-dark);
+  background: var(--impact-beige);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.admin-impact-page .admin-impact-card-header strong {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--impact-navy);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.admin-impact-page .admin-impact-card-header > div:nth-child(2) span {
+  color: var(--impact-muted);
+  font-size: 11px;
+}
+
+
+/* =========================================================
+   CARD ACTIONS
+   ========================================================= */
+
+.admin-impact-page .admin-impact-card-actions,
+.admin-impact-page .admin-impact-stat-actions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.admin-impact-page .admin-icon-button {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  color: #64707e;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.admin-impact-page .admin-icon-button:hover:not(:disabled) {
+  color: var(--impact-navy);
+  background: var(--impact-beige);
+  border-color: var(--impact-border);
+}
+
+.admin-impact-page .admin-icon-button.admin-icon-danger {
+  color: var(--impact-danger);
+}
+
+.admin-impact-page .admin-icon-button.admin-icon-danger:hover:not(:disabled) {
+  color: #ffffff;
+  background: var(--impact-danger);
+  border-color: var(--impact-danger);
+}
+
+
+/* =========================================================
+   PROJECT CARD BODY
+   ========================================================= */
+
+.admin-impact-page .admin-impact-card-body {
+  display: grid;
+  grid-template-columns: 250px minmax(0, 1fr);
+  gap: 26px;
+  padding: 22px;
+}
+
+.admin-impact-page .admin-impact-image-column {
+  min-width: 0;
+}
+
+.admin-impact-page .admin-impact-image-preview {
+  width: 100%;
+  height: 190px;
+  overflow: hidden;
+  border-radius: var(--impact-radius-sm);
+  border: 1px solid var(--impact-border);
+  background: #f4f6f8;
+}
+
+.admin-impact-page .admin-impact-image-preview img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.admin-impact-page .admin-impact-upload-button {
+  width: 100%;
+  margin-top: 10px;
+}
+
+.admin-impact-page .admin-impact-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 17px;
+}
+
+
+/* =========================================================
+   STATS
+   ========================================================= */
+
+.admin-impact-page .admin-impact-stat-card {
+  overflow: hidden;
+  border: 1px solid var(--impact-border);
+  border-radius: var(--impact-radius);
+  background: var(--impact-white);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.admin-impact-page .admin-impact-stat-card:hover {
+  border-color: #cfd6df;
+  box-shadow: var(--impact-shadow-sm);
+}
+
+.admin-impact-page .admin-impact-stat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 17px;
+  background: #fafbfc;
+  border-bottom: 1px solid var(--impact-border);
+}
+
+.admin-impact-page .admin-impact-stat-number {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--impact-gold-dark);
+}
+
+.admin-impact-page .admin-impact-stat-number span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 31px;
+  height: 31px;
+  border-radius: 7px;
+  color: var(--impact-gold-dark);
+  background: var(--impact-beige);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.admin-impact-page .admin-impact-stat-body {
+  display: grid;
+  grid-template-columns: 0.8fr 1fr 1.5fr;
+  gap: 18px;
+  padding: 22px;
+}
+
+
+/* =========================================================
+   GALLERY GRID
+   ========================================================= */
+
+.admin-impact-page .admin-impact-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  padding: 22px 26px 26px;
+}
+
+.admin-impact-page .admin-impact-gallery-card {
+  overflow: hidden;
+  border: 1px solid var(--impact-border);
+  border-radius: var(--impact-radius);
+  background: var(--impact-white);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.admin-impact-page .admin-impact-gallery-card:hover {
+  border-color: #cfd6df;
+  box-shadow: var(--impact-shadow);
+  transform: translateY(-2px);
+}
+
+.admin-impact-page .admin-impact-gallery-header {
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 11px 9px 13px;
+  border-bottom: 1px solid var(--impact-border);
+  background: #fafbfc;
+}
+
+.admin-impact-page .admin-impact-gallery-position {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--impact-muted-light);
+}
+
+.admin-impact-page .admin-impact-gallery-position span {
+  color: var(--impact-gold-dark);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.admin-impact-page .admin-impact-gallery-preview {
+  width: 100%;
+  height: 215px;
+  overflow: hidden;
+  background: #f3f5f7;
+}
+
+.admin-impact-page .admin-impact-gallery-preview img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.35s ease;
+}
+
+.admin-impact-page .admin-impact-gallery-card:hover
+.admin-impact-gallery-preview img {
+  transform: scale(1.025);
+}
+
+.admin-impact-page .admin-impact-gallery-card
+.admin-impact-image-empty {
+  min-height: 215px;
+}
+
+.admin-impact-page .admin-impact-gallery-upload {
+  width: calc(100% - 24px);
+  margin: 12px;
+}
+
+.admin-impact-page .admin-impact-gallery-card .form-group {
+  padding: 0 12px 16px;
+}
+
+
+/* =========================================================
+   TESTIMONIALS
+   ========================================================= */
+
+.admin-impact-page .admin-impact-testimonial-body {
+  display: grid;
+  grid-template-columns: 210px minmax(0, 1fr);
+  gap: 26px;
+  padding: 22px;
+}
+
+.admin-impact-page .admin-impact-testimonial-image-column {
+  min-width: 0;
+}
+
+.admin-impact-page .admin-impact-testimonial-preview {
+  width: 100%;
+  height: 210px;
+  overflow: hidden;
+  border: 1px solid var(--impact-border);
+  border-radius: var(--impact-radius-sm);
+  background: #f4f6f8;
+}
+
+.admin-impact-page .admin-impact-testimonial-preview img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.admin-impact-page .admin-impact-testimonial-image-column
+.btn-secondary {
+  width: 100%;
+  margin-top: 10px;
+}
+
+.admin-impact-page .admin-impact-testimonial-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+
+/* =========================================================
+   SAVE BAR
+   ========================================================= */
+
+.admin-impact-page .admin-impact-save-bar {
+  position: sticky;
+  bottom: 18px;
+  z-index: 20;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+
+  padding: 17px 20px;
+
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid var(--impact-border-dark);
+  border-radius: var(--impact-radius);
+
+  box-shadow:
+    0 10px 35px rgba(19, 43, 70, 0.13);
+
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.admin-impact-page .admin-impact-save-bar > div {
+  min-width: 0;
+}
+
+.admin-impact-page .admin-impact-save-bar strong {
+  display: block;
+  margin-bottom: 3px;
+  color: var(--impact-navy);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.admin-impact-page .admin-impact-save-bar span {
+  display: block;
+  color: var(--impact-muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+
+/* =========================================================
+   LOADING STATE
+   ========================================================= */
+
+.admin-impact-page .admin-empty-state {
+  min-height: 360px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 50px 24px;
+  text-align: center;
+  background: var(--impact-white);
+  border: 1px solid var(--impact-border);
+  border-radius: var(--impact-radius-lg);
+  box-shadow: var(--impact-shadow-sm);
+}
+
+.admin-impact-page .admin-empty-state h3 {
+  margin: 16px 0 7px;
+  color: var(--impact-navy);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.admin-impact-page .admin-empty-state p {
+  max-width: 400px;
+  margin: 0;
+  color: var(--impact-muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.admin-impact-page .admin-loading-icon {
+  color: var(--impact-gold);
+  animation: adminImpactSpin 1.1s linear infinite;
+}
+
+@keyframes adminImpactSpin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+/* =========================================================
+   SCROLLBAR
+   ========================================================= */
+
+.admin-impact-page ::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+.admin-impact-page ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.admin-impact-page ::-webkit-scrollbar-thumb {
+  background: #cbd1d8;
+  border-radius: 20px;
+}
+
+.admin-impact-page ::-webkit-scrollbar-thumb:hover {
+  background: #aeb6c0;
+}
+
+
+/* =========================================================
+   RESPONSIVE — LARGE TABLETS
+   ========================================================= */
+
+@media (max-width: 1100px) {
+
+  .admin-impact-page {
+    padding: 26px;
+  }
+
+  .admin-impact-page .admin-impact-image-editor {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-impact-page .admin-impact-large-image-preview {
+    min-height: 320px;
+  }
+
+  .admin-impact-page .admin-impact-large-image-preview img {
+    min-height: 320px;
+    max-height: 430px;
+  }
+
+  .admin-impact-page .admin-impact-gallery-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-impact-page .admin-impact-stat-body {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .admin-impact-page .admin-impact-stat-body .form-group:last-child {
+    grid-column: 1 / -1;
+  }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE — TABLETS
+   ========================================================= */
+
+@media (max-width: 800px) {
+
+  .admin-impact-page {
+    padding: 20px;
+  }
+
+  .admin-impact-page .admin-page-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .admin-impact-header-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .admin-impact-page .admin-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-impact-page .admin-impact-card-body {
+    grid-template-columns: 190px minmax(0, 1fr);
+    gap: 18px;
+  }
+
+  .admin-impact-page .admin-impact-testimonial-body {
+    grid-template-columns: 180px minmax(0, 1fr);
+    gap: 18px;
+  }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE — MOBILE
+   ========================================================= */
+
+@media (max-width: 620px) {
+
+  .admin-impact-page {
+    padding: 15px;
+  }
+
+  .admin-impact-page .admin-page-header {
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+  }
+
+  .admin-impact-page .admin-page-header h1 {
+    font-size: 28px;
+  }
+
+  .admin-impact-page .admin-page-header p {
+    font-size: 13px;
+  }
+
+  .admin-impact-header-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+  }
+
+  .admin-impact-header-actions .btn-primary {
+    grid-column: 1 / -1;
+    order: -1;
+  }
+
+  .admin-impact-page .admin-impact-section-header {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 19px;
+  }
+
+  .admin-impact-page .admin-impact-section-header > .btn-secondary {
+    width: 100%;
+  }
+
+  .admin-impact-page .admin-impact-section-heading {
+    gap: 11px;
+  }
+
+  .admin-impact-page .admin-impact-section-heading > span {
+    width: 34px;
+    height: 34px;
+    flex-basis: 34px;
+  }
+
+  .admin-impact-page .admin-impact-section-heading h2 {
+    font-size: 17px;
+  }
+
+  .admin-impact-page .admin-impact-section-heading p {
+    font-size: 12px;
+  }
+
+  .admin-impact-page .admin-impact-image-editor {
+    padding: 18px;
+    gap: 18px;
+  }
+
+  .admin-impact-page .admin-impact-large-image-preview,
+  .admin-impact-page .admin-impact-large-image-preview img {
+    min-height: 210px;
+    height: 210px;
+  }
+
+  .admin-impact-page .admin-form-grid {
+    padding: 18px;
+    gap: 17px;
+  }
+
+  .admin-impact-page .admin-impact-list,
+  .admin-impact-page .admin-impact-testimonials-list,
+  .admin-impact-page .admin-impact-stats-list {
+    padding: 17px;
+  }
+
+  .admin-impact-page .admin-impact-card-header {
+    grid-template-columns: auto minmax(0, 1fr);
+    padding: 11px 13px;
+  }
+
+  .admin-impact-page .admin-impact-card-actions {
+    grid-column: 1 / -1;
+    justify-content: flex-end;
+    padding-top: 4px;
+    border-top: 1px solid var(--impact-border);
+  }
+
+  .admin-impact-page .admin-impact-card-body {
+    grid-template-columns: 1fr;
+    padding: 17px;
+  }
+
+  .admin-impact-page .admin-impact-image-preview {
+    height: 220px;
+  }
+
+  .admin-impact-page .admin-impact-gallery-grid {
+    grid-template-columns: 1fr;
+    padding: 17px;
+  }
+
+  .admin-impact-page .admin-impact-gallery-preview {
+    height: 240px;
+  }
+
+  .admin-impact-page .admin-impact-gallery-card
+  .admin-impact-image-empty {
+    min-height: 240px;
+  }
+
+  .admin-impact-page .admin-impact-stat-header {
+    padding: 11px 13px;
+  }
+
+  .admin-impact-page .admin-impact-stat-body {
+    grid-template-columns: 1fr;
+    padding: 17px;
+    gap: 15px;
+  }
+
+  .admin-impact-page .admin-impact-stat-body .form-group:last-child {
+    grid-column: auto;
+  }
+
+  .admin-impact-page .admin-impact-testimonial-body {
+    grid-template-columns: 1fr;
+    padding: 17px;
+  }
+
+  .admin-impact-page .admin-impact-testimonial-preview {
+    height: 240px;
+  }
+
+  .admin-impact-page .admin-impact-save-bar {
+    bottom: 10px;
+    align-items: stretch;
+    flex-direction: column;
+    gap: 14px;
+    padding: 15px;
+  }
+
+  .admin-impact-page .admin-impact-save-bar .btn-primary {
+    width: 100%;
+  }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE — SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 400px) {
+
+  .admin-impact-page {
+    padding: 11px;
+  }
+
+  .admin-impact-header-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-impact-header-actions .btn-primary {
+    grid-column: auto;
+  }
+
+  .admin-impact-header-actions .btn-secondary,
+  .admin-impact-header-actions .btn-danger-outline,
+  .admin-impact-header-actions .btn-primary {
+    width: 100%;
+  }
+
+  .admin-impact-page .admin-impact-section-heading {
+    align-items: flex-start;
+  }
+
+  .admin-impact-page .admin-impact-card-header {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-impact-page .admin-impact-card-drag {
+    width: 100%;
+  }
+
+  .admin-impact-page .admin-impact-card-actions {
+    justify-content: space-between;
+  }
+
+  .admin-impact-page .admin-icon-button {
+    width: 38px;
+    height: 38px;
+  }
+
+  .admin-impact-page .admin-impact-gallery-preview {
+    height: 210px;
+  }
+
+}
+
+
+/* =========================================================
+   ACCESSIBILITY
+   ========================================================= */
+
+.admin-impact-page button:focus-visible,
+.admin-impact-page input:focus-visible,
+.admin-impact-page textarea:focus-visible,
+.admin-impact-page select:focus-visible {
+  outline: 3px solid rgba(220, 163, 54, 0.25);
+  outline-offset: 2px;
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .admin-impact-page *,
+  .admin-impact-page *::before,
+  .admin-impact-page *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+
+}

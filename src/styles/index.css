@@ -1,0 +1,67 @@
+@import url("https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500;600;700&family=Open+Sans:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap");
+
+:root {
+  --navy: #132b46;
+  --gold: #dca336;
+  --beige: #f4f1ea;
+  --text: #1f2937;
+  --white: #fff;
+  --container: 1200px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 78px;
+}
+
+body {
+  background: #fff;
+  color: var(--text);
+  font-family: "Open Sans", sans-serif;
+  overflow-x: hidden;
+}
+
+img {
+  max-width: 100%;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.container {
+  width: min(1200px, calc(100% - 40px));
+  margin: 0 auto;
+}
+
+.section {
+  padding: 90px 0;
+}
+
+::selection {
+  background: var(--gold);
+  color: #fff;
+}
+
+@media (max-width: 768px) {
+  .container {
+    width: min(100% - 30px, 1200px);
+  }
+
+  .section {
+    padding: 65px 0;
+  }
+}

@@ -1,0 +1,721 @@
+/* =========================================================
+   ADMIN CONTACTS
+   ========================================================= */
+
+.admin-contacts {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 28px 32px 50px;
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   PAGE HEADER
+   ========================================================= */
+
+.admin-contacts .admin-page-header {
+  width: 100%;
+  max-width: 1080px;
+  margin: 0 auto 24px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.admin-page-header-content {
+  max-width: 700px;
+}
+
+.admin-page-header-content h1 {
+  margin: 0 0 8px;
+  font-size: 28px;
+  line-height: 1.2;
+  font-weight: 700;
+  color: #132b46;
+}
+
+.admin-page-header-content p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* =========================================================
+   TOOLBAR
+   ========================================================= */
+
+.admin-contacts .gallery-toolbar {
+  width: 100%;
+  max-width: 1080px;
+  margin: 0 auto 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.gallery-toolbar-left {
+  width: 100%;
+}
+
+.gallery-search {
+  width: 100%;
+  max-width: 430px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+  background: #ffffff;
+  border: 1px solid #e2e6eb;
+  border-radius: 8px;
+  box-sizing: border-box;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.gallery-search:focus-within {
+  border-color: #dca336;
+  box-shadow: 0 0 0 3px rgba(220, 163, 54, 0.1);
+}
+
+.gallery-search svg {
+  flex-shrink: 0;
+  color: #8a94a3;
+}
+
+.gallery-search input {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: #1f2937;
+  font-size: 14px;
+}
+
+.gallery-search input::placeholder {
+  color: #9ca3af;
+}
+
+/* =========================================================
+   TABS
+   ========================================================= */
+
+.admin-contacts .admin-tabs {
+  width: 100%;
+  max-width: 1080px;
+  margin: 0 auto 22px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px;
+  background: #f1f3f5;
+  border: 1px solid #e4e7eb;
+  border-radius: 9px;
+  box-sizing: border-box;
+}
+
+.admin-tab {
+  border: none;
+  background: transparent;
+  color: #697586;
+  padding: 9px 18px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.admin-tab:hover {
+  color: #132b46;
+}
+
+.admin-tab.active {
+  background: #ffffff;
+  color: #132b46;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* =========================================================
+   MESSAGE LIST
+   ========================================================= */
+
+.admin-message-list {
+  width: 100%;
+  max-width: 1080px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* =========================================================
+   MESSAGE CARD
+   ========================================================= */
+
+.admin-message-card {
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 18px 20px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  box-sizing: border-box;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.admin-message-card:hover {
+  border-color: #d5dbe2;
+  box-shadow: 0 5px 18px rgba(19, 43, 70, 0.06);
+  transform: translateY(-1px);
+}
+
+/* Unread message */
+
+.admin-message-card.unread {
+  border-left: 3px solid #dca336;
+  background: #fffdfa;
+}
+
+/* =========================================================
+   MESSAGE ICON
+   ========================================================= */
+
+.admin-message-icon {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(220, 163, 54, 0.1);
+  color: #c48d25;
+  border-radius: 8px;
+}
+
+.admin-message-icon svg {
+  width: 19px;
+  height: 19px;
+}
+
+/* =========================================================
+   MESSAGE CONTENT
+   ========================================================= */
+
+.admin-message-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.admin-message-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 8px;
+}
+
+.admin-message-top h3 {
+  margin: 0 0 3px;
+  color: #172033;
+  font-size: 15px;
+  line-height: 1.3;
+  font-weight: 700;
+}
+
+.admin-message-top span:not(.message-status) {
+  color: #7b8492;
+  font-size: 12px;
+}
+
+.admin-message-content h4 {
+  margin: 0 0 6px;
+  color: #263445;
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.admin-message-content > p {
+  max-width: 850px;
+  margin: 0;
+  color: #6b7280;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+/* =========================================================
+   MESSAGE STATUS
+   ========================================================= */
+
+.message-status {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 68px;
+  padding: 5px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  line-height: 1;
+  font-weight: 700;
+}
+
+.message-status.unread {
+  color: #9a6915;
+  background: #fff1cc;
+}
+
+.message-status.read {
+  color: #536171;
+  background: #eef1f4;
+}
+
+.message-status.replied {
+  color: #27734a;
+  background: #e6f5eb;
+}
+
+.message-status.archived {
+  color: #687384;
+  background: #edf0f3;
+}
+
+/* =========================================================
+   MESSAGE FOOTER
+   ========================================================= */
+
+.admin-message-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid #f0f1f3;
+}
+
+.admin-message-footer > span {
+  color: #9299a3;
+  font-size: 11px;
+}
+
+/* =========================================================
+   MESSAGE ACTIONS
+   ========================================================= */
+
+.admin-message-actions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.admin-message-actions button {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #6b7280;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.admin-message-actions button:hover {
+  color: #132b46;
+  border-color: #cfd5dc;
+  background: #f8fafb;
+}
+
+.admin-message-actions button.delete:hover {
+  color: #c0392b;
+  border-color: #f0c9c5;
+  background: #fff5f4;
+}
+
+/* =========================================================
+   EMPTY STATE
+   ========================================================= */
+
+.gallery-empty-state {
+  width: 100%;
+  min-height: 260px;
+  padding: 50px 25px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: #ffffff;
+  border: 1px dashed #d9dee5;
+  border-radius: 10px;
+  box-sizing: border-box;
+}
+
+.gallery-empty-state svg {
+  margin-bottom: 12px;
+  color: #b5bdc8;
+}
+
+.gallery-empty-state h3 {
+  margin: 0 0 6px;
+  color: #273444;
+  font-size: 16px;
+}
+
+.gallery-empty-state p {
+  margin: 0;
+  color: #89929e;
+  font-size: 13px;
+}
+
+/* =========================================================
+   CONTACT MESSAGE MODAL
+   ========================================================= */
+
+.contact-message-modal {
+  width: min(680px, calc(100vw - 32px));
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  padding: 0;
+  background: #ffffff;
+  border-radius: 12px;
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   MODAL HEADER
+   ========================================================= */
+
+.contact-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 24px 26px;
+  border-bottom: 1px solid #edf0f2;
+}
+
+.contact-modal-header > div {
+  min-width: 0;
+}
+
+.contact-modal-header > div > span {
+  display: block;
+  margin-bottom: 7px;
+  color: #c18a25;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.contact-modal-header h2 {
+  margin: 0;
+  color: #172033;
+  font-size: 21px;
+  line-height: 1.3;
+}
+
+.gallery-modal-close {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e3e6ea;
+  border-radius: 7px;
+  background: #ffffff;
+  color: #697586;
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.gallery-modal-close:hover {
+  color: #132b46;
+  background: #f6f7f8;
+  border-color: #d4d9df;
+}
+
+/* =========================================================
+   CONTACT SENDER
+   ========================================================= */
+
+.contact-sender {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 24px;
+  padding: 20px 26px;
+  background: #fafbfc;
+  border-bottom: 1px solid #edf0f2;
+}
+
+.contact-sender strong {
+  grid-column: 1 / -1;
+  color: #263445;
+  font-size: 14px;
+}
+
+.contact-sender span {
+  min-width: 0;
+  overflow: hidden;
+  color: #737e8c;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* =========================================================
+   MESSAGE BODY
+   ========================================================= */
+
+.contact-message-body {
+  padding: 24px 26px;
+}
+
+.contact-message-body p {
+  margin: 0;
+  color: #424d5b;
+  font-size: 14px;
+  line-height: 1.8;
+  white-space: pre-wrap;
+}
+
+/* =========================================================
+   MODAL ACTIONS
+   ========================================================= */
+
+.contact-modal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 18px 26px 22px;
+  border-top: 1px solid #edf0f2;
+}
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+.admin-contacts .btn-primary,
+.admin-contacts .btn-secondary {
+  min-height: 40px;
+  padding: 0 16px;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+
+.admin-contacts .btn-secondary {
+  border: 1px solid #dfe3e8;
+  background: #ffffff;
+  color: #596575;
+}
+
+.admin-contacts .btn-secondary:hover {
+  background: #f7f8f9;
+}
+
+/* =========================================================
+   MODAL OVERLAY
+   ========================================================= */
+
+.admin-contacts .modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(15, 25, 38, 0.55);
+  backdrop-filter: blur(3px);
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1100px) {
+  .admin-contacts {
+    max-width: 100%;
+    padding: 24px;
+  }
+
+  .admin-contacts .admin-page-header,
+  .admin-contacts .gallery-toolbar,
+  .admin-contacts .admin-tabs,
+  .admin-message-list {
+    max-width: 100%;
+  }
+
+  .admin-message-card {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-contacts {
+    padding: 20px 16px 40px;
+  }
+
+  .admin-page-header-content h1 {
+    font-size: 24px;
+  }
+
+  .gallery-search {
+    max-width: none;
+  }
+
+  .admin-contacts .admin-tabs {
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .admin-contacts .admin-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .admin-tab {
+    flex: 0 0 auto;
+    padding: 8px 14px;
+  }
+
+  .admin-message-card {
+    gap: 12px;
+    padding: 14px;
+  }
+
+  .admin-message-icon {
+    width: 38px;
+    height: 38px;
+    flex-basis: 38px;
+  }
+
+  .admin-message-top {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .message-status {
+    align-self: flex-start;
+  }
+
+  .admin-message-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .admin-message-actions {
+    width: 100%;
+  }
+
+  .admin-message-actions button {
+    width: 34px;
+    height: 34px;
+  }
+
+  .contact-message-modal {
+    width: calc(100vw - 24px);
+    max-height: calc(100vh - 24px);
+  }
+
+  .contact-modal-header {
+    padding: 20px;
+  }
+
+  .contact-sender {
+    grid-template-columns: 1fr;
+    padding: 18px 20px;
+  }
+
+  .contact-sender strong {
+    grid-column: auto;
+  }
+
+  .contact-message-body {
+    padding: 20px;
+  }
+
+  .contact-modal-actions {
+    padding: 16px 20px 20px;
+    flex-direction: column-reverse;
+  }
+
+  .contact-modal-actions button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-contacts {
+    padding: 16px 12px 32px;
+  }
+
+  .admin-page-header-content h1 {
+    font-size: 22px;
+  }
+
+  .admin-page-header-content p {
+    font-size: 13px;
+  }
+
+  .admin-message-card {
+    align-items: flex-start;
+  }
+
+  .admin-message-icon {
+    width: 34px;
+    height: 34px;
+    flex-basis: 34px;
+  }
+
+  .admin-message-icon svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .admin-message-top h3 {
+    font-size: 14px;
+  }
+
+  .admin-message-content h4 {
+    font-size: 13px;
+  }
+
+  .admin-message-content > p {
+    font-size: 12px;
+  }
+
+  .contact-modal-header h2 {
+    font-size: 18px;
+  }
+}

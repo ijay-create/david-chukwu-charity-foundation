@@ -1,0 +1,908 @@
+/* ========================================
+   OUR IMPACT PAGE
+======================================== */
+
+.impact-page {
+  width: 100%;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+
+/* ========================================
+   HERO
+======================================== */
+
+.impact-hero {
+  position: relative;
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+
+/* ========================================
+   HERO OVERLAY
+======================================== */
+
+.impact-hero-overlay {
+  position: absolute;
+  inset: 0;
+
+  /*
+    Light overlay.
+    The image remains clearly visible while
+    maintaining good contrast for the text.
+  */
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0.55) 0%,
+    rgba(255, 255, 255, 0.35) 40%,
+    rgba(255, 255, 255, 0.12) 70%,
+    transparent 100%
+  );
+
+  pointer-events: none;
+}
+
+
+/* ========================================
+   HERO CONTAINER
+======================================== */
+
+.impact-hero-container {
+  position: relative;
+  z-index: 2;
+}
+
+
+/* ========================================
+   HERO CONTENT
+======================================== */
+
+.impact-hero-content {
+  max-width: 450px;
+  padding: 60px 0;
+}
+
+.impact-hero-content h1 {
+  color: #132b46;
+  font-family: "Poppins", sans-serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.impact-underline {
+  display: block;
+  width: 50px;
+  height: 3px;
+  margin: 10px 0 15px;
+  background: #dca336;
+}
+
+.impact-hero-content p {
+  margin-top: 5px;
+  color: #132b46;
+  font-family: "Open Sans", sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.6;
+}
+
+
+/* ========================================
+   SHARED SECTION HEADER
+======================================== */
+
+.impact-section-header {
+  text-align: center;
+}
+
+.impact-label {
+  display: block;
+
+  color: #dca336;
+  font-family: "Open Sans", sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+
+  letter-spacing: 1px;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.impact-section-header h2 {
+  margin-top: 10px;
+
+  color: #132b46;
+  font-family: "Poppins", sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.impact-section-underline {
+  display: block;
+  width: 50px;
+  height: 3px;
+
+  margin: 15px auto 40px;
+
+  background: #dca336;
+}
+
+
+/* ========================================
+   PROJECTS
+======================================== */
+
+.impact-projects {
+  padding: 60px 20px;
+  background: #ffffff;
+}
+
+.impact-project-grid {
+  display: grid;
+
+  grid-template-columns: repeat(3, 1fr);
+
+  gap: 30px;
+
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.impact-project-card {
+  overflow: hidden;
+
+  background: #ffffff;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.impact-project-card:hover {
+  transform: translateY(-3px);
+
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, 0.08);
+}
+
+.impact-project-image {
+  width: 100%;
+  height: 200px;
+
+  overflow: hidden;
+}
+
+.impact-project-image img {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  transition: transform 0.5s ease;
+}
+
+.impact-project-card:hover
+.impact-project-image img {
+  transform: scale(1.04);
+}
+
+.impact-project-content {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 15px;
+
+  padding: 20px;
+}
+
+.project-number {
+  flex-shrink: 0;
+
+  color: #dca336;
+
+  font-family: "Poppins", sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.impact-project-content h3 {
+  color: #132b46;
+
+  font-family: "Poppins", sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.impact-project-content p {
+  margin-top: 8px;
+
+  color: #4b5563;
+
+  font-family: "Open Sans", sans-serif;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+
+/* ========================================
+   GALLERY
+======================================== */
+
+.impact-gallery {
+  padding: 0 20px 60px;
+  background: #ffffff;
+}
+
+.impact-gallery-grid {
+  display: grid;
+
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: 180px;
+
+  gap: 15px;
+
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.impact-gallery-item {
+  overflow: hidden;
+
+  border-radius: 8px;
+}
+
+.impact-gallery-item img {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  transition: transform 0.5s ease;
+}
+
+.impact-gallery-item:hover img {
+  transform: scale(1.04);
+}
+
+.gallery-item-1 {
+  grid-row: span 2;
+}
+
+.gallery-item-4 {
+  grid-column: span 2;
+}
+
+
+/* ========================================
+   GALLERY BUTTON
+======================================== */
+
+.impact-gallery-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: fit-content;
+
+  gap: 8px;
+
+  margin: 30px auto 0;
+  padding: 10px 24px;
+
+  color: #ffffff;
+  background: #dca336;
+
+  border-radius: 4px;
+
+  font-family: "Open Sans", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+
+  text-decoration: none;
+
+  transition:
+    background 0.25s ease,
+    transform 0.25s ease;
+}
+
+.impact-gallery-button:hover {
+  background: #c4912d;
+
+  transform: translateY(-2px);
+}
+
+
+/* ========================================
+   NUMBERS
+======================================== */
+
+.impact-numbers {
+  padding: 50px 20px;
+
+  background: #f4f6f9;
+}
+
+.impact-numbers-container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.impact-numbers .impact-section-header h2 {
+  margin-bottom: 40px;
+}
+
+.impact-numbers .impact-section-underline {
+  display: none;
+}
+
+.impact-stats-grid {
+  display: grid;
+
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.impact-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 130px;
+
+  padding: 20px;
+
+  text-align: center;
+}
+
+.impact-stat + .impact-stat {
+  border-left: 1px solid #d1d5db;
+}
+
+.impact-stat-icon {
+  width: 32px;
+  height: 32px;
+
+  margin-bottom: 10px;
+
+  color: #dca336;
+
+  stroke-width: 1.8;
+}
+
+.impact-stat strong {
+  color: #dca336;
+
+  font-family: "Poppins", sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.impact-stat span {
+  margin-top: 5px;
+
+  color: #6b7280;
+
+  font-family: "Open Sans", sans-serif;
+  font-size: 0.9rem;
+}
+
+
+/* ========================================
+   STORIES
+======================================== */
+
+.impact-stories {
+  padding: 60px 20px;
+
+  background: #ffffff;
+}
+
+.testimonial-grid {
+  display: grid;
+
+  grid-template-columns: repeat(2, 1fr);
+
+  gap: 40px;
+
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.testimonial-card {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 20px;
+}
+
+.testimonial-card > img {
+  flex-shrink: 0;
+
+  width: 80px;
+  height: 80px;
+
+  object-fit: cover;
+
+  border-radius: 50%;
+}
+
+.testimonial-content {
+  padding-top: 5px;
+}
+
+.testimonial-content p {
+  color: #4b5563;
+
+  font-family: "Open Sans", sans-serif;
+  font-size: 0.95rem;
+  font-style: italic;
+  line-height: 1.7;
+}
+
+.testimonial-content span {
+  position: relative;
+
+  display: block;
+
+  margin-top: 10px;
+  padding-left: 14px;
+
+  color: #dca336;
+
+  font-family: "Open Sans", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.testimonial-content span::before {
+  content: "";
+
+  position: absolute;
+
+  top: 50%;
+  left: 0;
+
+  width: 6px;
+  height: 6px;
+
+  background: #dca336;
+
+  border-radius: 50%;
+
+  transform: translateY(-50%);
+}
+
+
+/* ========================================
+   CTA
+======================================== */
+
+.impact-cta {
+  padding: 60px 20px;
+
+  background: #132b46;
+}
+
+.impact-cta-container {
+  text-align: center;
+}
+
+.impact-cta h2 {
+  color: #ffffff;
+
+  font-family: "Poppins", sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.impact-cta p {
+  margin-top: 10px;
+
+  color: rgba(255, 255, 255, 0.85);
+
+  font-family: "Open Sans", sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+
+/* ========================================
+   CTA BUTTONS
+======================================== */
+
+.impact-cta-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 15px;
+
+  margin-top: 30px;
+}
+
+.impact-donate-button,
+.impact-involved-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  min-height: 44px;
+
+  padding: 12px 24px;
+
+  font-family: "Open Sans", sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+
+  text-decoration: none;
+
+  cursor: pointer;
+
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease,
+    color 0.25s ease,
+    transform 0.25s ease;
+}
+
+
+/* ========================================
+   DONATE BUTTON
+======================================== */
+
+.impact-donate-button {
+  color: #ffffff;
+
+  background: #dca336;
+
+  border: 1px solid #dca336;
+  border-radius: 4px;
+}
+
+.impact-donate-button:hover {
+  background: #c4912d;
+
+  border-color: #c4912d;
+
+  transform: translateY(-2px);
+}
+
+
+/* ========================================
+   GET INVOLVED BUTTON
+======================================== */
+
+.impact-involved-button {
+  color: #ffffff;
+
+  background: transparent;
+
+  border: 1px solid #ffffff;
+  border-radius: 4px;
+}
+
+.impact-involved-button:hover {
+  color: #132b46;
+
+  background: #ffffff;
+}
+
+
+/* ========================================
+   TABLET
+======================================== */
+
+@media (max-width: 992px) {
+
+  /* Projects */
+
+  .impact-project-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+
+  /* Gallery */
+
+  .impact-gallery-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .gallery-item-1 {
+    grid-row: span 1;
+  }
+
+  .gallery-item-4 {
+    grid-column: span 1;
+  }
+
+
+  /* Statistics */
+
+  .impact-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: 0;
+  }
+
+  .impact-stat:nth-child(3),
+  .impact-stat:nth-child(4) {
+    border-top: 1px solid #d1d5db;
+  }
+
+  .impact-stat:nth-child(3) {
+    border-left: none;
+  }
+
+
+  /* Testimonials */
+
+  .testimonial-grid {
+    grid-template-columns: 1fr;
+
+    max-width: 700px;
+  }
+}
+
+
+/* ========================================
+   MOBILE
+======================================== */
+
+@media (max-width: 768px) {
+
+  /* ======================================
+     HERO
+  ====================================== */
+
+  .impact-hero {
+    min-height: 420px;
+
+    display: flex;
+    align-items: flex-end;
+
+    background-position: center top;
+
+    background-size: 100% 220px;
+
+    background-repeat: no-repeat;
+
+    background-color: #ffffff;
+  }
+
+
+  /* ======================================
+     MOBILE HERO OVERLAY
+  ====================================== */
+
+  .impact-hero-overlay {
+    top: 0;
+    bottom: auto;
+
+    height: 220px;
+
+    /*
+      Very light mobile overlay.
+      Keeps the hero image visible.
+    */
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0) 40%,
+      rgba(255, 255, 255, 0.08) 60%,
+      rgba(255, 255, 255, 0.30) 80%,
+      rgba(255, 255, 255, 0.55) 100%
+    );
+
+    pointer-events: none;
+  }
+
+
+  /* ======================================
+     HERO CONTAINER
+  ====================================== */
+
+  .impact-hero-container {
+    width: 100%;
+  }
+
+
+  /* ======================================
+     HERO CONTENT
+  ====================================== */
+
+  .impact-hero-content {
+    max-width: 100%;
+
+    padding: 35px 20px;
+  }
+
+  .impact-hero-content h1 {
+    font-size: 2rem;
+  }
+
+  .impact-hero-content p {
+    font-size: 0.9rem;
+  }
+
+
+  /* ======================================
+     PROJECTS
+  ====================================== */
+
+  .impact-projects {
+    padding: 40px 15px;
+  }
+
+  .impact-section-header h2 {
+    font-size: 1.7rem;
+  }
+
+  .impact-label {
+    font-size: 0.7rem;
+  }
+
+  .impact-project-grid {
+    grid-template-columns: 1fr;
+
+    gap: 20px;
+  }
+
+  .impact-project-image {
+    height: 210px;
+  }
+
+
+  /* ======================================
+     GALLERY
+  ====================================== */
+
+  .impact-gallery {
+    padding: 0 15px 45px;
+  }
+
+  .impact-gallery-grid {
+    grid-template-columns: repeat(2, 1fr);
+
+    grid-auto-rows: 160px;
+
+    gap: 10px;
+  }
+
+  .gallery-item-1 {
+    grid-row: span 1;
+  }
+
+  .gallery-item-4 {
+    grid-column: span 1;
+  }
+
+
+  /* ======================================
+     NUMBERS
+  ====================================== */
+
+  .impact-numbers {
+    padding: 40px 15px;
+  }
+
+  .impact-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .impact-stat {
+    min-height: 120px;
+
+    border: none !important;
+
+    border-top: 1px solid #d1d5db !important;
+  }
+
+  .impact-stat:first-child {
+    border-top: none !important;
+  }
+
+  .impact-stat strong {
+    font-size: 1.8rem;
+  }
+
+
+  /* ======================================
+     STORIES
+  ====================================== */
+
+  .impact-stories {
+    padding: 40px 15px;
+  }
+
+  .testimonial-grid {
+    gap: 30px;
+  }
+
+  .testimonial-card {
+    gap: 15px;
+  }
+
+  .testimonial-card > img {
+    width: 65px;
+    height: 65px;
+  }
+
+  .testimonial-content p {
+    font-size: 0.9rem;
+  }
+
+
+  /* ======================================
+     CTA
+  ====================================== */
+
+  .impact-cta {
+    padding: 45px 15px;
+  }
+
+  .impact-cta h2 {
+    font-size: 1.7rem;
+  }
+
+  .impact-cta-buttons {
+    flex-direction: column;
+  }
+
+  .impact-donate-button,
+  .impact-involved-button {
+    width: 100%;
+
+    max-width: 280px;
+  }
+}
+
+
+/* ========================================
+   SMALL MOBILE
+======================================== */
+
+@media (max-width: 480px) {
+
+  /* Gallery */
+
+  .impact-gallery-grid {
+    grid-template-columns: 1fr;
+
+    grid-auto-rows: 220px;
+  }
+
+
+  /* Testimonials */
+
+  .testimonial-card {
+    align-items: flex-start;
+  }
+
+  .testimonial-card > img {
+    width: 60px;
+    height: 60px;
+  }
+}

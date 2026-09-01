@@ -1,0 +1,1133 @@
+/* ============================================================
+   ADMIN SETTINGS
+   David Chukwu Charity Foundation
+   ============================================================ */
+
+/* ============================================================
+   PAGE WRAPPER
+   ============================================================ */
+
+.admin-settings {
+  width: 100%;
+  min-height: 100%;
+  padding: 32px;
+  background: #f8fafc;
+  box-sizing: border-box;
+}
+
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+
+.settings-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 30px;
+}
+
+.settings-header h1 {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 700;
+  color: #132b46;
+  letter-spacing: -0.5px;
+}
+
+.settings-header p {
+  margin: 8px 0 0;
+  max-width: 700px;
+  font-size: 15px;
+  line-height: 1.7;
+  color: #64748b;
+}
+
+
+/* ============================================================
+   RESET BUTTON
+   ============================================================ */
+
+.settings-reset-button {
+  border: 1px solid #fecaca;
+  outline: none;
+  background: #ffffff;
+  color: #dc2626;
+  padding: 11px 18px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease,
+    color 0.25s ease,
+    transform 0.25s ease;
+}
+
+.settings-reset-button:hover {
+  background: #fef2f2;
+  border-color: #dc2626;
+}
+
+.settings-reset-button:active {
+  transform: translateY(1px);
+}
+
+.settings-reset-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+
+/* ============================================================
+   SUCCESS MESSAGE
+   ============================================================ */
+
+.settings-success {
+  width: 100%;
+  box-sizing: border-box;
+  background: #ecfdf5;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+  padding: 14px 18px;
+  border-radius: 10px;
+  margin-bottom: 22px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+
+/* ============================================================
+   ERROR MESSAGE
+   ============================================================ */
+
+.settings-error {
+  width: 100%;
+  box-sizing: border-box;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+  padding: 14px 18px;
+  border-radius: 10px;
+  margin-bottom: 22px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.settings-error p {
+  margin: 0 0 12px;
+}
+
+.settings-error button {
+  border: none;
+  outline: none;
+  background: #991b1b;
+  color: #ffffff;
+  padding: 9px 15px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.settings-error button:hover {
+  background: #7f1d1d;
+}
+
+
+/* ============================================================
+   FORM
+   ============================================================ */
+
+.settings-form {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+
+
+/* ============================================================
+   SETTINGS SECTION
+   ============================================================ */
+
+.settings-section {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 26px;
+  box-sizing: border-box;
+  transition:
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.settings-section:hover {
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.04);
+}
+
+
+/* ============================================================
+   SECTION HEADER
+   ============================================================ */
+
+.settings-section-header {
+  margin-bottom: 24px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid #eef2f7;
+}
+
+.settings-section-header h2 {
+  margin: 0;
+  color: #132b46;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.settings-section-header p {
+  margin: 7px 0 0;
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+
+/* ============================================================
+   FORM GRID
+   ============================================================ */
+
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.settings-field-full {
+  grid-column: span 2;
+}
+
+
+/* ============================================================
+   FORM FIELD
+   ============================================================ */
+
+.settings-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.settings-field label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.settings-field input,
+.settings-field textarea,
+.settings-field select {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #111827;
+  font-family: inherit;
+  font-size: 14px;
+  padding: 12px 14px;
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.settings-field textarea {
+  resize: vertical;
+  min-height: 120px;
+  line-height: 1.6;
+}
+
+.settings-field input::placeholder,
+.settings-field textarea::placeholder {
+  color: #9ca3af;
+}
+
+.settings-field input:focus,
+.settings-field textarea:focus,
+.settings-field select:focus {
+  border-color: #dca336;
+  box-shadow: 0 0 0 3px rgba(220, 163, 54, 0.15);
+}
+
+
+/* ============================================================
+   SMALL HELPER TEXT
+   ============================================================ */
+
+.settings-field small {
+  font-size: 12px;
+  color: #9ca3af;
+  line-height: 1.5;
+}
+
+
+/* ============================================================
+   FILE INPUT
+   ============================================================ */
+
+.settings-field input[type="file"] {
+  padding: 9px;
+  background: #f8fafc;
+  cursor: pointer;
+}
+
+.settings-field input[type="file"]::file-selector-button {
+  border: none;
+  background: #132b46;
+  color: #ffffff;
+  padding: 8px 14px;
+  border-radius: 7px;
+  margin-right: 10px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  transition: background 0.2s ease;
+}
+
+.settings-field input[type="file"]::file-selector-button:hover {
+  background: #1d4168;
+}
+
+
+/* ============================================================
+   IMAGE SETTINGS
+   ============================================================ */
+
+.hero-image-settings {
+  margin-top: 22px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 260px;
+  gap: 24px;
+  align-items: start;
+  padding-top: 22px;
+  border-top: 1px solid #eef2f7;
+}
+
+
+/* ============================================================
+   HERO IMAGE PREVIEW
+   ============================================================ */
+
+.hero-image-preview {
+  width: 100%;
+  height: 180px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  background: #f3f4f6;
+}
+
+.hero-image-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+
+/* ============================================================
+   UPLOAD BUTTON
+   ============================================================ */
+
+.settings-upload-button {
+  width: fit-content;
+  border: none;
+  outline: none;
+  background: #132b46;
+  color: #ffffff;
+  padding: 11px 18px;
+  border-radius: 9px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.25s ease,
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.settings-upload-button:hover {
+  background: #1d4168;
+  transform: translateY(-1px);
+}
+
+.settings-upload-button:active {
+  transform: translateY(0);
+}
+
+.settings-upload-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+
+/* ============================================================
+   CAUSES ADMIN GRID
+   ============================================================ */
+
+.causes-admin-grid {
+  margin-top: 28px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+}
+
+
+/* ============================================================
+   CAUSE ADMIN CARD
+   ============================================================ */
+
+.cause-admin-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 18px;
+  background: #fafafa;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.25s ease;
+}
+
+.cause-admin-card:hover {
+  border-color: #dca336;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.05);
+}
+
+
+/* ============================================================
+   CAUSE CARD HEADER
+   ============================================================ */
+
+.cause-admin-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.cause-admin-card-header h3 {
+  margin: 0;
+  font-size: 16px;
+  color: #132b46;
+  font-weight: 700;
+}
+
+
+/* ============================================================
+   CAUSE IMAGE
+   ============================================================ */
+
+.cause-image-preview {
+  width: 100%;
+  height: 190px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #e5e7eb;
+  border: 1px solid #d1d5db;
+}
+
+.cause-image-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+
+/* ============================================================
+   SETTINGS OPTIONS
+   ============================================================ */
+
+.settings-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+
+/* ============================================================
+   TOGGLE
+   ============================================================ */
+
+.settings-toggle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.settings-toggle label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.settings-toggle input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 46px;
+  height: 24px;
+  margin: 0;
+  border: none;
+  border-radius: 30px;
+  background: #d1d5db;
+  position: relative;
+  cursor: pointer;
+  transition:
+    background 0.25s ease,
+    box-shadow 0.25s ease;
+  flex-shrink: 0;
+}
+
+.settings-toggle input[type="checkbox"]::after {
+  content: "";
+  width: 18px;
+  height: 18px;
+  background: #ffffff;
+  border-radius: 50%;
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  transition: transform 0.25s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+.settings-toggle input[type="checkbox"]:checked {
+  background: #dca336;
+}
+
+.settings-toggle input[type="checkbox"]:checked::after {
+  transform: translateX(22px);
+}
+
+.settings-toggle input[type="checkbox"]:focus-visible {
+  box-shadow: 0 0 0 3px rgba(220, 163, 54, 0.2);
+}
+
+.settings-toggle span {
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+}
+
+
+/* ============================================================
+   FORM ACTIONS
+   ============================================================ */
+
+.settings-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding-bottom: 30px;
+}
+
+
+/* ============================================================
+   SAVE BUTTON
+   ============================================================ */
+
+.settings-save-button {
+  border: none;
+  outline: none;
+  background: #dca336;
+  color: #ffffff;
+  padding: 13px 28px;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background 0.25s ease,
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.settings-save-button:hover {
+  background: #c6922d;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(220, 163, 54, 0.25);
+}
+
+.settings-save-button:active {
+  transform: translateY(0);
+}
+
+.settings-save-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+
+/* ============================================================
+   LOADING
+   ============================================================ */
+
+.settings-loading {
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  color: #64748b;
+}
+
+
+/* ============================================================
+   EMPTY IMAGE PREVIEW
+   ============================================================ */
+
+.hero-image-preview:empty,
+.cause-image-preview:empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-image-preview:empty::before,
+.cause-image-preview:empty::before {
+  content: "No Image";
+  color: #9ca3af;
+  font-size: 13px;
+}
+
+
+/* ============================================================
+   ADMIN FOOTER
+   ============================================================ */
+
+.admin-footer {
+  width: 100%;
+  margin-top: 42px;
+  padding: 30px 32px 0;
+  background: #132b46;
+  color: #ffffff;
+  box-sizing: border-box;
+  border-radius: 16px 16px 0 0;
+}
+
+.admin-footer-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) repeat(2, minmax(140px, 1fr));
+  gap: 40px;
+  padding-bottom: 28px;
+}
+
+.admin-footer-brand {
+  min-width: 0;
+}
+
+.admin-footer-brand h3 {
+  margin: 0 0 10px;
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.admin-footer-brand p {
+  max-width: 430px;
+  margin: 0;
+  color: #cbd5e1;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.admin-footer-links {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.admin-footer-links h4 {
+  margin: 0 0 5px;
+  color: #dca336;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.admin-footer-links a {
+  width: fit-content;
+  color: #cbd5e1;
+  text-decoration: none;
+  font-size: 13px;
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.admin-footer-links a:hover {
+  color: #ffffff;
+  transform: translateX(2px);
+}
+
+.admin-footer-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 18px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.admin-footer-bottom p {
+  margin: 0;
+  color: #94a3b8;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.admin-footer-bottom span {
+  color: #dca336;
+  font-weight: 600;
+}
+
+
+/* ============================================================
+   SCROLLBAR
+   ============================================================ */
+
+.admin-settings::-webkit-scrollbar {
+  width: 8px;
+}
+
+.admin-settings::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.admin-settings::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+.admin-settings::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+
+/* ============================================================
+   TABLET
+   ============================================================ */
+
+@media (max-width: 1024px) {
+  .admin-settings {
+    padding: 24px;
+  }
+
+  .settings-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-field-full {
+    grid-column: span 1;
+  }
+
+  .hero-image-settings {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-image-preview {
+    height: 240px;
+  }
+
+  .causes-admin-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-options {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-footer {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  .admin-footer-content {
+    grid-template-columns: 1.5fr 1fr 1fr;
+    gap: 28px;
+  }
+}
+
+
+/* ============================================================
+   MOBILE
+   ============================================================ */
+
+@media (max-width: 768px) {
+  .admin-settings {
+    padding: 18px;
+  }
+
+  .settings-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .settings-header h1 {
+    font-size: 26px;
+  }
+
+  .settings-header p {
+    font-size: 14px;
+  }
+
+  .settings-reset-button {
+    width: 100%;
+  }
+
+  .settings-section {
+    padding: 18px;
+    border-radius: 12px;
+  }
+
+  .settings-section-header h2 {
+    font-size: 18px;
+  }
+
+  .hero-image-preview {
+    height: 200px;
+  }
+
+  .cause-image-preview {
+    height: 180px;
+  }
+
+  .settings-form-actions {
+    justify-content: stretch;
+  }
+
+  .settings-save-button {
+    width: 100%;
+  }
+
+
+  /* ----------------------------------------------------------
+     FOOTER
+     ---------------------------------------------------------- */
+
+  .admin-footer {
+    margin-top: 30px;
+    padding: 26px 20px 0;
+    border-radius: 12px 12px 0 0;
+  }
+
+  .admin-footer-content {
+    grid-template-columns: 1fr;
+    gap: 26px;
+  }
+
+  .admin-footer-brand p {
+    max-width: 100%;
+  }
+
+  .admin-footer-bottom {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}
+
+
+/* ============================================================
+   SMALL MOBILE
+   ============================================================ */
+
+@media (max-width: 480px) {
+  .admin-settings {
+    padding: 14px;
+  }
+
+  .settings-section {
+    padding: 15px;
+  }
+
+  .settings-header h1 {
+    font-size: 23px;
+  }
+
+  .settings-field input,
+  .settings-field textarea,
+  .settings-field select {
+    font-size: 13px;
+    padding: 11px 12px;
+  }
+
+  .cause-admin-card {
+    padding: 14px;
+  }
+
+  .settings-upload-button {
+    width: 100%;
+  }
+
+  .admin-footer {
+    margin-top: 24px;
+    padding: 22px 16px 0;
+  }
+
+  .admin-footer-content {
+    gap: 22px;
+  }
+
+  .admin-footer-brand h3 {
+    font-size: 16px;
+  }
+
+  .admin-footer-brand p,
+  .admin-footer-links a {
+    font-size: 12px;
+  }
+
+  .admin-footer-bottom {
+    padding: 15px 0;
+  }
+
+  .admin-footer-bottom p {
+    font-size: 11px;
+  }
+}
+
+
+/* ============================================================
+   DARK MODE
+   Supports:
+   .dark-mode
+   [data-theme="dark"]
+   ============================================================ */
+
+.dark-mode .admin-settings,
+[data-theme="dark"] .admin-settings {
+  background: #111827;
+}
+
+
+/* Header */
+
+.dark-mode .settings-header h1,
+[data-theme="dark"] .settings-header h1 {
+  color: #f9fafb;
+}
+
+.dark-mode .settings-header p,
+[data-theme="dark"] .settings-header p {
+  color: #9ca3af;
+}
+
+
+/* Sections */
+
+.dark-mode .settings-section,
+[data-theme="dark"] .settings-section {
+  background: #1f2937;
+  border-color: #374151;
+}
+
+.dark-mode .settings-section-header,
+[data-theme="dark"] .settings-section-header {
+  border-color: #374151;
+}
+
+.dark-mode .settings-section-header h2,
+[data-theme="dark"] .settings-section-header h2 {
+  color: #f3f4f6;
+}
+
+.dark-mode .settings-section-header p,
+[data-theme="dark"] .settings-section-header p {
+  color: #9ca3af;
+}
+
+
+/* Fields */
+
+.dark-mode .settings-field label,
+[data-theme="dark"] .settings-field label {
+  color: #e5e7eb;
+}
+
+.dark-mode .settings-field input,
+.dark-mode .settings-field textarea,
+.dark-mode .settings-field select,
+[data-theme="dark"] .settings-field input,
+[data-theme="dark"] .settings-field textarea,
+[data-theme="dark"] .settings-field select {
+  background: #111827;
+  border-color: #4b5563;
+  color: #f9fafb;
+}
+
+.dark-mode .settings-field input::placeholder,
+.dark-mode .settings-field textarea::placeholder,
+[data-theme="dark"] .settings-field input::placeholder,
+[data-theme="dark"] .settings-field textarea::placeholder {
+  color: #6b7280;
+}
+
+.dark-mode .settings-field input[type="file"],
+[data-theme="dark"] .settings-field input[type="file"] {
+  background: #111827;
+}
+
+.dark-mode .settings-field small,
+[data-theme="dark"] .settings-field small {
+  color: #9ca3af;
+}
+
+
+/* Images */
+
+.dark-mode .hero-image-settings,
+[data-theme="dark"] .hero-image-settings {
+  border-color: #374151;
+}
+
+.dark-mode .hero-image-preview,
+.dark-mode .cause-image-preview,
+[data-theme="dark"] .hero-image-preview,
+[data-theme="dark"] .cause-image-preview {
+  border-color: #374151;
+  background: #111827;
+}
+
+
+/* Cause Cards */
+
+.dark-mode .cause-admin-card,
+[data-theme="dark"] .cause-admin-card {
+  background: #111827;
+  border-color: #374151;
+}
+
+.dark-mode .cause-admin-card-header,
+[data-theme="dark"] .cause-admin-card-header {
+  border-color: #374151;
+}
+
+.dark-mode .cause-admin-card-header h3,
+[data-theme="dark"] .cause-admin-card-header h3 {
+  color: #f3f4f6;
+}
+
+
+/* Toggles */
+
+.dark-mode .settings-toggle span,
+[data-theme="dark"] .settings-toggle span {
+  color: #e5e7eb;
+}
+
+
+/* Reset Button */
+
+.dark-mode .settings-reset-button,
+[data-theme="dark"] .settings-reset-button {
+  background: #1f2937;
+  border-color: #7f1d1d;
+  color: #fca5a5;
+}
+
+.dark-mode .settings-reset-button:hover,
+[data-theme="dark"] .settings-reset-button:hover {
+  background: #2a1111;
+}
+
+
+/* Loading */
+
+.dark-mode .settings-loading,
+[data-theme="dark"] .settings-loading {
+  color: #9ca3af;
+}
+
+
+/* Footer */
+
+.dark-mode .admin-footer,
+[data-theme="dark"] .admin-footer {
+  background: #0f172a;
+}
+
+.dark-mode .admin-footer-brand p,
+[data-theme="dark"] .admin-footer-brand p {
+  color: #94a3b8;
+}
+
+.dark-mode .admin-footer-links a,
+[data-theme="dark"] .admin-footer-links a {
+  color: #94a3b8;
+}
+
+.dark-mode .admin-footer-links a:hover,
+[data-theme="dark"] .admin-footer-links a:hover {
+  color: #ffffff;
+}
+
+.dark-mode .admin-footer-bottom,
+[data-theme="dark"] .admin-footer-bottom {
+  border-top-color: rgba(255, 255, 255, 0.08);
+}
+
+
+/* ============================================================
+   ACCESSIBILITY
+   ============================================================ */
+
+.settings-reset-button:focus-visible,
+.settings-upload-button:focus-visible,
+.settings-save-button:focus-visible,
+.settings-error button:focus-visible,
+.admin-footer-links a:focus-visible {
+  outline: 2px solid #dca336;
+  outline-offset: 3px;
+}
+
+
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .settings-reset-button,
+  .settings-upload-button,
+  .settings-save-button,
+  .settings-field input,
+  .settings-field textarea,
+  .settings-field select,
+  .settings-toggle input[type="checkbox"],
+  .settings-toggle input[type="checkbox"]::after,
+  .settings-section,
+  .cause-admin-card,
+  .admin-footer-links a {
+    transition: none;
+  }
+}
