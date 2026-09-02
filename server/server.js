@@ -4,50 +4,41 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const path = require("path");
 
+// ============================================================
+// ENVIRONMENT VARIABLES
+// ============================================================
+
 dotenv.config();
+
+// ============================================================
+// APP INITIALIZATION
+// ============================================================
 
 const app = express();
 
 const PORT = process.env.PORT || 5000;
 
-/*
-|--------------------------------------------------------------------------
-| CORS CONFIGURATION
-|--------------------------------------------------------------------------
-|
-| Local development:
-|   http://localhost:5173
-|   http://localhost:5174
-|
-| Production:
-|   Set CLIENT_URL in Render environment variables.
-|
-| Example:
-|   CLIENT_URL=https://your-frontend.onrender.com
-|
-*/
+// ============================================================
+// CORS CONFIGURATION
+// ============================================================
 
 const allowedOrigins = [
+  // Local development
   "http://localhost:5173",
   "http://localhost:5174",
-  process.env.CLIENT_URL
+
+  // Production frontend - Vercel
+  "https://david-chukwu-charity-foundation.vercel.app",
+
+  // Existing production frontend, if configured
+  process.env.CLIENT_URL,
 ].filter(Boolean);
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      /*
-      |--------------------------------------------------------------------------
-      | Allow requests with no origin
-      |--------------------------------------------------------------------------
-      |
-      | This includes things like:
-      | - Postman
-      | - Server-to-server requests
-      | - Some development tools
-      |
-      */
-
+      // Allow requests without an Origin header
+      // such as Postman, server-to-server requests, etc.
       if (!origin) {
         return callback(null, true);
       }
@@ -65,38 +56,30 @@ app.use(
       );
     },
 
-    credentials: true
+    credentials: true,
   })
 );
 
-/*
-|--------------------------------------------------------------------------
-| GLOBAL MIDDLEWARE
-|--------------------------------------------------------------------------
-*/
+// ============================================================
+// BODY PARSERS
+// ============================================================
 
-app.use(express.json());
+app.use(
+  express.json({
+    limit: "10mb",
+  })
+);
 
 app.use(
   express.urlencoded({
-    extended: true
+    extended: true,
+    limit: "10mb",
   })
 );
 
-/*
-|--------------------------------------------------------------------------
-| STATIC UPLOADS
-|--------------------------------------------------------------------------
-|
-| Uploaded images can be accessed through:
-|
-| http://localhost:5000/uploads/filename.jpg
-|
-| Production:
-|
-| https://your-backend.onrender.com/uploads/filename.jpg
-|
-*/
+// ============================================================
+// STATIC UPLOADS
+// ============================================================
 
 app.use(
   "/uploads",
@@ -105,241 +88,94 @@ app.use(
   )
 );
 
-/*
-|--------------------------------------------------------------------------
-| API ROUTES
-|--------------------------------------------------------------------------
-*/
+// ============================================================
+// API ROUTES
+// ============================================================
 
-/*
-|--------------------------------------------------------------------------
-| AUTH
-|--------------------------------------------------------------------------
-*/
-
+// Authentication
 app.use(
   "/api/auth",
   require("./routes/authRoutes")
 );
 
-/*
-|--------------------------------------------------------------------------
-| GALLERY
-|--------------------------------------------------------------------------
-*/
-
-app.use(
-  "/api/gallery",
-  require("./routes/galleryRoutes")
-);
-
-/*
-|--------------------------------------------------------------------------
-| OUTREACH
-|--------------------------------------------------------------------------
-*/
-
-app.use(
-  "/api/outreach",
-  require("./routes/outreachRoutes")
-);
-
-/*
-|--------------------------------------------------------------------------
-| CONTACT
-|--------------------------------------------------------------------------
-*/
-
-app.use(
-  "/api/contact",
-  require("./routes/contactRoutes")
-);
-
-/*
-|--------------------------------------------------------------------------
-| GET INVOLVED
-|--------------------------------------------------------------------------
-*/
-
-app.use(
-  "/api/get-involved",
-  require("./routes/getInvolvedRoutes")
-);
-
-/*
-|--------------------------------------------------------------------------
-| VOLUNTEERS
-|--------------------------------------------------------------------------
-*/
-
-app.use(
-  "/api/volunteers",
-  require("./routes/volunteerRoutes")
-);
-
-/*
-|--------------------------------------------------------------------------
-| DONATIONS
-|--------------------------------------------------------------------------
-*/
-
-app.use(
-  "/api/donations",
-  require("./routes/donationRoutes")
-);
-
-/*
-|--------------------------------------------------------------------------
-| DONATION ACCOUNTS
-|--------------------------------------------------------------------------
-*/
-
-app.use(
-  "/api/donation-accounts",
-  require("./routes/donationAccountRoutes")
-);
-
-/*
-|--------------------------------------------------------------------------
-| DASHBOARD
-|--------------------------------------------------------------------------
-*/
-
-app.use(
-  "/api/dashboard",
-  require("./routes/dashboardRoutes")
-);
-
-/*
-|--------------------------------------------------------------------------
-| SETTINGS
-|--------------------------------------------------------------------------
-*/
-
-app.use(
-  "/api/settings",
-  require("./routes/settingsRoutes")
-);
-
-/*
-|--------------------------------------------------------------------------
-| ABOUT
-|--------------------------------------------------------------------------
-*/
-
+// About Us
 app.use(
   "/api/about",
   require("./routes/aboutRoutes")
 );
 
-/*
-|--------------------------------------------------------------------------
-| CAUSES
-|--------------------------------------------------------------------------
-*/
-
+// Causes
 app.use(
   "/api/causes",
   require("./routes/causesRoutes")
 );
 
-/*
-|--------------------------------------------------------------------------
-| IMPACT
-|--------------------------------------------------------------------------
-*/
-
+// Impact
 app.use(
   "/api/impact",
   require("./routes/impactRoutes")
 );
 
-/*
-|--------------------------------------------------------------------------
-| HOMEPAGE
-|--------------------------------------------------------------------------
-*/
-
+// Gallery
 app.use(
-  "/api/homepage",
-  require("./routes/homepageRoutes")
+  "/api/gallery",
+  require("./routes/galleryRoutes")
 );
 
-/*
-|--------------------------------------------------------------------------
-| NEWSLETTER - BREVO
-|--------------------------------------------------------------------------
-*/
-
+// Donations
 app.use(
-  "/api/newsletter",
-  require("./routes/newsletterRoutes")
+  "/api/donations",
+  require("./routes/donationRoutes")
 );
 
-/*
-|--------------------------------------------------------------------------
-| ROOT HEALTH CHECK
-|--------------------------------------------------------------------------
-*/
+// Contact
+app.use(
+  "/api/contact",
+  require("./routes/contactRoutes")
+);
+
+// Settings
+app.use(
+  "/api/settings",
+  require("./routes/settingsRoutes")
+);
+
+// ============================================================
+// ROOT HEALTH CHECK
+// ============================================================
 
 app.get("/", (req, res) => {
-  return res.status(200).json({
+  res.status(200).json({
     success: true,
     message:
-      "David Chukwu Charity Foundation API is running."
+      "David Chukwu Charity Foundation API is running",
   });
 });
 
-/*
-|--------------------------------------------------------------------------
-| API HEALTH CHECK
-|--------------------------------------------------------------------------
-*/
-
-app.get("/api/health", (req, res) => {
-  return res.status(200).json({
-    success: true,
-    message: "API is healthy.",
-    database:
-      mongoose.connection.readyState === 1
-        ? "connected"
-        : "disconnected"
-  });
-});
-
-/*
-|--------------------------------------------------------------------------
-| 404 HANDLER
-|--------------------------------------------------------------------------
-*/
+// ============================================================
+// API 404 HANDLER
+// ============================================================
 
 app.use((req, res) => {
-  return res.status(404).json({
+  res.status(404).json({
     success: false,
-    message:
-      `Route not found: ${req.method} ${req.originalUrl}`
+    message: "Route not found",
+    path: req.originalUrl,
   });
 });
 
-/*
-|--------------------------------------------------------------------------
-| GLOBAL ERROR HANDLER
-|--------------------------------------------------------------------------
-*/
+// ============================================================
+// GLOBAL ERROR HANDLER
+// ============================================================
 
 app.use(
   (error, req, res, next) => {
     console.error(
-      "SERVER ERROR:",
+      "GLOBAL ERROR:",
       error
     );
 
-    /*
-    |--------------------------------------------------------------------------
-    | CORS ERROR
-    |--------------------------------------------------------------------------
-    */
-
+    // Handle CORS errors
     if (
       error.message ===
       "Not allowed by CORS"
@@ -347,31 +183,38 @@ app.use(
       return res.status(403).json({
         success: false,
         message:
-          "Request blocked by CORS policy."
+          "Request blocked by CORS policy.",
       });
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | GENERAL SERVER ERROR
-    |--------------------------------------------------------------------------
-    */
+    // Handle Multer errors
+    if (
+      error.name === "MulterError"
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          error.message ||
+          "File upload error.",
+      });
+    }
 
-    return res.status(500).json({
+    return res.status(
+      error.status || 500
+    ).json({
       success: false,
       message:
-        "Internal server error."
+        error.message ||
+        "Internal server error.",
     });
   }
 );
 
-/*
-|--------------------------------------------------------------------------
-| DATABASE CONNECTION
-|--------------------------------------------------------------------------
-*/
+// ============================================================
+// DATABASE CONNECTION
+// ============================================================
 
-const startServer = async () => {
+const connectDB = async () => {
   try {
     await mongoose.connect(
       process.env.MONGO_URI
@@ -381,21 +224,15 @@ const startServer = async () => {
       "MongoDB connected successfully"
     );
 
-    app.listen(
-      PORT,
-      () => {
-        console.log(
-          `Server running on port ${PORT}`
-        );
+    // ========================================================
+    // START SERVER
+    // ========================================================
 
-        console.log(
-          `Environment: ${
-            process.env.NODE_ENV ||
-            "development"
-          }`
-        );
-      }
-    );
+    app.listen(PORT, () => {
+      console.log(
+        `Server running on port ${PORT}`
+      );
+    });
   } catch (error) {
     console.error(
       "MongoDB connection failed:",
@@ -406,4 +243,8 @@ const startServer = async () => {
   }
 };
 
-startServer();
+// ============================================================
+// START APPLICATION
+// ============================================================
+
+connectDB();
