@@ -25,15 +25,17 @@ import {
 import "../styles/OurImpact.css";
 
 
+
 // ========================================
 // API
 // ========================================
 
 const API_URL =
-  "http://localhost:5000/api/impact";
+  `${import.meta.env.VITE_API_URL || "http://localhost:5000/api"}/impact`;
 
 const SERVER_URL =
-  "http://localhost:5000";
+  "https://david-chukwu-charity-api.onrender.com";
+
 
 
 // ========================================
@@ -202,6 +204,7 @@ const defaultImpact = {
 };
 
 
+
 // ========================================
 // STAT ICON MAP
 // ========================================
@@ -219,6 +222,7 @@ const statIconMap = {
 };
 
 
+
 // ========================================
 // MEDIA URL
 // ========================================
@@ -230,6 +234,7 @@ const getMediaUrl = (
   if (!fileUrl) {
     return "";
   }
+
 
 
   if (
@@ -249,9 +254,11 @@ const getMediaUrl = (
   }
 
 
+
   return `${SERVER_URL}${fileUrl}`;
 
 };
+
 
 
 // ========================================
@@ -271,6 +278,7 @@ const sortByOrder = (
   }
 
 
+
   return [...items].sort(
     (a, b) =>
       Number(a?.order || 0) -
@@ -278,6 +286,7 @@ const sortByOrder = (
   );
 
 };
+
 
 
 // ========================================
@@ -299,6 +308,7 @@ const normalizeImpact = (
     },
 
 
+
     projects:
       Array.isArray(
         data?.projects
@@ -307,6 +317,7 @@ const normalizeImpact = (
             data.projects
           )
         : defaultImpact.projects,
+
 
 
     gallery:
@@ -319,6 +330,7 @@ const normalizeImpact = (
         : defaultImpact.gallery,
 
 
+
     stats:
       Array.isArray(
         data?.stats
@@ -329,6 +341,7 @@ const normalizeImpact = (
         : defaultImpact.stats,
 
 
+
     testimonials:
       Array.isArray(
         data?.testimonials
@@ -337,6 +350,7 @@ const normalizeImpact = (
             data.testimonials
           )
         : defaultImpact.testimonials,
+
 
 
     cta: {
@@ -350,6 +364,7 @@ const normalizeImpact = (
   };
 
 };
+
 
 
 // ========================================
@@ -402,6 +417,7 @@ const Reveal = ({
 };
 
 
+
 // ========================================
 // OUR IMPACT
 // ========================================
@@ -418,16 +434,19 @@ const OurImpact = ({
   );
 
 
+
   const [
     loading,
     setLoading
   ] = useState(true);
 
 
+
   const [
     error,
     setError
   ] = useState("");
+
 
 
   // ======================================
@@ -443,14 +462,17 @@ const OurImpact = ({
       setError("");
 
 
+
       const response =
         await fetch(
           API_URL
         );
 
 
+
       const data =
         await response.json();
+
 
 
       if (
@@ -466,10 +488,12 @@ const OurImpact = ({
       }
 
 
+
       const normalized =
         normalizeImpact(
           data.impact
         );
+
 
 
       setImpact(
@@ -486,6 +510,7 @@ const OurImpact = ({
       );
 
 
+
       setError(
         loadError.message ||
         "Unable to load our impact."
@@ -500,6 +525,7 @@ const OurImpact = ({
   };
 
 
+
   // ======================================
   // INITIAL LOAD
   // ======================================
@@ -509,6 +535,7 @@ const OurImpact = ({
     loadImpact();
 
   }, []);
+
 
 
   // ======================================
@@ -546,6 +573,7 @@ const OurImpact = ({
   }
 
 
+
   // ======================================
   // ERROR STATE
   // ======================================
@@ -567,14 +595,17 @@ const OurImpact = ({
           </div>
 
 
+
           <h2>
             Unable to Load Our Impact
           </h2>
 
 
+
           <p>
             {error}
           </p>
+
 
 
           <button
@@ -602,9 +633,11 @@ const OurImpact = ({
   }
 
 
+
   return (
 
     <main className="impact-page">
+
 
 
       {/* ========================================
@@ -630,6 +663,7 @@ const OurImpact = ({
           className=
             "impact-hero-overlay"
         />
+
 
 
         <div className="container impact-hero-container">
@@ -670,6 +704,7 @@ const OurImpact = ({
             )}
 
 
+
             <h1>
 
               {
@@ -680,10 +715,12 @@ const OurImpact = ({
             </h1>
 
 
+
             <span
               className=
                 "impact-underline"
             />
+
 
 
             {impact.hero.lineOne && (
@@ -698,6 +735,7 @@ const OurImpact = ({
               </p>
 
             )}
+
 
 
             {impact.hero.lineTwo && (
@@ -720,6 +758,7 @@ const OurImpact = ({
       </section>
 
 
+
       {/* ========================================
           OUTREACH & PROJECTS
       ======================================== */}
@@ -727,6 +766,7 @@ const OurImpact = ({
       <section className="impact-projects">
 
         <div className="container">
+
 
 
           <Reveal
@@ -742,6 +782,7 @@ const OurImpact = ({
             </span>
 
 
+
             <h2>
 
               Latest Outreach &amp;
@@ -750,12 +791,14 @@ const OurImpact = ({
             </h2>
 
 
+
             <span
               className=
                 "impact-section-underline"
             />
 
           </Reveal>
+
 
 
           <div className="impact-project-grid">
@@ -770,6 +813,7 @@ const OurImpact = ({
                   getMediaUrl(
                     project.imageUrl
                   );
+
 
 
                 return (
@@ -826,6 +870,7 @@ const OurImpact = ({
                     </div>
 
 
+
                     {/* CONTENT */}
 
                     <div className="impact-project-content">
@@ -842,6 +887,7 @@ const OurImpact = ({
                       </span>
 
 
+
                       <div>
 
                         <h3>
@@ -849,6 +895,7 @@ const OurImpact = ({
                             project.title
                           }
                         </h3>
+
 
 
                         <p>
@@ -875,6 +922,7 @@ const OurImpact = ({
       </section>
 
 
+
       {/* ========================================
           MOMENTS OF IMPACT
       ======================================== */}
@@ -882,6 +930,7 @@ const OurImpact = ({
       <section className="impact-gallery">
 
         <div className="container">
+
 
 
           <Reveal
@@ -894,12 +943,14 @@ const OurImpact = ({
             </h2>
 
 
+
             <span
               className=
                 "impact-section-underline"
             />
 
           </Reveal>
+
 
 
           <div className="impact-gallery-grid">
@@ -914,6 +965,7 @@ const OurImpact = ({
                   getMediaUrl(
                     item.imageUrl
                   );
+
 
 
                 return (
@@ -978,6 +1030,7 @@ const OurImpact = ({
           </div>
 
 
+
           <Link
 
             to="/gallery"
@@ -1000,6 +1053,7 @@ const OurImpact = ({
       </section>
 
 
+
       {/* ========================================
           IMPACT IN NUMBERS
       ======================================== */}
@@ -1007,6 +1061,7 @@ const OurImpact = ({
       <section className="impact-numbers">
 
         <div className="container impact-numbers-container">
+
 
 
           <Reveal
@@ -1021,6 +1076,7 @@ const OurImpact = ({
           </Reveal>
 
 
+
           <div className="impact-stats-grid">
 
             {impact.stats.map(
@@ -1033,6 +1089,7 @@ const OurImpact = ({
                   statIconMap[
                     stat.icon
                   ] || Users;
+
 
 
                 return (
@@ -1059,11 +1116,13 @@ const OurImpact = ({
                     />
 
 
+
                     <strong>
                       {
                         stat.number
                       }
                     </strong>
+
 
 
                     <span>
@@ -1086,6 +1145,7 @@ const OurImpact = ({
       </section>
 
 
+
       {/* ========================================
           STORIES THAT INSPIRE
       ======================================== */}
@@ -1093,6 +1153,7 @@ const OurImpact = ({
       <section className="impact-stories">
 
         <div className="container">
+
 
 
           <Reveal
@@ -1105,12 +1166,14 @@ const OurImpact = ({
             </h2>
 
 
+
             <span
               className=
                 "impact-section-underline"
             />
 
           </Reveal>
+
 
 
           <div className="testimonial-grid">
@@ -1125,6 +1188,7 @@ const OurImpact = ({
                   getMediaUrl(
                     testimonial.imageUrl
                   );
+
 
 
                 return (
@@ -1175,6 +1239,7 @@ const OurImpact = ({
                     )}
 
 
+
                     {/* TESTIMONIAL CONTENT */}
 
                     <div className="testimonial-content">
@@ -1184,6 +1249,7 @@ const OurImpact = ({
                         "{testimonial.quote}"
 
                       </p>
+
 
 
                       <span>
@@ -1210,6 +1276,7 @@ const OurImpact = ({
       </section>
 
 
+
       {/* ========================================
           CTA
       ======================================== */}
@@ -1219,7 +1286,9 @@ const OurImpact = ({
         <div className="container impact-cta-container">
 
 
+
           <Reveal>
+
 
 
             {impact.cta.eyebrow && (
@@ -1236,6 +1305,7 @@ const OurImpact = ({
             )}
 
 
+
             <h2>
 
               {
@@ -1244,6 +1314,7 @@ const OurImpact = ({
               }
 
             </h2>
+
 
 
             <p>
@@ -1256,7 +1327,9 @@ const OurImpact = ({
             </p>
 
 
+
             <div className="impact-cta-buttons">
+
 
 
               {/* DONATE */}
@@ -1287,6 +1360,7 @@ const OurImpact = ({
               </button>
 
 
+
               {/* GET INVOLVED */}
 
               <Link
@@ -1305,6 +1379,7 @@ const OurImpact = ({
                 }
 
 
+
                 <ArrowRight
                   size={17}
                 />
@@ -1312,6 +1387,8 @@ const OurImpact = ({
               </Link>
 
             </div>
+
+
 
           </Reveal>
 
@@ -1324,6 +1401,7 @@ const OurImpact = ({
   );
 
 };
+
 
 
 export default OurImpact;
