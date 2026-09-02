@@ -1,9 +1,5 @@
 const About = require("../models/About");
-
-const API_BASE_URL =
-  process.env.API_BASE_URL ||
-  "http://localhost:5000";
-
+const uploadToCloudinary = require("../utils/cloudinaryUpload");
 
 // ========================================
 // GET ABOUT
@@ -19,23 +15,17 @@ const getAbout = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      about
+      about,
     });
-
   } catch (error) {
-    console.error(
-      "GET ABOUT ERROR:",
-      error
-    );
+    console.error("GET ABOUT ERROR:", error);
 
     return res.status(500).json({
       success: false,
-      message:
-        "Failed to fetch About Us content"
+      message: "Failed to fetch About Us content",
     });
   }
 };
-
 
 // ========================================
 // UPDATE ABOUT
@@ -43,13 +33,11 @@ const getAbout = async (req, res) => {
 
 const updateAbout = async (req, res) => {
   try {
-
     let about = await About.findOne();
 
     if (!about) {
       about = await About.create({});
     }
-
 
     // ====================================
     // PARSE JSON SECTIONS
@@ -61,7 +49,6 @@ const updateAbout = async (req, res) => {
     let founder = {};
     let coreValues = [];
     let collaboration = {};
-
 
     if (req.body.story) {
       story = JSON.parse(req.body.story);
@@ -80,17 +67,12 @@ const updateAbout = async (req, res) => {
     }
 
     if (req.body.coreValues) {
-      coreValues = JSON.parse(
-        req.body.coreValues
-      );
+      coreValues = JSON.parse(req.body.coreValues);
     }
 
     if (req.body.collaboration) {
-      collaboration = JSON.parse(
-        req.body.collaboration
-      );
+      collaboration = JSON.parse(req.body.collaboration);
     }
-
 
     // ====================================
     // UPDATE TEXT CONTENT
@@ -98,90 +80,134 @@ const updateAbout = async (req, res) => {
 
     about.story = {
       ...about.story.toObject(),
-      ...story
+      ...story,
     };
 
     about.mission = {
       ...about.mission.toObject(),
-      ...mission
+      ...mission,
     };
 
     about.vision = {
       ...about.vision.toObject(),
-      ...vision
+      ...vision,
     };
 
     about.founder = {
       ...about.founder.toObject(),
-      ...founder
+      ...founder,
     };
 
-    about.coreValues =
-      Array.isArray(coreValues)
-        ? coreValues
-        : about.coreValues;
+    about.coreValues = Array.isArray(coreValues)
+      ? coreValues
+      : about.coreValues;
 
     about.collaboration = {
       ...about.collaboration.toObject(),
-      ...collaboration
+      ...collaboration,
     };
-
 
     // ====================================
     // HERO IMAGE
     // ====================================
 
-    if (
-      req.files?.heroImage?.[0]
-    ) {
+    if (req.files?.heroImage?.[0]) {
+      const file = req.files.heroImage[0];
+
+      const cloudinaryResult = await uploadToCloudinary(
+        file.buffer,
+        {
+          folder:
+            "david-chukwu-charity-foundation/about-us/hero",
+        }
+      );
+
+      if (!cloudinaryResult?.secure_url) {
+        throw new Error(
+          "Cloudinary did not return a Hero image URL."
+        );
+      }
 
       about.hero.imageUrl =
-        `/uploads/${req.files.heroImage[0].filename}`;
-
+        cloudinaryResult.secure_url;
     }
-
 
     // ====================================
     // FOUNDER IMAGE
     // ====================================
 
-    if (
-      req.files?.founderImage?.[0]
-    ) {
+    if (req.files?.founderImage?.[0]) {
+      const file = req.files.founderImage[0];
+
+      const cloudinaryResult = await uploadToCloudinary(
+        file.buffer,
+        {
+          folder:
+            "david-chukwu-charity-foundation/about-us/founder",
+        }
+      );
+
+      if (!cloudinaryResult?.secure_url) {
+        throw new Error(
+          "Cloudinary did not return a Founder image URL."
+        );
+      }
 
       about.founder.imageUrl =
-        `/uploads/${req.files.founderImage[0].filename}`;
-
+        cloudinaryResult.secure_url;
     }
-
 
     // ====================================
     // DAVID CHUKWU LOGO
     // ====================================
 
-    if (
-      req.files?.davidChukwuLogo?.[0]
-    ) {
+    if (req.files?.davidChukwuLogo?.[0]) {
+      const file = req.files.davidChukwuLogo[0];
+
+      const cloudinaryResult = await uploadToCloudinary(
+        file.buffer,
+        {
+          folder:
+            "david-chukwu-charity-foundation/about-us/logos",
+          publicId: "david-chukwu-logo",
+        }
+      );
+
+      if (!cloudinaryResult?.secure_url) {
+        throw new Error(
+          "Cloudinary did not return the David Chukwu logo URL."
+        );
+      }
 
       about.collaboration.davidChukwuLogo =
-        `/uploads/${req.files.davidChukwuLogo[0].filename}`;
-
+        cloudinaryResult.secure_url;
     }
-
 
     // ====================================
     // NICHOLAS MARK LOGO
     // ====================================
 
-    if (
-      req.files?.nicholasMarkLogo?.[0]
-    ) {
+    if (req.files?.nicholasMarkLogo?.[0]) {
+      const file = req.files.nicholasMarkLogo[0];
+
+      const cloudinaryResult = await uploadToCloudinary(
+        file.buffer,
+        {
+          folder:
+            "david-chukwu-charity-foundation/about-us/logos",
+          publicId: "nicholas-mark-logo",
+        }
+      );
+
+      if (!cloudinaryResult?.secure_url) {
+        throw new Error(
+          "Cloudinary did not return the Nicholas Mark logo URL."
+        );
+      }
 
       about.collaboration.nicholasMarkLogo =
-        `/uploads/${req.files.nicholasMarkLogo[0].filename}`;
-
+        cloudinaryResult.secure_url;
     }
-
 
     // ====================================
     // SAVE
@@ -189,32 +215,28 @@ const updateAbout = async (req, res) => {
 
     await about.save();
 
-
     return res.status(200).json({
       success: true,
-      message:
-        "About Us content updated successfully",
-      about
+      message: "About Us content updated successfully",
+      about,
     });
-
   } catch (error) {
-
-    console.error(
-      "UPDATE ABOUT ERROR:",
-      error
-    );
+    console.error("UPDATE ABOUT ERROR:", error);
 
     return res.status(500).json({
       success: false,
       message:
         error.message ||
-        "Failed to update About Us content"
+        "Failed to update About Us content",
     });
   }
 };
 
+// ========================================
+// EXPORTS
+// ========================================
 
 module.exports = {
   getAbout,
-  updateAbout
+  updateAbout,
 };

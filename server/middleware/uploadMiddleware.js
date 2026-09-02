@@ -1,88 +1,42 @@
 const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
 
-/*
-|--------------------------------------------------------------------------
-| UPLOAD DIRECTORY
-|--------------------------------------------------------------------------
-*/
+// ============================================================
+// MULTER MEMORY STORAGE
+// ============================================================
+// Files are kept in memory as req.file.buffer.
+// This allows us to send them directly to Cloudinary.
+// No files are permanently stored on Render's local filesystem.
+// ============================================================
 
-const uploadDirectory = path.join(
-  __dirname,
-  "../uploads"
-);
+const storage = multer.memoryStorage();
 
-/*
-|--------------------------------------------------------------------------
-| ENSURE UPLOAD DIRECTORY EXISTS
-|--------------------------------------------------------------------------
-*/
-
-if (!fs.existsSync(uploadDirectory)) {
-  fs.mkdirSync(uploadDirectory, {
-    recursive: true
-  });
-}
-
-/*
-|--------------------------------------------------------------------------
-| MULTER STORAGE
-|--------------------------------------------------------------------------
-*/
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadDirectory);
-  },
-
-  filename: (req, file, cb) => {
-    const extension = path.extname(
-      file.originalname
-    );
-
-    const filename = `${Date.now()}-${Math.round(
-      Math.random() * 1e9
-    )}${extension}`;
-
-    cb(null, filename);
-  }
-});
-
-/*
-|--------------------------------------------------------------------------
-| FILE FILTER
-|--------------------------------------------------------------------------
-*/
+// ============================================================
+// FILE FILTER
+// ============================================================
 
 const fileFilter = (req, file, cb) => {
   const allowedTypes = [
     "image/jpeg",
     "image/jpg",
     "image/png",
-    "video/mp4"
+    "image/webp",
+    "video/mp4",
   ];
 
-  if (
-    allowedTypes.includes(
-      file.mimetype
-    )
-  ) {
+  if (allowedTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
     cb(
       new Error(
-        "Only JPG, JPEG, PNG and MP4 files are allowed"
+        "Only JPG, JPEG, PNG, WEBP and MP4 files are allowed"
       )
     );
   }
 };
 
-/*
-|--------------------------------------------------------------------------
-| MULTER CONFIGURATION
-|--------------------------------------------------------------------------
-*/
+// ============================================================
+// MULTER CONFIGURATION
+// ============================================================
 
 const upload = multer({
   storage,
@@ -90,14 +44,8 @@ const upload = multer({
   fileFilter,
 
   limits: {
-    fileSize: 50 * 1024 * 1024
-  }
+    fileSize: 50 * 1024 * 1024, // 50MB
+  },
 });
-
-/*
-|--------------------------------------------------------------------------
-| EXPORT
-|--------------------------------------------------------------------------
-*/
 
 module.exports = upload;
