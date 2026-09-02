@@ -9,86 +9,53 @@ import API from "../../api/axios";
 import "../../styles/Admin.settings.css";
 
 const AdminSettings = () => {
-  // ==========================================================================
+  // ============================================================================
   // SETTINGS STATE
-  // ==========================================================================
+  // ============================================================================
 
   const [settings, setSettings] = useState(null);
 
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [resetting, setResetting] = useState(false);
-
-  // ==========================================================================
-  // UPLOAD STATES
-  // ==========================================================================
-
-  const [uploadingHero, setUploadingHero] = useState(false);
-  const [uploadingAbout, setUploadingAbout] = useState(false);
-  const [uploadingFeatured, setUploadingFeatured] =
-    useState(false);
-  const [uploadingCta, setUploadingCta] = useState(false);
-  const [uploadingCause, setUploadingCause] =
-    useState(null);
-
-  // ==========================================================================
-  // SELECTED FILES
-  // ==========================================================================
-
-  const [heroImageFile, setHeroImageFile] =
-    useState(null);
-
-  const [aboutImageFile, setAboutImageFile] =
-    useState(null);
-
-  const [featuredImageFile, setFeaturedImageFile] =
-    useState(null);
-
-  const [ctaImageFile, setCtaImageFile] =
-    useState(null);
-
-  const [causeImageFiles, setCauseImageFiles] =
-    useState({
-      0: null,
-      1: null,
-      2: null,
-      3: null,
-    });
-
-  // ==========================================================================
-  // IMAGE PREVIEWS
-  // ==========================================================================
-
-  const [heroPreview, setHeroPreview] =
-    useState("");
-
-  const [aboutPreview, setAboutPreview] =
-    useState("");
-
-  const [featuredPreview, setFeaturedPreview] =
-    useState("");
-
-  const [ctaPreview, setCtaPreview] =
-    useState("");
-
-  const [causePreviews, setCausePreviews] =
-    useState({
-      0: "",
-      1: "",
-      2: "",
-      3: "",
-    });
-
-  // ==========================================================================
-  // MESSAGES
-  // ==========================================================================
+  const [isBusy, setIsBusy] = useState(false);
 
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
-  // ==========================================================================
-  // IMAGE URL HELPER
-  // ==========================================================================
+  // ============================================================================
+  // IMAGE FILE STATE
+  // ============================================================================
+
+  const [heroImageFile, setHeroImageFile] = useState(null);
+  const [aboutImageFile, setAboutImageFile] = useState(null);
+  const [featuredImageFile, setFeaturedImageFile] = useState(null);
+  const [ctaImageFile, setCtaImageFile] = useState(null);
+
+  const [causeImageFiles, setCauseImageFiles] = useState({});
+
+  // ============================================================================
+  // IMAGE PREVIEW STATE
+  // ============================================================================
+
+  const [heroPreview, setHeroPreview] = useState("");
+  const [aboutPreview, setAboutPreview] = useState("");
+  const [featuredPreview, setFeaturedPreview] = useState("");
+  const [ctaPreview, setCtaPreview] = useState("");
+
+  const [causePreviews, setCausePreviews] = useState({});
+
+  // ============================================================================
+  // IMAGE HELPERS
+  // ============================================================================
+
+  const isCloudinaryImageUrl = useCallback(
+    (image) => {
+      return (
+        typeof image === "string" &&
+        image.includes("res.cloudinary.com/")
+      );
+    },
+    []
+  );
 
   const getImageUrl = useCallback((image) => {
     if (!image) {
@@ -96,309 +63,308 @@ const AdminSettings = () => {
     }
 
     if (
-      image.startsWith("http://") ||
-      image.startsWith("https://") ||
+      typeof image === "string" &&
       image.startsWith("blob:")
     ) {
       return image;
     }
 
-    const baseURL =
-      API.defaults?.baseURL ||
-      import.meta.env.VITE_API_URL ||
-      "http://localhost:5000/api";
-
-    const serverURL = baseURL.replace(
-      /\/api\/?$/,
-      ""
-    );
-
-    if (image.startsWith("/")) {
-      return `${serverURL}${image}`;
+    if (
+      typeof image === "string" &&
+      image.startsWith("http://")
+    ) {
+      return image;
     }
 
-    return `${serverURL}/${image}`;
+    if (
+      typeof image === "string" &&
+      image.startsWith("https://")
+    ) {
+      return image;
+    }
+
+    if (
+      typeof image === "string" &&
+      image.startsWith("/uploads/")
+    ) {
+      const apiBaseUrl =
+        import.meta.env.VITE_API_URL ||
+        "http://localhost:5000/api";
+
+      const serverBaseUrl =
+        apiBaseUrl.replace(/\/api\/?$/, "");
+
+      return `${serverBaseUrl}${image}`;
+    }
+
+    return image;
   }, []);
 
-  // ==========================================================================
-  // REMOVE ABOUT PAGE FROM SETTINGS
-  // ==========================================================================
+  // ============================================================================
+  // LOAD SETTINGS
+  // ============================================================================
 
-  const cleanSettings = useCallback(
-    (loadedSettings) => {
-      if (!loadedSettings) {
-        return loadedSettings;
+  const loadSettings = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError("");
+
+      const response = await API.get("/settings");
+
+      if (!response.data?.success) {
+        throw new Error(
+          response.data?.message ||
+            "Failed to load settings."
+        );
       }
 
-      const {
-        aboutPage,
-        ...settingsWithoutAboutPage
-      } = loadedSettings;
+      const loadedSettings =
+        response.data?.settings;
 
-      return settingsWithoutAboutPage;
-    },
-    []
-  );
+      if (!loadedSettings) {
+        throw new Error(
+          "No settings were returned by the server."
+        );
+      }
 
-  // ==========================================================================
+      setSettings(loadedSettings);
+
+      updatePreviews(loadedSettings);
+    } catch (err) {
+      console.error(
+        "LOAD SETTINGS ERROR:",
+        err
+      );
+
+      setError(
+        err.response?.data?.message ||
+          err.message ||
+          "Failed to load settings."
+      );
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // ============================================================================
   // UPDATE IMAGE PREVIEWS
-  // ==========================================================================
+  // ============================================================================
 
   const updatePreviews = useCallback(
-    (loadedSettings) => {
+    (currentSettings) => {
+      if (!currentSettings) {
+        return;
+      }
+
       const homepage =
-        loadedSettings?.homepage || {};
+        currentSettings.homepage || {};
 
-      const hero =
-        homepage.hero || {};
+      // ------------------------------------------------------------------------
+      // HERO
+      // ------------------------------------------------------------------------
 
-      const about =
-        homepage.about || {};
+      const heroImage =
+        homepage.hero?.image || "";
 
-      const featured =
-        homepage.featured || {};
+      if (heroImage) {
+        setHeroPreview(
+          getImageUrl(heroImage)
+        );
+      }
 
-      const cta =
-        homepage.cta || {};
+      // ------------------------------------------------------------------------
+      // ABOUT
+      // ------------------------------------------------------------------------
+
+      const aboutImage =
+        homepage.about?.image || "";
+
+      if (aboutImage) {
+        setAboutPreview(
+          getImageUrl(aboutImage)
+        );
+      }
+
+      // ------------------------------------------------------------------------
+      // FEATURED
+      // ------------------------------------------------------------------------
+
+      const featuredImage =
+        homepage.featured?.image || "";
+
+      if (featuredImage) {
+        setFeaturedPreview(
+          getImageUrl(featuredImage)
+        );
+      }
+
+      // ------------------------------------------------------------------------
+      // CTA
+      // ------------------------------------------------------------------------
+
+      const ctaImage =
+        homepage.cta?.image || "";
+
+      if (ctaImage) {
+        setCtaPreview(
+          getImageUrl(ctaImage)
+        );
+      }
+
+      // ------------------------------------------------------------------------
+      // CAUSES
+      // ------------------------------------------------------------------------
 
       const causes =
         homepage.causes?.items || [];
 
-      setHeroPreview(
-        getImageUrl(hero.image || "")
-      );
+      const previews = {};
 
-      setAboutPreview(
-        getImageUrl(about.image || "")
-      );
-
-      setFeaturedPreview(
-        getImageUrl(featured.image || "")
-      );
-
-      setCtaPreview(
-        getImageUrl(cta.image || "")
-      );
-
-      setCausePreviews({
-        0: getImageUrl(
-          causes[0]?.image || ""
-        ),
-        1: getImageUrl(
-          causes[1]?.image || ""
-        ),
-        2: getImageUrl(
-          causes[2]?.image || ""
-        ),
-        3: getImageUrl(
-          causes[3]?.image || ""
-        ),
+      causes.forEach((cause, index) => {
+        if (cause?.image) {
+          previews[index] =
+            getImageUrl(cause.image);
+        }
       });
+
+      setCausePreviews(previews);
     },
     [getImageUrl]
   );
 
-  // ==========================================================================
-  // FETCH SETTINGS
-  // ==========================================================================
-
-  const fetchSettings = useCallback(
-    async () => {
-      try {
-        setLoading(true);
-        setError("");
-
-        const response =
-          await API.get("/settings");
-
-        if (!response.data?.success) {
-          throw new Error(
-            response.data?.message ||
-              "Failed to load settings."
-          );
-        }
-
-        const loadedSettings =
-          response.data?.settings;
-
-        if (!loadedSettings) {
-          throw new Error(
-            "No settings were returned by the server."
-          );
-        }
-
-        const cleanedSettings =
-          cleanSettings(
-            loadedSettings
-          );
-
-        setSettings(cleanedSettings);
-
-        updatePreviews(
-          cleanedSettings
-        );
-      } catch (err) {
-        console.error(
-          "FETCH SETTINGS ERROR:",
-          err
-        );
-
-        setError(
-          err.response?.data?.message ||
-            err.message ||
-            "Failed to load settings."
-        );
-      } finally {
-        setLoading(false);
-      }
-    },
-    [
-      cleanSettings,
-      updatePreviews,
-    ]
-  );
-
-  // ==========================================================================
+  // ============================================================================
   // INITIAL LOAD
-  // ==========================================================================
+  // ============================================================================
 
   useEffect(() => {
-    fetchSettings();
-  }, [fetchSettings]);
+    loadSettings();
+  }, [loadSettings]);
 
-  // ==========================================================================
-  // CLEANUP BLOB URLS
-  // ==========================================================================
+  // ============================================================================
+  // FORM VALUE HANDLER
+  // ============================================================================
 
-  useEffect(() => {
-    return () => {
-      const previews = [
-        heroPreview,
-        aboutPreview,
-        featuredPreview,
-        ctaPreview,
-        ...Object.values(causePreviews),
-      ];
-
-      previews.forEach((preview) => {
-        if (
-          preview &&
-          preview.startsWith("blob:")
-        ) {
-          URL.revokeObjectURL(preview);
-        }
-      });
-    };
-  }, [
-    heroPreview,
-    aboutPreview,
-    featuredPreview,
-    ctaPreview,
-    causePreviews,
-  ]);
-
-  // ==========================================================================
-  // MESSAGE HELPERS
-  // ==========================================================================
-
-  const clearMessages = () => {
-    setMessage("");
-    setError("");
-  };
-
-  // ==========================================================================
-  // TOP LEVEL FIELD CHANGE
-  // ==========================================================================
-
-  const handleChange = (event) => {
+  const handleChange = (
+    event,
+    section = null,
+    nestedSection = null,
+    index = null
+  ) => {
     const {
       name,
       value,
-    } = event.target;
-
-    clearMessages();
-
-    setSettings((previous) => ({
-      ...previous,
-      [name]: value,
-    }));
-  };
-
-  // ==========================================================================
-  // BOOLEAN FIELD CHANGE
-  // ==========================================================================
-
-  const handleBooleanChange = (event) => {
-    const {
-      name,
+      type,
       checked,
     } = event.target;
 
-    clearMessages();
+    const finalValue =
+      type === "checkbox"
+        ? checked
+        : value;
 
-    setSettings((previous) => ({
-      ...previous,
-      [name]: checked,
-    }));
-  };
+    setSettings((previous) => {
+      if (!previous) {
+        return previous;
+      }
 
-  // ==========================================================================
-  // NUMBER FIELD CHANGE
-  // ==========================================================================
+      // ------------------------------------------------------------------------
+      // ROOT SETTING
+      // ------------------------------------------------------------------------
 
-  const handleNumberChange = (event) => {
-    const {
-      name,
-      value,
-    } = event.target;
+      if (!section) {
+        return {
+          ...previous,
+          [name]: finalValue,
+        };
+      }
 
-    clearMessages();
+      // ------------------------------------------------------------------------
+      // FOOTER / OTHER OBJECT
+      // ------------------------------------------------------------------------
 
-    setSettings((previous) => ({
-      ...previous,
-      [name]: value,
-    }));
-  };
+      if (section !== "homepage") {
+        return {
+          ...previous,
+          [section]: {
+            ...(previous[section] || {}),
+            [name]: finalValue,
+          },
+        };
+      }
 
-  // ==========================================================================
-  // HOMEPAGE FIELD CHANGE
-  // ==========================================================================
+      // ------------------------------------------------------------------------
+      // HOMEPAGE
+      // ------------------------------------------------------------------------
 
-  const handleHomepageChange = (
-    section,
-    field,
-    value
-  ) => {
-    clearMessages();
+      if (
+        nestedSection === "causes" &&
+        index !== null
+      ) {
+        const currentCauses =
+          previous.homepage?.causes?.items ||
+          [];
 
-    setSettings((previous) => ({
-      ...previous,
+        const updatedCauses = [
+          ...currentCauses,
+        ];
 
-      homepage: {
-        ...(previous.homepage || {}),
+        updatedCauses[index] = {
+          ...(updatedCauses[index] || {}),
+          [name]: finalValue,
+        };
 
-        [section]: {
-          ...(previous.homepage?.[section] ||
-            {}),
+        return {
+          ...previous,
+          homepage: {
+            ...(previous.homepage || {}),
+            causes: {
+              ...(previous.homepage?.causes ||
+                {}),
+              items: updatedCauses,
+            },
+          },
+        };
+      }
 
-          [field]: value,
+      if (nestedSection) {
+        return {
+          ...previous,
+          homepage: {
+            ...(previous.homepage || {}),
+            [nestedSection]: {
+              ...(previous.homepage?.[
+                nestedSection
+              ] || {}),
+              [name]: finalValue,
+            },
+          },
+        };
+      }
+
+      return {
+        ...previous,
+        homepage: {
+          ...(previous.homepage || {}),
+          [name]: finalValue,
         },
-      },
-    }));
+      };
+    });
   };
 
-  // ==========================================================================
-  // CAUSE FIELD CHANGE
-  // ==========================================================================
+  // ============================================================================
+  // CAUSE CHANGE HANDLER
+  // ============================================================================
 
   const handleCauseChange = (
     index,
     field,
     value
   ) => {
-    clearMessages();
-
     setSettings((previous) => {
+      if (!previous) {
+        return previous;
+      }
+
       const currentCauses =
         previous.homepage?.causes?.items ||
         [];
@@ -414,14 +380,10 @@ const AdminSettings = () => {
 
       return {
         ...previous,
-
         homepage: {
           ...(previous.homepage || {}),
-
           causes: {
-            ...(previous.homepage?.causes ||
-              {}),
-
+            ...(previous.homepage?.causes || {}),
             items: updatedCauses,
           },
         },
@@ -429,282 +391,92 @@ const AdminSettings = () => {
     });
   };
 
-  // ==========================================================================
-  // IMAGE VALIDATION
-  // ==========================================================================
-
-  const validateImage = (
-    file,
-    imageName
-  ) => {
-    if (!file) {
-      setError(
-        `Please select a ${imageName.toLowerCase()}.`
-      );
-
-      return false;
-    }
-
-    const allowedTypes = [
-      "image/jpeg",
-      "image/jpg",
-      "image/png",
-      "image/webp",
-    ];
-
-    if (
-      !allowedTypes.includes(file.type)
-    ) {
-      setError(
-        `${imageName} must be JPG, JPEG, PNG or WEBP.`
-      );
-
-      return false;
-    }
-
-    const maxSize =
-      5 * 1024 * 1024;
-
-    if (file.size > maxSize) {
-      setError(
-        `${imageName} must not exceed 5MB.`
-      );
-
-      return false;
-    }
-
-    return true;
-  };
-
-  // ==========================================================================
-  // CREATE PREVIEW
-  // ==========================================================================
-
-  const createPreview = (file) => {
-    return URL.createObjectURL(file);
-  };
-
-  // ==========================================================================
-  // HERO IMAGE SELECT
-  // ==========================================================================
+  // ============================================================================
+  // IMAGE FILE HANDLERS
+  // ============================================================================
 
   const handleHeroImageSelect = (event) => {
-    const file =
-      event.target.files?.[0];
+    const file = event.target.files?.[0];
 
     if (!file) {
       return;
     }
-
-    if (
-      !validateImage(
-        file,
-        "Hero image"
-      )
-    ) {
-      event.target.value = "";
-      return;
-    }
-
-    clearMessages();
-
-    if (
-      heroPreview?.startsWith("blob:")
-    ) {
-      URL.revokeObjectURL(
-        heroPreview
-      );
-    }
-
-    const preview =
-      createPreview(file);
 
     setHeroImageFile(file);
-    setHeroPreview(preview);
+
+    setHeroPreview(
+      URL.createObjectURL(file)
+    );
   };
 
-  // ==========================================================================
-  // ABOUT IMAGE SELECT
-  // ==========================================================================
-
-  const handleAboutImageSelect = (
-    event
-  ) => {
-    const file =
-      event.target.files?.[0];
+  const handleAboutImageSelect = (event) => {
+    const file = event.target.files?.[0];
 
     if (!file) {
       return;
     }
 
-    if (
-      !validateImage(
-        file,
-        "About image"
-      )
-    ) {
-      event.target.value = "";
-      return;
-    }
-
-    clearMessages();
-
-    if (
-      aboutPreview?.startsWith("blob:")
-    ) {
-      URL.revokeObjectURL(
-        aboutPreview
-      );
-    }
-
-    const preview =
-      createPreview(file);
-
     setAboutImageFile(file);
-    setAboutPreview(preview);
-  };
 
-  // ==========================================================================
-  // FEATURED IMAGE SELECT
-  // ==========================================================================
+    setAboutPreview(
+      URL.createObjectURL(file)
+    );
+  };
 
   const handleFeaturedImageSelect = (
     event
   ) => {
-    const file =
-      event.target.files?.[0];
+    const file = event.target.files?.[0];
 
     if (!file) {
       return;
     }
-
-    if (
-      !validateImage(
-        file,
-        "Featured image"
-      )
-    ) {
-      event.target.value = "";
-      return;
-    }
-
-    clearMessages();
-
-    if (
-      featuredPreview?.startsWith("blob:")
-    ) {
-      URL.revokeObjectURL(
-        featuredPreview
-      );
-    }
-
-    const preview =
-      createPreview(file);
 
     setFeaturedImageFile(file);
-    setFeaturedPreview(preview);
+
+    setFeaturedPreview(
+      URL.createObjectURL(file)
+    );
   };
 
-  // ==========================================================================
-  // CTA IMAGE SELECT
-  // ==========================================================================
-
-  const handleCtaImageSelect = (
-    event
-  ) => {
-    const file =
-      event.target.files?.[0];
+  const handleCtaImageSelect = (event) => {
+    const file = event.target.files?.[0];
 
     if (!file) {
       return;
     }
-
-    if (
-      !validateImage(
-        file,
-        "CTA image"
-      )
-    ) {
-      event.target.value = "";
-      return;
-    }
-
-    clearMessages();
-
-    if (
-      ctaPreview?.startsWith("blob:")
-    ) {
-      URL.revokeObjectURL(
-        ctaPreview
-      );
-    }
-
-    const preview =
-      createPreview(file);
 
     setCtaImageFile(file);
-    setCtaPreview(preview);
+
+    setCtaPreview(
+      URL.createObjectURL(file)
+    );
   };
 
-  // ==========================================================================
-  // CAUSE IMAGE SELECT
-  // ==========================================================================
-
   const handleCauseImageSelect = (
-    event,
-    index
+    index,
+    event
   ) => {
-    const file =
-      event.target.files?.[0];
+    const file = event.target.files?.[0];
 
     if (!file) {
       return;
     }
 
-    if (
-      !validateImage(
-        file,
-        `Cause ${index + 1} image`
-      )
-    ) {
-      event.target.value = "";
-      return;
-    }
+    setCauseImageFiles((previous) => ({
+      ...previous,
+      [index]: file,
+    }));
 
-    clearMessages();
-
-    const oldPreview =
-      causePreviews[index];
-
-    if (
-      oldPreview?.startsWith("blob:")
-    ) {
-      URL.revokeObjectURL(
-        oldPreview
-      );
-    }
-
-    const preview =
-      createPreview(file);
-
-    setCauseImageFiles(
-      (previous) => ({
-        ...previous,
-        [index]: file,
-      })
-    );
-
-    setCausePreviews(
-      (previous) => ({
-        ...previous,
-        [index]: preview,
-      })
-    );
+    setCausePreviews((previous) => ({
+      ...previous,
+      [index]: URL.createObjectURL(file),
+    }));
   };
 
-  // ==========================================================================
+  // ============================================================================
   // PROCESS UPLOAD RESPONSE
-  // ==========================================================================
+  // ============================================================================
 
   const processUploadResponse = (
     response,
@@ -717,66 +489,159 @@ const AdminSettings = () => {
       );
     }
 
-    const updatedSettings =
-      response.data?.settings;
+    const uploadedImage =
+      response.data?.image;
 
-    if (updatedSettings) {
-      const cleanedSettings =
-        cleanSettings(
-          updatedSettings
-        );
-
-      setSettings(
-        cleanedSettings
-      );
-
-      updatePreviews(
-        cleanedSettings
+    if (
+      typeof uploadedImage !== "string" ||
+      !uploadedImage.trim()
+    ) {
+      throw new Error(
+        "Upload succeeded, but the server did not return an image URL."
       );
     }
 
-    return updatedSettings;
+    return uploadedImage.trim();
   };
 
-  // ==========================================================================
-  // UPLOAD HERO IMAGE
-  // ==========================================================================
+  // ============================================================================
+  // APPLY UPLOADED IMAGE
+  // ============================================================================
+
+  const applyUploadedImage = useCallback(
+    (
+      section,
+      uploadedImage,
+      causeIndex = null
+    ) => {
+      setSettings((previous) => {
+        if (!previous) {
+          return previous;
+        }
+
+        // ----------------------------------------------------------------------
+        // CAUSE IMAGE
+        // ----------------------------------------------------------------------
+
+        if (causeIndex !== null) {
+          const currentCauses =
+            previous.homepage?.causes?.items ||
+            [];
+
+          const updatedCauses = [
+            ...currentCauses,
+          ];
+
+          updatedCauses[causeIndex] = {
+            ...(updatedCauses[causeIndex] || {}),
+            image: uploadedImage,
+          };
+
+          return {
+            ...previous,
+            homepage: {
+              ...(previous.homepage || {}),
+              causes: {
+                ...(previous.homepage?.causes ||
+                  {}),
+                items: updatedCauses,
+              },
+            },
+          };
+        }
+
+        // ----------------------------------------------------------------------
+        // NORMAL HOMEPAGE IMAGE
+        // ----------------------------------------------------------------------
+
+        return {
+          ...previous,
+          homepage: {
+            ...(previous.homepage || {}),
+            [section]: {
+              ...(previous.homepage?.[
+                section
+              ] || {}),
+              image: uploadedImage,
+            },
+          },
+        };
+      });
+
+      // ------------------------------------------------------------------------
+      // UPDATE PREVIEW
+      // ------------------------------------------------------------------------
+
+      if (causeIndex !== null) {
+        setCausePreviews((previous) => ({
+          ...previous,
+          [causeIndex]:
+            getImageUrl(uploadedImage),
+        }));
+
+        return;
+      }
+
+      const preview =
+        getImageUrl(uploadedImage);
+
+      if (section === "hero") {
+        setHeroPreview(preview);
+      }
+
+      if (section === "about") {
+        setAboutPreview(preview);
+      }
+
+      if (section === "featured") {
+        setFeaturedPreview(preview);
+      }
+
+      if (section === "cta") {
+        setCtaPreview(preview);
+      }
+    },
+    [getImageUrl]
+  );
+
+  // ============================================================================
+  // HERO IMAGE UPLOAD
+  // ============================================================================
 
   const handleHeroUpload = async () => {
     if (!heroImageFile) {
       setError(
         "Please select a hero image first."
       );
-
       return;
     }
 
     try {
-      setUploadingHero(true);
-      clearMessages();
+      setIsBusy(true);
+      setError("");
+      setMessage("");
 
-      const formData =
-        new FormData();
+      const formData = new FormData();
 
       formData.append(
         "heroImage",
         heroImageFile
       );
 
-      const response =
-        await API.post(
-          "/settings/hero-image",
-          formData,
-          {
-            headers: {
-              "Content-Type": undefined,
-            },
-          }
+      const response = await API.post(
+        "/settings/hero-image",
+        formData
+      );
+
+      const uploadedImage =
+        processUploadResponse(
+          response,
+          "Failed to upload hero image."
         );
 
-      processUploadResponse(
-        response,
-        "Failed to upload hero image."
+      applyUploadedImage(
+        "hero",
+        uploadedImage
       );
 
       setHeroImageFile(null);
@@ -786,7 +651,7 @@ const AdminSettings = () => {
       );
     } catch (err) {
       console.error(
-        "UPLOAD HERO IMAGE ERROR:",
+        "HERO IMAGE UPLOAD ERROR:",
         err
       );
 
@@ -796,59 +661,58 @@ const AdminSettings = () => {
           "Failed to upload hero image."
       );
     } finally {
-      setUploadingHero(false);
+      setIsBusy(false);
     }
   };
 
-  // ==========================================================================
-  // UPLOAD ABOUT IMAGE
-  // ==========================================================================
+  // ============================================================================
+  // ABOUT IMAGE UPLOAD
+  // ============================================================================
 
   const handleAboutUpload = async () => {
     if (!aboutImageFile) {
       setError(
-        "Please select an about image first."
+        "Please select an About image first."
       );
-
       return;
     }
 
     try {
-      setUploadingAbout(true);
-      clearMessages();
+      setIsBusy(true);
+      setError("");
+      setMessage("");
 
-      const formData =
-        new FormData();
+      const formData = new FormData();
 
       formData.append(
         "aboutImage",
         aboutImageFile
       );
 
-      const response =
-        await API.post(
-          "/settings/about-image",
-          formData,
-          {
-            headers: {
-              "Content-Type": undefined,
-            },
-          }
+      const response = await API.post(
+        "/settings/about-image",
+        formData
+      );
+
+      const uploadedImage =
+        processUploadResponse(
+          response,
+          "Failed to upload about image."
         );
 
-      processUploadResponse(
-        response,
-        "Failed to upload about image."
+      applyUploadedImage(
+        "about",
+        uploadedImage
       );
 
       setAboutImageFile(null);
 
       setMessage(
-        "About image uploaded successfully."
+        "Homepage About image uploaded successfully."
       );
     } catch (err) {
       console.error(
-        "UPLOAD ABOUT IMAGE ERROR:",
+        "ABOUT IMAGE UPLOAD ERROR:",
         err
       );
 
@@ -858,111 +722,110 @@ const AdminSettings = () => {
           "Failed to upload about image."
       );
     } finally {
-      setUploadingAbout(false);
+      setIsBusy(false);
     }
   };
 
-  // ==========================================================================
-  // UPLOAD FEATURED IMAGE
-  // ==========================================================================
+  // ============================================================================
+  // FEATURED IMAGE UPLOAD
+  // ============================================================================
 
-  const handleFeaturedUpload = async () => {
-    if (!featuredImageFile) {
-      setError(
-        "Please select a featured image first."
-      );
+  const handleFeaturedUpload =
+    async () => {
+      if (!featuredImageFile) {
+        setError(
+          "Please select a featured image first."
+        );
+        return;
+      }
 
-      return;
-    }
+      try {
+        setIsBusy(true);
+        setError("");
+        setMessage("");
 
-    try {
-      setUploadingFeatured(true);
-      clearMessages();
+        const formData = new FormData();
 
-      const formData =
-        new FormData();
-
-      formData.append(
-        "featuredImage",
-        featuredImageFile
-      );
-
-      const response =
-        await API.post(
-          "/settings/featured-image",
-          formData,
-          {
-            headers: {
-              "Content-Type": undefined,
-            },
-          }
+        formData.append(
+          "featuredImage",
+          featuredImageFile
         );
 
-      processUploadResponse(
-        response,
-        "Failed to upload featured image."
-      );
+        const response = await API.post(
+          "/settings/featured-image",
+          formData
+        );
 
-      setFeaturedImageFile(null);
+        const uploadedImage =
+          processUploadResponse(
+            response,
+            "Failed to upload featured image."
+          );
 
-      setMessage(
-        "Featured image uploaded successfully."
-      );
-    } catch (err) {
-      console.error(
-        "UPLOAD FEATURED IMAGE ERROR:",
-        err
-      );
+        applyUploadedImage(
+          "featured",
+          uploadedImage
+        );
 
-      setError(
-        err.response?.data?.message ||
-          err.message ||
-          "Failed to upload featured image."
-      );
-    } finally {
-      setUploadingFeatured(false);
-    }
-  };
+        setFeaturedImageFile(null);
 
-  // ==========================================================================
-  // UPLOAD CTA IMAGE
-  // ==========================================================================
+        setMessage(
+          "Featured image uploaded successfully."
+        );
+      } catch (err) {
+        console.error(
+          "FEATURED IMAGE UPLOAD ERROR:",
+          err
+        );
+
+        setError(
+          err.response?.data?.message ||
+            err.message ||
+            "Failed to upload featured image."
+        );
+      } finally {
+        setIsBusy(false);
+      }
+    };
+
+  // ============================================================================
+  // CTA IMAGE UPLOAD
+  // ============================================================================
 
   const handleCtaUpload = async () => {
     if (!ctaImageFile) {
       setError(
         "Please select a CTA image first."
       );
-
       return;
     }
 
     try {
-      setUploadingCta(true);
-      clearMessages();
+      setIsBusy(true);
+      setError("");
+      setMessage("");
 
-      const formData =
-        new FormData();
+      const formData = new FormData();
 
       formData.append(
         "ctaImage",
         ctaImageFile
       );
 
-      const response =
-        await API.post(
-          "/settings/cta-image",
-          formData,
-          {
-            headers: {
-              "Content-Type": undefined,
-            },
-          }
+      const response = await API.post(
+        "/settings/cta-image",
+        formData
+      );
+
+      const uploadedImage =
+        processUploadResponse(
+          response,
+          "Failed to upload CTA image."
         );
 
-      processUploadResponse(
-        response,
-        "Failed to upload CTA image."
+      applyUploadedImage(
+        "cta",
+        uploadedImage
       );
 
       setCtaImageFile(null);
@@ -972,7 +835,7 @@ const AdminSettings = () => {
       );
     } catch (err) {
       console.error(
-        "UPLOAD CTA IMAGE ERROR:",
+        "CTA IMAGE UPLOAD ERROR:",
         err
       );
 
@@ -982,13 +845,13 @@ const AdminSettings = () => {
           "Failed to upload CTA image."
       );
     } finally {
-      setUploadingCta(false);
+      setIsBusy(false);
     }
   };
 
-  // ==========================================================================
-  // UPLOAD CAUSE IMAGE
-  // ==========================================================================
+  // ============================================================================
+  // CAUSE IMAGE UPLOAD
+  // ============================================================================
 
   const handleCauseUpload = async (
     index
@@ -998,20 +861,19 @@ const AdminSettings = () => {
 
     if (!file) {
       setError(
-        `Please select a Cause ${
+        `Please select an image for Cause ${
           index + 1
-        } image first.`
+        } first.`
       );
-
       return;
     }
 
     try {
-      setUploadingCause(index);
-      clearMessages();
+      setIsBusy(true);
+      setError("");
+      setMessage("");
 
-      const formData =
-        new FormData();
+      const formData = new FormData();
 
       formData.append(
         "causeImage",
@@ -1023,20 +885,21 @@ const AdminSettings = () => {
         String(index)
       );
 
-      const response =
-        await API.post(
-          "/settings/causes-image",
-          formData,
-          {
-            headers: {
-              "Content-Type": undefined,
-            },
-          }
+      const response = await API.post(
+        "/settings/causes-image",
+        formData
+      );
+
+      const uploadedImage =
+        processUploadResponse(
+          response,
+          "Failed to upload cause image."
         );
 
-      processUploadResponse(
-        response,
-        "Failed to upload cause image."
+      applyUploadedImage(
+        "causes",
+        uploadedImage,
+        index
       );
 
       setCauseImageFiles(
@@ -1053,7 +916,7 @@ const AdminSettings = () => {
       );
     } catch (err) {
       console.error(
-        "UPLOAD CAUSE IMAGE ERROR:",
+        "CAUSE IMAGE UPLOAD ERROR:",
         err
       );
 
@@ -1063,299 +926,465 @@ const AdminSettings = () => {
           "Failed to upload cause image."
       );
     } finally {
-      setUploadingCause(null);
+      setIsBusy(false);
     }
   };
 
-  // ==========================================================================
+  // ============================================================================
   // CREATE SAVE PAYLOAD
-  // ==========================================================================
+  // ============================================================================
+  //
+  // IMPORTANT:
+  // Images are intentionally NOT included here.
+  //
+  // Image uploads are handled independently by Cloudinary upload endpoints.
+  // This prevents Save Settings from accidentally sending:
+  //
+  //     ""
+  //     "/uploads/..."
+  //
+  // over an existing Cloudinary URL.
+  //
+  // ============================================================================
 
-  const createSavePayload = () => {
-    const homepage =
-      settings.homepage || {};
+  const createSavePayload = useCallback(
+    (currentSettings) => {
+      if (!currentSettings) {
+        return {};
+      }
 
-    const hero =
-      homepage.hero || {};
+      const homepage =
+        currentSettings.homepage || {};
 
-    const about =
-      homepage.about || {};
+      const hero =
+        homepage.hero || {};
 
-    const causes =
-      homepage.causes || {};
+      const about =
+        homepage.about || {};
 
-    const featured =
-      homepage.featured || {};
+      const causes =
+        homepage.causes || {};
 
-    const cta =
-      homepage.cta || {};
+      const featured =
+        homepage.featured || {};
 
-    const footer =
-      settings.footer || {};
+      const cta =
+        homepage.cta || {};
 
-    const causesItems =
-      causes.items || [];
+      return {
+        foundationName:
+          currentSettings.foundationName ||
+          "",
 
-    return {
-      // ========================================================================
-      // FOUNDATION INFORMATION
-      // ========================================================================
-
-      foundationName:
-        settings.foundationName || "",
-
-      description:
-        settings.description || "",
-
-      email:
-        settings.email || "",
-
-      phone:
-        settings.phone || "",
-
-      address:
-        settings.address || "",
-
-      website:
-        settings.website || "",
-
-      // ========================================================================
-      // SOCIAL MEDIA
-      // ========================================================================
-
-      facebook:
-        settings.facebook || "",
-
-      instagram:
-        settings.instagram || "",
-
-      twitter:
-        settings.twitter || "",
-
-      linkedin:
-        settings.linkedin || "",
-
-      // ========================================================================
-      // FOOTER
-      // ========================================================================
-
-      footer: {
         description:
-          footer.description || "",
-
-        copyrightText:
-          footer.copyrightText || "",
+          currentSettings.description ||
+          "",
 
         email:
-          footer.email || "",
+          currentSettings.email || "",
 
         phone:
-          footer.phone || "",
+          currentSettings.phone || "",
 
         address:
-          footer.address || "",
+          currentSettings.address || "",
+
+        website:
+          currentSettings.website || "",
 
         facebook:
-          footer.facebook || "",
+          currentSettings.facebook || "",
 
         instagram:
-          footer.instagram || "",
+          currentSettings.instagram || "",
 
         twitter:
-          footer.twitter || "",
+          currentSettings.twitter || "",
 
         linkedin:
-          footer.linkedin || "",
-      },
+          currentSettings.linkedin || "",
 
-      // ========================================================================
-      // HOMEPAGE
-      // ========================================================================
-
-      homepage: {
-        hero: {
-          eyebrow:
-            hero.eyebrow || "",
-
-          title:
-            hero.title || "",
-
+        footer: {
           description:
-            hero.description || "",
+            currentSettings.footer
+              ?.description || "",
 
-          primaryButtonText:
-            hero.primaryButtonText || "",
+          copyrightText:
+            currentSettings.footer
+              ?.copyrightText || "",
 
-          secondaryButtonText:
-            hero.secondaryButtonText || "",
+          email:
+            currentSettings.footer
+              ?.email || "",
 
-          image:
-            hero.image || "",
+          phone:
+            currentSettings.footer
+              ?.phone || "",
+
+          address:
+            currentSettings.footer
+              ?.address || "",
+
+          facebook:
+            currentSettings.footer
+              ?.facebook || "",
+
+          instagram:
+            currentSettings.footer
+              ?.instagram || "",
+
+          twitter:
+            currentSettings.footer
+              ?.twitter || "",
+
+          linkedin:
+            currentSettings.footer
+              ?.linkedin || "",
         },
 
-        about: {
-          eyebrow:
-            about.eyebrow || "",
+        homepage: {
+          hero: {
+            eyebrow:
+              hero.eyebrow || "",
 
-          title:
-            about.title || "",
+            title:
+              hero.title || "",
 
-          description:
-            about.description || "",
+            description:
+              hero.description || "",
 
-          buttonText:
-            about.buttonText || "",
+            primaryButtonText:
+              hero.primaryButtonText ||
+              "",
 
-          image:
-            about.image || "",
-        },
+            secondaryButtonText:
+              hero.secondaryButtonText ||
+              "",
+          },
 
-        causes: {
-          eyebrow:
-            causes.eyebrow || "",
+          about: {
+            eyebrow:
+              about.eyebrow || "",
 
-          title:
-            causes.title || "",
+            title:
+              about.title || "",
 
-          description:
-            causes.description || "",
+            description:
+              about.description || "",
 
-          items: causesItems.map(
-            (cause) => ({
+            buttonText:
+              about.buttonText || "",
+          },
+
+          causes: {
+            eyebrow:
+              causes.eyebrow || "",
+
+            title:
+              causes.title || "",
+
+            description:
+              causes.description || "",
+
+            items: (
+              causes.items || []
+            ).map((item) => ({
               title:
-                cause?.title || "",
+                item?.title || "",
 
               text:
-                cause?.text || "",
+                item?.text || "",
+            })),
+          },
 
-              image:
-                cause?.image || "",
-            })
+          featured: {
+            eyebrow:
+              featured.eyebrow || "",
+
+            title:
+              featured.title || "",
+
+            description:
+              featured.description || "",
+
+            buttonText:
+              featured.buttonText || "",
+          },
+
+          cta: {
+            eyebrow:
+              cta.eyebrow || "",
+
+            title:
+              cta.title || "",
+
+            description:
+              cta.description || "",
+
+            buttonText:
+              cta.buttonText || "",
+          },
+        },
+
+        donationEnabled:
+          Boolean(
+            currentSettings.donationEnabled
           ),
-        },
 
-        featured: {
-          eyebrow:
-            featured.eyebrow || "",
+        donationCurrency:
+          currentSettings.donationCurrency ||
+          "GBP",
 
-          title:
-            featured.title || "",
+        minimumDonation:
+          currentSettings.minimumDonation ??
+          0,
 
-          description:
-            featured.description || "",
+        maximumDonation:
+          currentSettings.maximumDonation ??
+          null,
 
-          buttonText:
-            featured.buttonText || "",
+        donationMessage:
+          currentSettings.donationMessage ||
+          "",
 
-          image:
-            featured.image || "",
-        },
+        emailNotifications:
+          Boolean(
+            currentSettings.emailNotifications
+          ),
 
-        cta: {
-          eyebrow:
-            cta.eyebrow || "",
+        newDonationNotifications:
+          Boolean(
+            currentSettings.newDonationNotifications
+          ),
 
-          title:
-            cta.title || "",
+        newContactNotifications:
+          Boolean(
+            currentSettings.newContactNotifications
+          ),
 
-          description:
-            cta.description || "",
+        newVolunteerNotifications:
+          Boolean(
+            currentSettings.newVolunteerNotifications
+          ),
 
-          buttonText:
-            cta.buttonText || "",
+        adminNotifications:
+          Boolean(
+            currentSettings.adminNotifications
+          ),
 
-          image:
-            cta.image || "",
-        },
+        darkMode:
+          Boolean(
+            currentSettings.darkMode
+          ),
+
+        compactSidebar:
+          Boolean(
+            currentSettings.compactSidebar
+          ),
+      };
+    },
+    []
+  );
+
+  // ============================================================================
+  // CLEAN RETURNED SETTINGS
+  // ============================================================================
+
+  const cleanSettings = useCallback(
+    (returnedSettings) => {
+      if (!returnedSettings) {
+        return returnedSettings;
+      }
+
+      const cleaned = {
+        ...returnedSettings,
+      };
+
+      return cleaned;
+    },
+    []
+  );
+
+  // ============================================================================
+  // MERGE SAVED SETTINGS WITH CURRENT IMAGES
+  // ============================================================================
+  //
+  // CRITICAL PROTECTION:
+  //
+  // If the current React state contains:
+  //
+  //     https://res.cloudinary.com/...
+  //
+  // that URL always wins over:
+  //
+  //     ""
+  //     "/uploads/..."
+  //     undefined
+  //
+  // This applies to:
+  //
+  //     Hero
+  //     About
+  //     Featured
+  //     CTA
+  //     Causes 1–4
+  //
+  // ============================================================================
+
+  const mergeSavedSettingsWithCurrentImages =
+    useCallback(
+      (
+        previousSettings,
+        returnedSettings
+      ) => {
+        if (!returnedSettings) {
+          return previousSettings;
+        }
+
+        if (!previousSettings) {
+          return returnedSettings;
+        }
+
+        const previousHomepage =
+          previousSettings.homepage || {};
+
+        const returnedHomepage =
+          returnedSettings.homepage || {};
+
+        // ----------------------------------------------------------------------
+        // IMAGE CHOOSER
+        // ----------------------------------------------------------------------
+
+        const chooseImage = (
+          previousImage,
+          returnedImage
+        ) => {
+          if (
+            isCloudinaryImageUrl(
+              previousImage
+            )
+          ) {
+            return previousImage;
+          }
+
+          return (
+            returnedImage ||
+            previousImage ||
+            ""
+          );
+        };
+
+        // ----------------------------------------------------------------------
+        // MERGE STANDARD HOMEPAGE IMAGE SECTION
+        // ----------------------------------------------------------------------
+
+        const mergeSection = (
+          section
+        ) => {
+          const previousSection =
+            previousHomepage[section] ||
+            {};
+
+          const returnedSection =
+            returnedHomepage[section] ||
+            {};
+
+          return {
+            ...previousSection,
+            ...returnedSection,
+
+            image: chooseImage(
+              previousSection.image,
+              returnedSection.image
+            ),
+          };
+        };
+
+        // ----------------------------------------------------------------------
+        // MERGE CAUSES
+        // ----------------------------------------------------------------------
+
+        const previousCauses =
+          previousHomepage.causes?.items ||
+          [];
+
+        const returnedCauses =
+          returnedHomepage.causes?.items ||
+          [];
+
+        const causeCount = Math.max(
+          previousCauses.length,
+          returnedCauses.length
+        );
+
+        const mergedCauses =
+          Array.from(
+            {
+              length: causeCount,
+            },
+            (_, index) => {
+              const previousCause =
+                previousCauses[index] ||
+                {};
+
+              const returnedCause =
+                returnedCauses[index] ||
+                {};
+
+              return {
+                ...previousCause,
+                ...returnedCause,
+
+                image: chooseImage(
+                  previousCause.image,
+                  returnedCause.image
+                ),
+              };
+            }
+          );
+
+        // ----------------------------------------------------------------------
+        // FINAL MERGED SETTINGS
+        // ----------------------------------------------------------------------
+
+        return {
+          ...previousSettings,
+          ...returnedSettings,
+
+          homepage: {
+            ...previousHomepage,
+            ...returnedHomepage,
+
+            hero:
+              mergeSection("hero"),
+
+            about:
+              mergeSection("about"),
+
+            featured:
+              mergeSection("featured"),
+
+            cta:
+              mergeSection("cta"),
+
+            causes: {
+              ...(previousHomepage.causes ||
+                {}),
+
+              ...(returnedHomepage.causes ||
+                {}),
+
+              items: mergedCauses,
+            },
+          },
+        };
       },
+      [isCloudinaryImageUrl]
+    );
 
-      // ========================================================================
-      // DONATION SETTINGS
-      // ========================================================================
-
-      donationEnabled:
-        Boolean(
-          settings.donationEnabled
-        ),
-
-      donationCurrency:
-        settings.donationCurrency ||
-        "GBP",
-
-      minimumDonation:
-        settings.minimumDonation ===
-          "" ||
-        settings.minimumDonation ===
-          null ||
-        settings.minimumDonation ===
-          undefined
-          ? 0
-          : Number(
-              settings.minimumDonation
-            ),
-
-      maximumDonation:
-        settings.maximumDonation ===
-          "" ||
-        settings.maximumDonation ===
-          null ||
-        settings.maximumDonation ===
-          undefined
-          ? null
-          : Number(
-              settings.maximumDonation
-            ),
-
-      donationMessage:
-        settings.donationMessage ||
-        "",
-
-      // ========================================================================
-      // NOTIFICATIONS
-      // ========================================================================
-
-      emailNotifications:
-        Boolean(
-          settings.emailNotifications
-        ),
-
-      newDonationNotifications:
-        Boolean(
-          settings.newDonationNotifications
-        ),
-
-      newContactNotifications:
-        Boolean(
-          settings.newContactNotifications
-        ),
-
-      newVolunteerNotifications:
-        Boolean(
-          settings.newVolunteerNotifications
-        ),
-
-      adminNotifications:
-        Boolean(
-          settings.adminNotifications
-        ),
-
-      // ========================================================================
-      // APPEARANCE
-      // ========================================================================
-
-      darkMode:
-        Boolean(settings.darkMode),
-
-      compactSidebar:
-        Boolean(
-          settings.compactSidebar
-        ),
-    };
-  };
-
-  // ==========================================================================
+  // ============================================================================
   // SAVE SETTINGS
-  // ==========================================================================
+  // ============================================================================
 
   const handleSave = async (event) => {
     event.preventDefault();
@@ -1365,17 +1394,21 @@ const AdminSettings = () => {
     }
 
     try {
-      setSaving(true);
-      clearMessages();
+      setIsBusy(true);
+      setError("");
+      setMessage("");
+
+      // ------------------------------------------------------------------------
+      // CREATE PAYLOAD WITHOUT IMAGE FIELDS
+      // ------------------------------------------------------------------------
 
       const payload =
-        createSavePayload();
+        createSavePayload(settings);
 
-      const response =
-        await API.put(
-          "/settings",
-          payload
-        );
+      const response = await API.put(
+        "/settings",
+        payload
+      );
 
       if (!response.data?.success) {
         throw new Error(
@@ -1384,21 +1417,29 @@ const AdminSettings = () => {
         );
       }
 
-      const updatedSettings =
+      // ------------------------------------------------------------------------
+      // SERVER RETURNED SETTINGS
+      // ------------------------------------------------------------------------
+
+      const returnedSettings =
         response.data?.settings;
 
-      if (updatedSettings) {
-        const cleanedSettings =
+      if (returnedSettings) {
+        const cleanedReturnedSettings =
           cleanSettings(
-            updatedSettings
+            returnedSettings
           );
 
-        setSettings(
-          cleanedSettings
-        );
+        const mergedSettings =
+          mergeSavedSettingsWithCurrentImages(
+            settings,
+            cleanedReturnedSettings
+          );
+
+        setSettings(mergedSettings);
 
         updatePreviews(
-          cleanedSettings
+          mergedSettings
         );
       }
 
@@ -1407,7 +1448,7 @@ const AdminSettings = () => {
       );
     } catch (err) {
       console.error(
-        "UPDATE SETTINGS ERROR:",
+        "SAVE SETTINGS ERROR:",
         err
       );
 
@@ -1417,18 +1458,18 @@ const AdminSettings = () => {
           "Failed to update settings."
       );
     } finally {
-      setSaving(false);
+      setIsBusy(false);
     }
   };
 
-  // ==========================================================================
+  // ============================================================================
   // RESET SETTINGS
-  // ==========================================================================
+  // ============================================================================
 
   const handleReset = async () => {
     const confirmed =
       window.confirm(
-        "Are you sure you want to reset all settings to their default values?"
+        "Are you sure you want to reset all settings? This action cannot be undone."
       );
 
     if (!confirmed) {
@@ -1436,13 +1477,13 @@ const AdminSettings = () => {
     }
 
     try {
-      setResetting(true);
-      clearMessages();
+      setIsBusy(true);
+      setError("");
+      setMessage("");
 
-      const response =
-        await API.delete(
-          "/settings"
-        );
+      const response = await API.delete(
+        "/settings"
+      );
 
       if (!response.data?.success) {
         throw new Error(
@@ -1454,39 +1495,25 @@ const AdminSettings = () => {
       const resetSettings =
         response.data?.settings;
 
-      if (!resetSettings) {
-        throw new Error(
-          "The server did not return the reset settings."
-        );
-      }
+      if (resetSettings) {
+        setSettings(resetSettings);
 
-      const cleanedResetSettings =
-        cleanSettings(
+        updatePreviews(
           resetSettings
         );
+      } else {
+        await loadSettings();
+      }
 
-      setSettings(
-        cleanedResetSettings
-      );
-
+      // Clear selected files
       setHeroImageFile(null);
       setAboutImageFile(null);
       setFeaturedImageFile(null);
       setCtaImageFile(null);
-
-      setCauseImageFiles({
-        0: null,
-        1: null,
-        2: null,
-        3: null,
-      });
-
-      updatePreviews(
-        cleanedResetSettings
-      );
+      setCauseImageFiles({});
 
       setMessage(
-        "Settings have been reset successfully."
+        "Settings reset successfully."
       );
     } catch (err) {
       console.error(
@@ -1500,26 +1527,13 @@ const AdminSettings = () => {
           "Failed to reset settings."
       );
     } finally {
-      setResetting(false);
+      setIsBusy(false);
     }
   };
 
-  // ==========================================================================
-  // BUSY STATE
-  // ==========================================================================
-
-  const isBusy =
-    saving ||
-    resetting ||
-    uploadingHero ||
-    uploadingAbout ||
-    uploadingFeatured ||
-    uploadingCta ||
-    uploadingCause !== null;
-
-  // ==========================================================================
-  // LOADING STATE
-  // ==========================================================================
+  // ============================================================================
+  // LOADING
+  // ============================================================================
 
   if (loading) {
     return (
@@ -1531,40 +1545,56 @@ const AdminSettings = () => {
     );
   }
 
-  // ==========================================================================
-  // FAILED LOAD STATE
-  // ==========================================================================
+  // ============================================================================
+  // ERROR STATE
+  // ============================================================================
 
   if (!settings) {
     return (
       <div className="admin-settings">
         <div className="settings-error">
-          <p>
-            {error ||
-              "Settings could not be loaded."}
-          </p>
-
-          <button
-            type="button"
-            onClick={fetchSettings}
-          >
-            Try Again
-          </button>
+          {error ||
+            "Unable to load settings."}
         </div>
       </div>
     );
   }
 
-  // ==========================================================================
+  // ============================================================================
+  // DATA REFERENCES
+  // ============================================================================
+
+  const homepage =
+    settings.homepage || {};
+
+  const hero =
+    homepage.hero || {};
+
+  const about =
+    homepage.about || {};
+
+  const causes =
+    homepage.causes || {};
+
+  const causeItems =
+    causes.items || [];
+
+  const featured =
+    homepage.featured || {};
+
+  const cta =
+    homepage.cta || {};
+
+  // ============================================================================
   // RENDER
-  // ==========================================================================
+  // ============================================================================
 
   return (
     <div className="admin-settings">
 
-      {/* ====================================================================
-          HEADER
-      ==================================================================== */}
+      {/* ================================================================== */}
+      {/* HEADER */}
+      {/* ================================================================== */}
 
       <div className="settings-header">
 
@@ -1572,11 +1602,9 @@ const AdminSettings = () => {
           <h1>Settings</h1>
 
           <p>
-            Manage your foundation
-            information, homepage
-            content, footer, donations,
-            notifications and
-            appearance.
+            Manage your foundation,
+            homepage content, donations,
+            notifications and appearance.
           </p>
         </div>
 
@@ -1586,765 +1614,597 @@ const AdminSettings = () => {
           onClick={handleReset}
           disabled={isBusy}
         >
-          {resetting
-            ? "Resetting..."
-            : "Reset Settings"}
+          Reset Settings
         </button>
 
       </div>
 
-      {/* ====================================================================
-          SUCCESS MESSAGE
-      ==================================================================== */}
+      {/* ================================================================== */}
+      {/* SUCCESS MESSAGE */}
+      {/* ================================================================== */}
 
       {message && (
-        <div
-          className="settings-success"
-          role="alert"
-        >
+        <div className="settings-success">
           {message}
         </div>
       )}
 
-      {/* ====================================================================
-          ERROR MESSAGE
-      ==================================================================== */}
+      {/* ================================================================== */}
+      {/* ERROR MESSAGE */}
+      {/* ================================================================== */}
 
       {error && (
-        <div
-          className="settings-error"
-          role="alert"
-        >
+        <div className="settings-error">
           {error}
         </div>
       )}
 
-      {/* ====================================================================
-          SETTINGS FORM
-      ==================================================================== */}
+      {/* ================================================================== */}
+      {/* FORM */}
+      {/* ================================================================== */}
 
       <form
         className="settings-form"
         onSubmit={handleSave}
       >
 
-        {/* ==================================================================
-            FOUNDATION INFORMATION
-        ================================================================== */}
+        {/* ================================================================ */}
+        {/* FOUNDATION INFORMATION */}
+        {/* ================================================================ */}
 
         <section className="settings-section">
 
           <div className="settings-section-header">
+            <div>
+              <h2>
+                Foundation Information
+              </h2>
 
-            <h2>
-              Foundation Information
-            </h2>
-
-            <p>
-              Basic information about
-              your foundation.
-            </p>
-
+              <p>
+                Basic information about
+                your foundation.
+              </p>
+            </div>
           </div>
 
           <div className="settings-grid">
 
-            <div className="settings-field settings-field-full">
-
-              <label htmlFor="foundationName">
+            <div className="settings-field">
+              <label>
                 Foundation Name
               </label>
 
               <input
-                id="foundationName"
-                name="foundationName"
                 type="text"
                 value={
                   settings.foundationName ||
                   ""
                 }
-                onChange={handleChange}
-              />
-
-            </div>
-
-            <div className="settings-field settings-field-full">
-
-              <label htmlFor="description">
-                Description
-              </label>
-
-              <textarea
-                id="description"
-                name="description"
-                rows="5"
-                value={
-                  settings.description ||
-                  ""
+                onChange={(event) =>
+                  handleChange(event)
                 }
-                onChange={handleChange}
               />
-
             </div>
 
             <div className="settings-field">
-
-              <label htmlFor="email">
+              <label>
                 Email
               </label>
 
               <input
-                id="email"
-                name="email"
                 type="email"
                 value={
                   settings.email || ""
                 }
-                onChange={handleChange}
+                onChange={(event) =>
+                  handleChange(event)
+                }
               />
-
             </div>
 
             <div className="settings-field">
-
-              <label htmlFor="phone">
+              <label>
                 Phone
               </label>
 
               <input
-                id="phone"
-                name="phone"
                 type="text"
                 value={
                   settings.phone || ""
                 }
-                onChange={handleChange}
-              />
-
-            </div>
-
-            <div className="settings-field settings-field-full">
-
-              <label htmlFor="address">
-                Address
-              </label>
-
-              <input
-                id="address"
-                name="address"
-                type="text"
-                value={
-                  settings.address || ""
+                onChange={(event) =>
+                  handleChange(event)
                 }
-                onChange={handleChange}
               />
-
             </div>
 
-            <div className="settings-field settings-field-full">
-
-              <label htmlFor="website">
+            <div className="settings-field">
+              <label>
                 Website
               </label>
 
               <input
-                id="website"
-                name="website"
                 type="url"
-                placeholder="https://example.org"
                 value={
                   settings.website || ""
                 }
-                onChange={handleChange}
-              />
-
-            </div>
-
-          </div>
-
-        </section>
-
-        {/* ==================================================================
-            SOCIAL MEDIA
-        ================================================================== */}
-
-        <section className="settings-section">
-
-          <div className="settings-section-header">
-
-            <h2>
-              Social Media
-            </h2>
-
-            <p>
-              Add your foundation's
-              social media profile
-              links.
-            </p>
-
-          </div>
-
-          <div className="settings-grid">
-
-            {[
-              [
-                "facebook",
-                "Facebook",
-              ],
-              [
-                "instagram",
-                "Instagram",
-              ],
-              [
-                "twitter",
-                "Twitter / X",
-              ],
-              [
-                "linkedin",
-                "LinkedIn",
-              ],
-            ].map(
-              ([name, label]) => (
-                <div
-                  className="settings-field"
-                  key={name}
-                >
-
-                  <label htmlFor={name}>
-                    {label}
-                  </label>
-
-                  <input
-                    id={name}
-                    name={name}
-                    type="url"
-                    placeholder={`https://${name}.com/...`}
-                    value={
-                      settings[name] ||
-                      ""
-                    }
-                    onChange={
-                      handleChange
-                    }
-                  />
-
-                </div>
-              )
-            )}
-
-          </div>
-
-        </section>
-
-        {/* ==================================================================
-            FOOTER SETTINGS
-        ================================================================== */}
-
-        <section className="settings-section">
-
-          <div className="settings-section-header">
-
-            <h2>
-              Footer Settings
-            </h2>
-
-            <p>
-              Manage the information
-              displayed in the website
-              footer.
-            </p>
-
-          </div>
-
-          <div className="settings-grid">
-
-            <div className="settings-field settings-field-full">
-
-              <label htmlFor="footer-description">
-                Footer Description
-              </label>
-
-              <textarea
-                id="footer-description"
-                rows="5"
-                value={
-                  settings.footer
-                    ?.description || ""
-                }
                 onChange={(event) =>
-                  setSettings(
-                    (previous) => ({
-                      ...previous,
-
-                      footer: {
-                        ...(previous.footer ||
-                          {}),
-                        description:
-                          event.target
-                            .value,
-                      },
-                    })
-                  )
+                  handleChange(event)
                 }
-                placeholder="Enter the description that will appear in the website footer."
               />
-
             </div>
 
-            <div className="settings-field settings-field-full">
-
-              <label htmlFor="footer-copyrightText">
-                Copyright Text
-              </label>
-
-              <input
-                id="footer-copyrightText"
-                type="text"
-                value={
-                  settings.footer
-                    ?.copyrightText ||
-                  ""
-                }
-                onChange={(event) =>
-                  setSettings(
-                    (previous) => ({
-                      ...previous,
-
-                      footer: {
-                        ...(previous.footer ||
-                          {}),
-                        copyrightText:
-                          event.target
-                            .value,
-                      },
-                    })
-                  )
-                }
-                placeholder="© 2026 David Chukwu Charity Foundation. All rights reserved."
-              />
-
-            </div>
-
-            <div className="settings-field">
-
-              <label htmlFor="footer-email">
-                Email
-              </label>
-
-              <input
-                id="footer-email"
-                type="email"
-                value={
-                  settings.footer
-                    ?.email || ""
-                }
-                onChange={(event) =>
-                  setSettings(
-                    (previous) => ({
-                      ...previous,
-
-                      footer: {
-                        ...(previous.footer ||
-                          {}),
-                        email:
-                          event.target
-                            .value,
-                      },
-                    })
-                  )
-                }
-                placeholder="info@example.org"
-              />
-
-            </div>
-
-            <div className="settings-field">
-
-              <label htmlFor="footer-phone">
-                Phone
-              </label>
-
-              <input
-                id="footer-phone"
-                type="text"
-                value={
-                  settings.footer
-                    ?.phone || ""
-                }
-                onChange={(event) =>
-                  setSettings(
-                    (previous) => ({
-                      ...previous,
-
-                      footer: {
-                        ...(previous.footer ||
-                          {}),
-                        phone:
-                          event.target
-                            .value,
-                      },
-                    })
-                  )
-                }
-                placeholder="+234 800 000 0000"
-              />
-
-            </div>
-
-            <div className="settings-field settings-field-full">
-
-              <label htmlFor="footer-address">
+            <div className="settings-field-full">
+              <label>
                 Address
               </label>
 
               <input
-                id="footer-address"
                 type="text"
                 value={
-                  settings.footer
-                    ?.address || ""
+                  settings.address || ""
                 }
                 onChange={(event) =>
-                  setSettings(
-                    (previous) => ({
-                      ...previous,
-
-                      footer: {
-                        ...(previous.footer ||
-                          {}),
-                        address:
-                          event.target
-                            .value,
-                      },
-                    })
-                  )
+                  handleChange(event)
                 }
-                placeholder="Enter foundation address"
               />
-
             </div>
 
-            <div className="settings-field">
-
-              <label htmlFor="footer-facebook">
-                Facebook URL
+            <div className="settings-field-full">
+              <label>
+                Foundation Description
               </label>
 
-              <input
-                id="footer-facebook"
-                type="url"
-                placeholder="https://facebook.com/..."
+              <textarea
+                rows="4"
                 value={
-                  settings.footer
-                    ?.facebook || ""
+                  settings.description ||
+                  ""
                 }
                 onChange={(event) =>
-                  setSettings(
-                    (previous) => ({
-                      ...previous,
-
-                      footer: {
-                        ...(previous.footer ||
-                          {}),
-                        facebook:
-                          event.target
-                            .value,
-                      },
-                    })
-                  )
+                  handleChange(event)
                 }
               />
-
-            </div>
-
-            <div className="settings-field">
-
-              <label htmlFor="footer-instagram">
-                Instagram URL
-              </label>
-
-              <input
-                id="footer-instagram"
-                type="url"
-                placeholder="https://instagram.com/..."
-                value={
-                  settings.footer
-                    ?.instagram || ""
-                }
-                onChange={(event) =>
-                  setSettings(
-                    (previous) => ({
-                      ...previous,
-
-                      footer: {
-                        ...(previous.footer ||
-                          {}),
-                        instagram:
-                          event.target
-                            .value,
-                      },
-                    })
-                  )
-                }
-              />
-
-            </div>
-
-            <div className="settings-field">
-
-              <label htmlFor="footer-twitter">
-                Twitter / X URL
-              </label>
-
-              <input
-                id="footer-twitter"
-                type="url"
-                placeholder="https://x.com/..."
-                value={
-                  settings.footer
-                    ?.twitter || ""
-                }
-                onChange={(event) =>
-                  setSettings(
-                    (previous) => ({
-                      ...previous,
-
-                      footer: {
-                        ...(previous.footer ||
-                          {}),
-                        twitter:
-                          event.target
-                            .value,
-                      },
-                    })
-                  )
-                }
-              />
-
-            </div>
-
-            <div className="settings-field">
-
-              <label htmlFor="footer-linkedin">
-                LinkedIn URL
-              </label>
-
-              <input
-                id="footer-linkedin"
-                type="url"
-                placeholder="https://linkedin.com/company/..."
-                value={
-                  settings.footer
-                    ?.linkedin || ""
-                }
-                onChange={(event) =>
-                  setSettings(
-                    (previous) => ({
-                      ...previous,
-
-                      footer: {
-                        ...(previous.footer ||
-                          {}),
-                        linkedin:
-                          event.target
-                            .value,
-                      },
-                    })
-                  )
-                }
-              />
-
             </div>
 
           </div>
 
         </section>
 
-        {/* ==================================================================
-            HOMEPAGE HERO
-        ================================================================== */}
+        {/* ================================================================ */}
+        {/* SOCIAL MEDIA */}
+        {/* ================================================================ */}
 
         <section className="settings-section">
 
           <div className="settings-section-header">
+            <div>
+              <h2>Social Media</h2>
 
-            <h2>
-              Homepage — Hero
-            </h2>
-
-            <p>
-              Configure the main hero
-              section of your
-              homepage.
-            </p>
-
+              <p>
+                Manage your foundation's
+                social media links.
+              </p>
+            </div>
           </div>
 
           <div className="settings-grid">
 
-            <div className="settings-field settings-field-full">
-
-              <label htmlFor="hero-eyebrow">
-                Eyebrow
-              </label>
+            <div className="settings-field">
+              <label>Facebook</label>
 
               <input
-                id="hero-eyebrow"
-                type="text"
+                type="url"
                 value={
-                  settings.homepage?.hero
-                    ?.eyebrow || ""
+                  settings.facebook || ""
                 }
                 onChange={(event) =>
-                  handleHomepageChange(
-                    "hero",
-                    "eyebrow",
-                    event.target.value
-                  )
+                  handleChange(event)
                 }
               />
-
-            </div>
-
-            <div className="settings-field settings-field-full">
-
-              <label htmlFor="hero-title">
-                Title
-              </label>
-
-              <input
-                id="hero-title"
-                type="text"
-                value={
-                  settings.homepage?.hero
-                    ?.title || ""
-                }
-                onChange={(event) =>
-                  handleHomepageChange(
-                    "hero",
-                    "title",
-                    event.target.value
-                  )
-                }
-              />
-
-            </div>
-
-            <div className="settings-field settings-field-full">
-
-              <label htmlFor="hero-description">
-                Description
-              </label>
-
-              <textarea
-                id="hero-description"
-                rows="5"
-                value={
-                  settings.homepage?.hero
-                    ?.description || ""
-                }
-                onChange={(event) =>
-                  handleHomepageChange(
-                    "hero",
-                    "description",
-                    event.target.value
-                  )
-                }
-              />
-
             </div>
 
             <div className="settings-field">
+              <label>Instagram</label>
 
-              <label htmlFor="hero-primary-button">
+              <input
+                type="url"
+                value={
+                  settings.instagram || ""
+                }
+                onChange={(event) =>
+                  handleChange(event)
+                }
+              />
+            </div>
+
+            <div className="settings-field">
+              <label>Twitter</label>
+
+              <input
+                type="url"
+                value={
+                  settings.twitter || ""
+                }
+                onChange={(event) =>
+                  handleChange(event)
+                }
+              />
+            </div>
+
+            <div className="settings-field">
+              <label>LinkedIn</label>
+
+              <input
+                type="url"
+                value={
+                  settings.linkedin || ""
+                }
+                onChange={(event) =>
+                  handleChange(event)
+                }
+              />
+            </div>
+
+          </div>
+
+        </section>
+
+        {/* ================================================================ */}
+        {/* FOOTER SETTINGS */}
+        {/* ================================================================ */}
+
+        <section className="settings-section">
+
+          <div className="settings-section-header">
+            <div>
+              <h2>Footer Settings</h2>
+
+              <p>
+                Configure the information
+                displayed in the website footer.
+              </p>
+            </div>
+          </div>
+
+          <div className="settings-grid">
+
+            <div className="settings-field-full">
+              <label>
+                Footer Description
+              </label>
+
+              <textarea
+                rows="4"
+                value={
+                  settings.footer
+                    ?.description || ""
+                }
+                onChange={(event) =>
+                  handleChange(
+                    event,
+                    "footer"
+                  )
+                }
+              />
+            </div>
+
+            <div className="settings-field">
+              <label>
+                Copyright Text
+              </label>
+
+              <input
+                type="text"
+                value={
+                  settings.footer
+                    ?.copyrightText || ""
+                }
+                onChange={(event) =>
+                  handleChange(
+                    event,
+                    "footer"
+                  )
+                }
+              />
+            </div>
+
+            <div className="settings-field">
+              <label>
+                Footer Email
+              </label>
+
+              <input
+                type="email"
+                value={
+                  settings.footer?.email ||
+                  ""
+                }
+                onChange={(event) =>
+                  handleChange(
+                    event,
+                    "footer"
+                  )
+                }
+              />
+            </div>
+
+            <div className="settings-field">
+              <label>
+                Footer Phone
+              </label>
+
+              <input
+                type="text"
+                value={
+                  settings.footer?.phone ||
+                  ""
+                }
+                onChange={(event) =>
+                  handleChange(
+                    event,
+                    "footer"
+                  )
+                }
+              />
+            </div>
+
+            <div className="settings-field">
+              <label>
+                Footer Address
+              </label>
+
+              <input
+                type="text"
+                value={
+                  settings.footer?.address ||
+                  ""
+                }
+                onChange={(event) =>
+                  handleChange(
+                    event,
+                    "footer"
+                  )
+                }
+              />
+            </div>
+
+            <div className="settings-field">
+              <label>
+                Footer Facebook
+              </label>
+
+              <input
+                type="url"
+                value={
+                  settings.footer?.facebook ||
+                  ""
+                }
+                onChange={(event) =>
+                  handleChange(
+                    event,
+                    "footer"
+                  )
+                }
+              />
+            </div>
+
+            <div className="settings-field">
+              <label>
+                Footer Instagram
+              </label>
+
+              <input
+                type="url"
+                value={
+                  settings.footer?.instagram ||
+                  ""
+                }
+                onChange={(event) =>
+                  handleChange(
+                    event,
+                    "footer"
+                  )
+                }
+              />
+            </div>
+
+            <div className="settings-field">
+              <label>
+                Footer Twitter
+              </label>
+
+              <input
+                type="url"
+                value={
+                  settings.footer?.twitter ||
+                  ""
+                }
+                onChange={(event) =>
+                  handleChange(
+                    event,
+                    "footer"
+                  )
+                }
+              />
+            </div>
+
+            <div className="settings-field">
+              <label>
+                Footer LinkedIn
+              </label>
+
+              <input
+                type="url"
+                value={
+                  settings.footer?.linkedin ||
+                  ""
+                }
+                onChange={(event) =>
+                  handleChange(
+                    event,
+                    "footer"
+                  )
+                }
+              />
+            </div>
+
+          </div>
+
+        </section>
+
+        {/* ================================================================ */}
+        {/* HOMEPAGE HERO */}
+        {/* ================================================================ */}
+
+        <section className="settings-section">
+
+          <div className="settings-section-header">
+            <div>
+              <h2>Homepage Hero</h2>
+
+              <p>
+                Manage the main hero section
+                of your homepage.
+              </p>
+            </div>
+          </div>
+
+          <div className="settings-grid">
+
+            <div className="settings-field">
+              <label>Eyebrow</label>
+
+              <input
+                type="text"
+                value={
+                  hero.eyebrow || ""
+                }
+                onChange={(event) =>
+                  handleChange(
+                    event,
+                    "homepage",
+                    "hero"
+                  )
+                }
+                name="eyebrow"
+              />
+            </div>
+
+            <div className="settings-field">
+              <label>Title</label>
+
+              <input
+                type="text"
+                value={
+                  hero.title || ""
+                }
+                onChange={(event) =>
+                  handleChange(
+                    event,
+                    "homepage",
+                    "hero"
+                  )
+                }
+                name="title"
+              />
+            </div>
+
+            <div className="settings-field-full">
+              <label>Description</label>
+
+              <textarea
+                rows="5"
+                value={
+                  hero.description || ""
+                }
+                onChange={(event) =>
+                  handleChange(
+                    event,
+                    "homepage",
+                    "hero"
+                  )
+                }
+                name="description"
+              />
+            </div>
+
+            <div className="settings-field">
+              <label>
                 Primary Button Text
               </label>
 
               <input
-                id="hero-primary-button"
                 type="text"
                 value={
-                  settings.homepage?.hero
-                    ?.primaryButtonText ||
+                  hero.primaryButtonText ||
                   ""
                 }
                 onChange={(event) =>
-                  handleHomepageChange(
-                    "hero",
-                    "primaryButtonText",
-                    event.target.value
+                  handleChange(
+                    event,
+                    "homepage",
+                    "hero"
                   )
                 }
+                name="primaryButtonText"
               />
-
             </div>
 
             <div className="settings-field">
-
-              <label htmlFor="hero-secondary-button">
+              <label>
                 Secondary Button Text
               </label>
 
               <input
-                id="hero-secondary-button"
                 type="text"
                 value={
-                  settings.homepage?.hero
-                    ?.secondaryButtonText ||
+                  hero.secondaryButtonText ||
                   ""
                 }
                 onChange={(event) =>
-                  handleHomepageChange(
-                    "hero",
-                    "secondaryButtonText",
-                    event.target.value
+                  handleChange(
+                    event,
+                    "homepage",
+                    "hero"
                   )
                 }
+                name="secondaryButtonText"
               />
-
             </div>
 
           </div>
 
           <div className="hero-image-settings">
 
-            <div className="settings-field">
+            <div className="hero-image-preview">
 
-              <label htmlFor="heroImage">
+              {heroPreview ? (
+                <img
+                  src={heroPreview}
+                  alt="Homepage hero preview"
+                />
+              ) : (
+                <span>
+                  No hero image
+                </span>
+              )}
+
+            </div>
+
+            <div>
+              <label>
                 Hero Image
               </label>
 
               <input
-                id="heroImage"
                 type="file"
-                accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                accept="image/jpeg,image/jpg,image/png,image/webp"
                 onChange={
                   handleHeroImageSelect
                 }
               />
 
-              <small>
-                JPG, JPEG, PNG or WEBP.
-                Maximum size: 5MB.
-              </small>
-
-            </div>
-
-            {heroPreview && (
-              <div className="hero-image-preview">
-
-                <img
-                  src={heroPreview}
-                  alt="Hero preview"
-                  onError={() =>
-                    setHeroPreview("")
-                  }
-                />
-
-              </div>
-            )}
-
-            {heroImageFile && (
               <button
                 type="button"
                 className="settings-upload-button"
@@ -2352,178 +2212,147 @@ const AdminSettings = () => {
                   handleHeroUpload
                 }
                 disabled={
-                  uploadingHero
+                  isBusy ||
+                  !heroImageFile
                 }
               >
-                {uploadingHero
-                  ? "Uploading..."
-                  : "Upload Hero Image"}
+                Upload Hero Image
               </button>
-            )}
+            </div>
 
           </div>
 
         </section>
 
-        {/* ==================================================================
-            HOMEPAGE ABOUT
-        ================================================================== */}
+        {/* ================================================================ */}
+        {/* HOMEPAGE ABOUT */}
+        {/* ================================================================ */}
 
         <section className="settings-section">
 
           <div className="settings-section-header">
+            <div>
+              <h2>Homepage About</h2>
 
-            <h2>
-              Homepage — About
-            </h2>
-
-            <p>
-              Configure the About
-              section displayed on the
-              homepage.
-            </p>
-
+              <p>
+                Manage the About section
+                displayed on the homepage.
+              </p>
+            </div>
           </div>
 
           <div className="settings-grid">
 
-            <div className="settings-field settings-field-full">
-
-              <label htmlFor="about-eyebrow">
-                Eyebrow
-              </label>
+            <div className="settings-field">
+              <label>Eyebrow</label>
 
               <input
-                id="about-eyebrow"
                 type="text"
                 value={
-                  settings.homepage?.about
-                    ?.eyebrow || ""
+                  about.eyebrow || ""
                 }
                 onChange={(event) =>
-                  handleHomepageChange(
-                    "about",
-                    "eyebrow",
-                    event.target.value
+                  handleChange(
+                    event,
+                    "homepage",
+                    "about"
                   )
                 }
+                name="eyebrow"
               />
-
             </div>
 
-            <div className="settings-field settings-field-full">
-
-              <label htmlFor="about-title">
-                Title
-              </label>
+            <div className="settings-field">
+              <label>Title</label>
 
               <input
-                id="about-title"
                 type="text"
                 value={
-                  settings.homepage?.about
-                    ?.title || ""
+                  about.title || ""
                 }
                 onChange={(event) =>
-                  handleHomepageChange(
-                    "about",
-                    "title",
-                    event.target.value
+                  handleChange(
+                    event,
+                    "homepage",
+                    "about"
                   )
                 }
+                name="title"
               />
-
             </div>
 
-            <div className="settings-field settings-field-full">
-
-              <label htmlFor="about-description">
-                Description
-              </label>
+            <div className="settings-field-full">
+              <label>Description</label>
 
               <textarea
-                id="about-description"
                 rows="5"
                 value={
-                  settings.homepage?.about
-                    ?.description || ""
+                  about.description || ""
                 }
                 onChange={(event) =>
-                  handleHomepageChange(
-                    "about",
-                    "description",
-                    event.target.value
+                  handleChange(
+                    event,
+                    "homepage",
+                    "about"
                   )
                 }
+                name="description"
               />
-
             </div>
 
-            <div className="settings-field settings-field-full">
-
-              <label htmlFor="about-button">
+            <div className="settings-field">
+              <label>
                 Button Text
               </label>
 
               <input
-                id="about-button"
                 type="text"
                 value={
-                  settings.homepage?.about
-                    ?.buttonText || ""
+                  about.buttonText || ""
                 }
                 onChange={(event) =>
-                  handleHomepageChange(
-                    "about",
-                    "buttonText",
-                    event.target.value
+                  handleChange(
+                    event,
+                    "homepage",
+                    "about"
                   )
                 }
+                name="buttonText"
               />
-
             </div>
 
           </div>
 
           <div className="hero-image-settings">
 
-            <div className="settings-field">
+            <div className="hero-image-preview">
 
-              <label htmlFor="aboutImage">
+              {aboutPreview ? (
+                <img
+                  src={aboutPreview}
+                  alt="Homepage About preview"
+                />
+              ) : (
+                <span>
+                  No About image
+                </span>
+              )}
+
+            </div>
+
+            <div>
+              <label>
                 About Image
               </label>
 
               <input
-                id="aboutImage"
                 type="file"
-                accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                accept="image/jpeg,image/jpg,image/png,image/webp"
                 onChange={
                   handleAboutImageSelect
                 }
               />
 
-              <small>
-                JPG, JPEG, PNG or WEBP.
-                Maximum size: 5MB.
-              </small>
-
-            </div>
-
-            {aboutPreview && (
-              <div className="hero-image-preview">
-
-                <img
-                  src={aboutPreview}
-                  alt="About section preview"
-                  onError={() =>
-                    setAboutPreview("")
-                  }
-                />
-
-              </div>
-            )}
-
-            {aboutImageFile && (
               <button
                 type="button"
                 className="settings-upload-button"
@@ -2531,436 +2360,346 @@ const AdminSettings = () => {
                   handleAboutUpload
                 }
                 disabled={
-                  uploadingAbout
+                  isBusy ||
+                  !aboutImageFile
                 }
               >
-                {uploadingAbout
-                  ? "Uploading..."
-                  : "Upload About Image"}
+                Upload About Image
               </button>
-            )}
+            </div>
 
           </div>
 
         </section>
 
-        {/* ==================================================================
-            HOMEPAGE CAUSES
-        ================================================================== */}
+        {/* ================================================================ */}
+        {/* HOMEPAGE CAUSES */}
+        {/* ================================================================ */}
 
         <section className="settings-section">
 
           <div className="settings-section-header">
+            <div>
+              <h2>Homepage Causes</h2>
 
-            <h2>
-              Homepage — Causes
-            </h2>
-
-            <p>
-              Configure the Causes
-              section and the people
-              your foundation supports.
-            </p>
-
+              <p>
+                Manage your four featured
+                causes.
+              </p>
+            </div>
           </div>
 
           <div className="settings-grid">
 
-            <div className="settings-field settings-field-full">
-
-              <label htmlFor="causes-eyebrow">
-                Eyebrow
-              </label>
+            <div className="settings-field">
+              <label>Eyebrow</label>
 
               <input
-                id="causes-eyebrow"
                 type="text"
                 value={
-                  settings.homepage?.causes
-                    ?.eyebrow || ""
+                  causes.eyebrow || ""
                 }
                 onChange={(event) =>
-                  handleHomepageChange(
-                    "causes",
-                    "eyebrow",
-                    event.target.value
+                  handleChange(
+                    event,
+                    "homepage",
+                    "causes"
                   )
                 }
+                name="eyebrow"
               />
-
             </div>
 
-            <div className="settings-field settings-field-full">
-
-              <label htmlFor="causes-title">
-                Title
-              </label>
+            <div className="settings-field">
+              <label>Title</label>
 
               <input
-                id="causes-title"
                 type="text"
                 value={
-                  settings.homepage?.causes
-                    ?.title || ""
+                  causes.title || ""
                 }
                 onChange={(event) =>
-                  handleHomepageChange(
-                    "causes",
-                    "title",
-                    event.target.value
+                  handleChange(
+                    event,
+                    "homepage",
+                    "causes"
                   )
                 }
+                name="title"
               />
-
             </div>
 
-            <div className="settings-field settings-field-full">
-
-              <label htmlFor="causes-description">
-                Description
-              </label>
+            <div className="settings-field-full">
+              <label>Description</label>
 
               <textarea
-                id="causes-description"
-                rows="5"
+                rows="4"
                 value={
-                  settings.homepage?.causes
-                    ?.description || ""
+                  causes.description || ""
                 }
                 onChange={(event) =>
-                  handleHomepageChange(
-                    "causes",
-                    "description",
-                    event.target.value
+                  handleChange(
+                    event,
+                    "homepage",
+                    "causes"
                   )
                 }
+                name="description"
               />
-
             </div>
 
           </div>
 
           <div className="causes-admin-grid">
 
-            {[0, 1, 2, 3].map(
-              (index) => {
-                const cause =
-                  settings.homepage?.causes
-                    ?.items?.[index] ||
-                  {};
+            {causeItems
+              .slice(0, 4)
+              .map((cause, index) => (
+                <div
+                  className="cause-admin-card"
+                  key={index}
+                >
 
-                return (
-                  <div
-                    className="cause-admin-card"
-                    key={index}
-                  >
+                  <div className="cause-admin-card-header">
+                    <h3>
+                      Cause {index + 1}
+                    </h3>
+                  </div>
 
-                    <div className="cause-admin-card-header">
+                  <div className="settings-field">
+                    <label>
+                      Title
+                    </label>
 
-                      <h3>
-                        Cause {index + 1}
-                      </h3>
+                    <input
+                      type="text"
+                      value={
+                        cause?.title || ""
+                      }
+                      onChange={(event) =>
+                        handleCauseChange(
+                          index,
+                          "title",
+                          event.target.value
+                        )
+                      }
+                    />
+                  </div>
 
-                    </div>
+                  <div className="settings-field">
+                    <label>
+                      Description
+                    </label>
 
-                    <div className="settings-field">
+                    <textarea
+                      rows="4"
+                      value={
+                        cause?.text || ""
+                      }
+                      onChange={(event) =>
+                        handleCauseChange(
+                          index,
+                          "text",
+                          event.target.value
+                        )
+                      }
+                    />
+                  </div>
 
-                      <label
-                        htmlFor={`cause-title-${index}`}
-                      >
-                        Cause Title
-                      </label>
+                  <div className="cause-image-preview">
 
-                      <input
-                        id={`cause-title-${index}`}
-                        type="text"
-                        value={
-                          cause.title || ""
+                    {causePreviews[index] ? (
+                      <img
+                        src={
+                          causePreviews[index]
                         }
-                        onChange={(event) =>
-                          handleCauseChange(
-                            index,
-                            "title",
-                            event.target.value
-                          )
-                        }
-                        placeholder="e.g. Widows"
+                        alt={`Cause ${
+                          index + 1
+                        } preview`}
                       />
-
-                    </div>
-
-                    <div className="settings-field">
-
-                      <label
-                        htmlFor={`cause-text-${index}`}
-                      >
-                        Description
-                      </label>
-
-                      <input
-                        id={`cause-text-${index}`}
-                        type="text"
-                        value={
-                          cause.text || ""
-                        }
-                        onChange={(event) =>
-                          handleCauseChange(
-                            index,
-                            "text",
-                            event.target.value
-                          )
-                        }
-                        placeholder="e.g. Support & Empowerment"
-                      />
-
-                    </div>
-
-                    <div className="settings-field">
-
-                      <label
-                        htmlFor={`cause-image-${index}`}
-                      >
-                        Cause Image
-                      </label>
-
-                      <input
-                        id={`cause-image-${index}`}
-                        type="file"
-                        accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
-                        onChange={(event) =>
-                          handleCauseImageSelect(
-                            event,
-                            index
-                          )
-                        }
-                      />
-
-                      <small>
-                        JPG, JPEG, PNG or WEBP.
-                        Maximum size: 5MB.
-                      </small>
-
-                    </div>
-
-                    {causePreviews[index] && (
-                      <div className="cause-image-preview">
-
-                        <img
-                          src={
-                            causePreviews[
-                              index
-                            ]
-                          }
-                          alt={
-                            cause.title ||
-                            `Cause ${
-                              index + 1
-                            } preview`
-                          }
-                          onError={() =>
-                            setCausePreviews(
-                              (previous) => ({
-                                ...previous,
-                                [index]: "",
-                              })
-                            )
-                          }
-                        />
-
-                      </div>
-                    )}
-
-                    {causeImageFiles[index] && (
-                      <button
-                        type="button"
-                        className="settings-upload-button"
-                        onClick={() =>
-                          handleCauseUpload(
-                            index
-                          )
-                        }
-                        disabled={
-                          uploadingCause ===
-                          index
-                        }
-                      >
-                        {uploadingCause ===
-                        index
-                          ? "Uploading..."
-                          : `Upload Cause ${
-                              index + 1
-                            } Image`}
-                      </button>
+                    ) : (
+                      <span>
+                        No cause image
+                      </span>
                     )}
 
                   </div>
-                );
-              }
-            )}
+
+                  <div className="settings-field">
+
+                    <label>
+                      Cause Image
+                    </label>
+
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/jpg,image/png,image/webp"
+                      onChange={(event) =>
+                        handleCauseImageSelect(
+                          index,
+                          event
+                        )
+                      }
+                    />
+
+                    <button
+                      type="button"
+                      className="settings-upload-button"
+                      onClick={() =>
+                        handleCauseUpload(
+                          index
+                        )
+                      }
+                      disabled={
+                        isBusy ||
+                        !causeImageFiles[
+                          index
+                        ]
+                      }
+                    >
+                      Upload Cause Image
+                    </button>
+
+                  </div>
+
+                </div>
+              ))}
 
           </div>
 
         </section>
 
-        {/* ==================================================================
-            HOMEPAGE FEATURED
-        ================================================================== */}
+        {/* ================================================================ */}
+        {/* HOMEPAGE FEATURED */}
+        {/* ================================================================ */}
 
         <section className="settings-section">
 
           <div className="settings-section-header">
+            <div>
+              <h2>Homepage Featured</h2>
 
-            <h2>
-              Homepage — Featured
-            </h2>
-
-            <p>
-              Configure the Featured
-              section displayed on the
-              homepage.
-            </p>
-
+              <p>
+                Manage the featured
+                initiative section.
+              </p>
+            </div>
           </div>
 
           <div className="settings-grid">
 
-            <div className="settings-field settings-field-full">
-
-              <label htmlFor="featured-eyebrow">
-                Eyebrow
-              </label>
+            <div className="settings-field">
+              <label>Eyebrow</label>
 
               <input
-                id="featured-eyebrow"
                 type="text"
                 value={
-                  settings.homepage?.featured
-                    ?.eyebrow || ""
+                  featured.eyebrow || ""
                 }
                 onChange={(event) =>
-                  handleHomepageChange(
-                    "featured",
-                    "eyebrow",
-                    event.target.value
+                  handleChange(
+                    event,
+                    "homepage",
+                    "featured"
                   )
                 }
+                name="eyebrow"
               />
-
-            </div>
-
-            <div className="settings-field settings-field-full">
-
-              <label htmlFor="featured-title">
-                Title
-              </label>
-
-              <input
-                id="featured-title"
-                type="text"
-                value={
-                  settings.homepage?.featured
-                    ?.title || ""
-                }
-                onChange={(event) =>
-                  handleHomepageChange(
-                    "featured",
-                    "title",
-                    event.target.value
-                  )
-                }
-              />
-
-            </div>
-
-            <div className="settings-field settings-field-full">
-
-              <label htmlFor="featured-description">
-                Description
-              </label>
-
-              <textarea
-                id="featured-description"
-                rows="5"
-                value={
-                  settings.homepage?.featured
-                    ?.description || ""
-                }
-                onChange={(event) =>
-                  handleHomepageChange(
-                    "featured",
-                    "description",
-                    event.target.value
-                  )
-                }
-              />
-
             </div>
 
             <div className="settings-field">
+              <label>Title</label>
 
-              <label htmlFor="featured-button">
+              <input
+                type="text"
+                value={
+                  featured.title || ""
+                }
+                onChange={(event) =>
+                  handleChange(
+                    event,
+                    "homepage",
+                    "featured"
+                  )
+                }
+                name="title"
+              />
+            </div>
+
+            <div className="settings-field-full">
+              <label>Description</label>
+
+              <textarea
+                rows="5"
+                value={
+                  featured.description ||
+                  ""
+                }
+                onChange={(event) =>
+                  handleChange(
+                    event,
+                    "homepage",
+                    "featured"
+                  )
+                }
+                name="description"
+              />
+            </div>
+
+            <div className="settings-field">
+              <label>
                 Button Text
               </label>
 
               <input
-                id="featured-button"
                 type="text"
                 value={
-                  settings.homepage?.featured
-                    ?.buttonText || ""
+                  featured.buttonText ||
+                  ""
                 }
                 onChange={(event) =>
-                  handleHomepageChange(
-                    "featured",
-                    "buttonText",
-                    event.target.value
+                  handleChange(
+                    event,
+                    "homepage",
+                    "featured"
                   )
                 }
+                name="buttonText"
               />
-
             </div>
 
           </div>
 
           <div className="hero-image-settings">
 
-            <div className="settings-field">
+            <div className="hero-image-preview">
 
-              <label htmlFor="featuredImage">
+              {featuredPreview ? (
+                <img
+                  src={featuredPreview}
+                  alt="Featured preview"
+                />
+              ) : (
+                <span>
+                  No featured image
+                </span>
+              )}
+
+            </div>
+
+            <div>
+              <label>
                 Featured Image
               </label>
 
               <input
-                id="featuredImage"
                 type="file"
-                accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                accept="image/jpeg,image/jpg,image/png,image/webp"
                 onChange={
                   handleFeaturedImageSelect
                 }
               />
 
-              <small>
-                JPG, JPEG, PNG or WEBP.
-                Maximum size: 5MB.
-              </small>
-
-            </div>
-
-            {featuredPreview && (
-              <div className="hero-image-preview">
-
-                <img
-                  src={featuredPreview}
-                  alt="Featured section preview"
-                  onError={() =>
-                    setFeaturedPreview("")
-                  }
-                />
-
-              </div>
-            )}
-
-            {featuredImageFile && (
               <button
                 type="button"
                 className="settings-upload-button"
@@ -2968,177 +2707,147 @@ const AdminSettings = () => {
                   handleFeaturedUpload
                 }
                 disabled={
-                  uploadingFeatured
+                  isBusy ||
+                  !featuredImageFile
                 }
               >
-                {uploadingFeatured
-                  ? "Uploading..."
-                  : "Upload Featured Image"}
+                Upload Featured Image
               </button>
-            )}
+            </div>
 
           </div>
 
         </section>
 
-        {/* ==================================================================
-            HOMEPAGE CTA
-        ================================================================== */}
+        {/* ================================================================ */}
+        {/* HOMEPAGE CTA */}
+        {/* ================================================================ */}
 
         <section className="settings-section">
 
           <div className="settings-section-header">
+            <div>
+              <h2>Homepage CTA</h2>
 
-            <h2>
-              Homepage — Call To Action
-            </h2>
-
-            <p>
-              Configure the final
-              call-to-action section.
-            </p>
-
+              <p>
+                Manage the final call-to-action
+                section.
+              </p>
+            </div>
           </div>
 
           <div className="settings-grid">
 
-            <div className="settings-field settings-field-full">
-
-              <label htmlFor="cta-eyebrow">
-                Eyebrow
-              </label>
+            <div className="settings-field">
+              <label>Eyebrow</label>
 
               <input
-                id="cta-eyebrow"
                 type="text"
                 value={
-                  settings.homepage?.cta
-                    ?.eyebrow || ""
+                  cta.eyebrow || ""
                 }
                 onChange={(event) =>
-                  handleHomepageChange(
-                    "cta",
-                    "eyebrow",
-                    event.target.value
+                  handleChange(
+                    event,
+                    "homepage",
+                    "cta"
                   )
                 }
+                name="eyebrow"
               />
-
-            </div>
-
-            <div className="settings-field settings-field-full">
-
-              <label htmlFor="cta-title">
-                Title
-              </label>
-
-              <input
-                id="cta-title"
-                type="text"
-                value={
-                  settings.homepage?.cta
-                    ?.title || ""
-                }
-                onChange={(event) =>
-                  handleHomepageChange(
-                    "cta",
-                    "title",
-                    event.target.value
-                  )
-                }
-              />
-
-            </div>
-
-            <div className="settings-field settings-field-full">
-
-              <label htmlFor="cta-description">
-                Description
-              </label>
-
-              <textarea
-                id="cta-description"
-                rows="5"
-                value={
-                  settings.homepage?.cta
-                    ?.description || ""
-                }
-                onChange={(event) =>
-                  handleHomepageChange(
-                    "cta",
-                    "description",
-                    event.target.value
-                  )
-                }
-              />
-
             </div>
 
             <div className="settings-field">
+              <label>Title</label>
 
-              <label htmlFor="cta-button">
+              <input
+                type="text"
+                value={
+                  cta.title || ""
+                }
+                onChange={(event) =>
+                  handleChange(
+                    event,
+                    "homepage",
+                    "cta"
+                  )
+                }
+                name="title"
+              />
+            </div>
+
+            <div className="settings-field-full">
+              <label>Description</label>
+
+              <textarea
+                rows="5"
+                value={
+                  cta.description || ""
+                }
+                onChange={(event) =>
+                  handleChange(
+                    event,
+                    "homepage",
+                    "cta"
+                  )
+                }
+                name="description"
+              />
+            </div>
+
+            <div className="settings-field">
+              <label>
                 Button Text
               </label>
 
               <input
-                id="cta-button"
                 type="text"
                 value={
-                  settings.homepage?.cta
-                    ?.buttonText || ""
+                  cta.buttonText || ""
                 }
                 onChange={(event) =>
-                  handleHomepageChange(
-                    "cta",
-                    "buttonText",
-                    event.target.value
+                  handleChange(
+                    event,
+                    "homepage",
+                    "cta"
                   )
                 }
+                name="buttonText"
               />
-
             </div>
 
           </div>
 
           <div className="hero-image-settings">
 
-            <div className="settings-field">
+            <div className="hero-image-preview">
 
-              <label htmlFor="ctaImage">
+              {ctaPreview ? (
+                <img
+                  src={ctaPreview}
+                  alt="CTA preview"
+                />
+              ) : (
+                <span>
+                  No CTA image
+                </span>
+              )}
+
+            </div>
+
+            <div>
+              <label>
                 CTA Image
               </label>
 
               <input
-                id="ctaImage"
                 type="file"
-                accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                accept="image/jpeg,image/jpg,image/png,image/webp"
                 onChange={
                   handleCtaImageSelect
                 }
               />
 
-              <small>
-                JPG, JPEG, PNG or WEBP.
-                Maximum size: 5MB.
-              </small>
-
-            </div>
-
-            {ctaPreview && (
-              <div className="hero-image-preview">
-
-                <img
-                  src={ctaPreview}
-                  alt="CTA section preview"
-                  onError={() =>
-                    setCtaPreview("")
-                  }
-                />
-
-              </div>
-            )}
-
-            {ctaImageFile && (
               <button
                 type="button"
                 className="settings-upload-button"
@@ -3146,146 +2855,156 @@ const AdminSettings = () => {
                   handleCtaUpload
                 }
                 disabled={
-                  uploadingCta
+                  isBusy ||
+                  !ctaImageFile
                 }
               >
-                {uploadingCta
-                  ? "Uploading..."
-                  : "Upload CTA Image"}
+                Upload CTA Image
               </button>
-            )}
+            </div>
 
           </div>
 
         </section>
 
-        {/* ==================================================================
-            DONATION SETTINGS
-        ================================================================== */}
+        {/* ================================================================ */}
+        {/* DONATION SETTINGS */}
+        {/* ================================================================ */}
 
         <section className="settings-section">
 
           <div className="settings-section-header">
+            <div>
+              <h2>Donation Settings</h2>
 
-            <h2>
-              Donation Settings
-            </h2>
-
-            <p>
-              Control how donations
-              are configured on the
-              foundation website.
-            </p>
-
-          </div>
-
-          <div className="settings-toggle">
-
-            <label>
-
-              <input
-                type="checkbox"
-                name="donationEnabled"
-                checked={Boolean(
-                  settings.donationEnabled
-                )}
-                onChange={
-                  handleBooleanChange
-                }
-              />
-
-              <span>
-                Enable Donations
-              </span>
-
-            </label>
-
+              <p>
+                Configure donation options.
+              </p>
+            </div>
           </div>
 
           <div className="settings-grid">
 
             <div className="settings-field">
 
-              <label htmlFor="donationCurrency">
-                Donation Currency
+              <label>
+                Donations Enabled
               </label>
 
-              <input
-                id="donationCurrency"
-                name="donationCurrency"
-                type="text"
-                maxLength="3"
-                value={
-                  settings.donationCurrency ||
-                  ""
-                }
-                onChange={handleChange}
-              />
+              <label className="settings-toggle">
+
+                <input
+                  type="checkbox"
+                  checked={
+                    Boolean(
+                      settings.donationEnabled
+                    )
+                  }
+                  onChange={(event) =>
+                    handleChange(event)
+                  }
+                  name="donationEnabled"
+                />
+
+                <span></span>
+
+              </label>
 
             </div>
 
             <div className="settings-field">
 
-              <label htmlFor="minimumDonation">
+              <label>
+                Donation Currency
+              </label>
+
+              <select
+                value={
+                  settings.donationCurrency ||
+                  "GBP"
+                }
+                onChange={(event) =>
+                  handleChange(event)
+                }
+                name="donationCurrency"
+              >
+                <option value="GBP">
+                  GBP
+                </option>
+
+                <option value="USD">
+                  USD
+                </option>
+
+                <option value="EUR">
+                  EUR
+                </option>
+
+                <option value="NGN">
+                  NGN
+                </option>
+              </select>
+
+            </div>
+
+            <div className="settings-field">
+
+              <label>
                 Minimum Donation
               </label>
 
               <input
-                id="minimumDonation"
-                name="minimumDonation"
                 type="number"
                 min="0"
-                step="0.01"
                 value={
                   settings.minimumDonation ??
                   ""
                 }
-                onChange={
-                  handleNumberChange
+                onChange={(event) =>
+                  handleChange(event)
                 }
+                name="minimumDonation"
               />
 
             </div>
 
             <div className="settings-field">
 
-              <label htmlFor="maximumDonation">
+              <label>
                 Maximum Donation
               </label>
 
               <input
-                id="maximumDonation"
-                name="maximumDonation"
                 type="number"
                 min="0"
-                step="0.01"
-                placeholder="No maximum"
                 value={
                   settings.maximumDonation ??
                   ""
                 }
-                onChange={
-                  handleNumberChange
+                onChange={(event) =>
+                  handleChange(event)
                 }
+                name="maximumDonation"
               />
 
             </div>
 
-            <div className="settings-field settings-field-full">
+            <div className="settings-field-full">
 
-              <label htmlFor="donationMessage">
+              <label>
                 Donation Message
               </label>
 
               <textarea
-                id="donationMessage"
-                name="donationMessage"
                 rows="4"
                 value={
                   settings.donationMessage ||
                   ""
                 }
-                onChange={handleChange}
+                onChange={(event) =>
+                  handleChange(event)
+                }
+                name="donationMessage"
               />
 
             </div>
@@ -3294,95 +3013,21 @@ const AdminSettings = () => {
 
         </section>
 
-        {/* ==================================================================
-            NOTIFICATIONS
-        ================================================================== */}
+        {/* ================================================================ */}
+        {/* NOTIFICATIONS */}
+        {/* ================================================================ */}
 
         <section className="settings-section">
 
           <div className="settings-section-header">
+            <div>
+              <h2>Notifications</h2>
 
-            <h2>
-              Notifications
-            </h2>
-
-            <p>
-              Control administrator
-              notification preferences.
-            </p>
-
-          </div>
-
-          <div className="settings-options">
-
-            {[
-              [
-                "emailNotifications",
-                "Email Notifications",
-              ],
-              [
-                "newDonationNotifications",
-                "New Donation Notifications",
-              ],
-              [
-                "newContactNotifications",
-                "New Contact Notifications",
-              ],
-              [
-                "newVolunteerNotifications",
-                "New Volunteer Notifications",
-              ],
-              [
-                "adminNotifications",
-                "Admin Notifications",
-              ],
-            ].map(
-              ([name, label]) => (
-                <label
-                  className="settings-toggle"
-                  key={name}
-                >
-
-                  <input
-                    type="checkbox"
-                    name={name}
-                    checked={Boolean(
-                      settings[name]
-                    )}
-                    onChange={
-                      handleBooleanChange
-                    }
-                  />
-
-                  <span>
-                    {label}
-                  </span>
-
-                </label>
-              )
-            )}
-
-          </div>
-
-        </section>
-
-        {/* ==================================================================
-            APPEARANCE
-        ================================================================== */}
-
-        <section className="settings-section">
-
-          <div className="settings-section-header">
-
-            <h2>
-              Appearance
-            </h2>
-
-            <p>
-              Configure administrator
-              dashboard appearance.
-            </p>
-
+              <p>
+                Configure administrative
+                notification preferences.
+              </p>
+            </div>
           </div>
 
           <div className="settings-options">
@@ -3391,18 +3036,202 @@ const AdminSettings = () => {
 
               <input
                 type="checkbox"
+                checked={
+                  Boolean(
+                    settings.emailNotifications
+                  )
+                }
+                onChange={(event) =>
+                  handleChange(event)
+                }
+                name="emailNotifications"
+              />
+
+              <span></span>
+
+              <div>
+                <strong>
+                  Email Notifications
+                </strong>
+
+                <p>
+                  Receive administrative
+                  email notifications.
+                </p>
+              </div>
+
+            </label>
+
+            <label className="settings-toggle">
+
+              <input
+                type="checkbox"
+                checked={
+                  Boolean(
+                    settings.newDonationNotifications
+                  )
+                }
+                onChange={(event) =>
+                  handleChange(event)
+                }
+                name="newDonationNotifications"
+              />
+
+              <span></span>
+
+              <div>
+                <strong>
+                  New Donation Notifications
+                </strong>
+
+                <p>
+                  Get notified when a new
+                  donation is received.
+                </p>
+              </div>
+
+            </label>
+
+            <label className="settings-toggle">
+
+              <input
+                type="checkbox"
+                checked={
+                  Boolean(
+                    settings.newContactNotifications
+                  )
+                }
+                onChange={(event) =>
+                  handleChange(event)
+                }
+                name="newContactNotifications"
+              />
+
+              <span></span>
+
+              <div>
+                <strong>
+                  New Contact Notifications
+                </strong>
+
+                <p>
+                  Get notified when someone
+                  submits the contact form.
+                </p>
+              </div>
+
+            </label>
+
+            <label className="settings-toggle">
+
+              <input
+                type="checkbox"
+                checked={
+                  Boolean(
+                    settings.newVolunteerNotifications
+                  )
+                }
+                onChange={(event) =>
+                  handleChange(event)
+                }
+                name="newVolunteerNotifications"
+              />
+
+              <span></span>
+
+              <div>
+                <strong>
+                  New Volunteer Notifications
+                </strong>
+
+                <p>
+                  Get notified when someone
+                  submits a volunteer request.
+                </p>
+              </div>
+
+            </label>
+
+            <label className="settings-toggle">
+
+              <input
+                type="checkbox"
+                checked={
+                  Boolean(
+                    settings.adminNotifications
+                  )
+                }
+                onChange={(event) =>
+                  handleChange(event)
+                }
+                name="adminNotifications"
+              />
+
+              <span></span>
+
+              <div>
+                <strong>
+                  Admin Notifications
+                </strong>
+
+                <p>
+                  Enable general administrative
+                  notifications.
+                </p>
+              </div>
+
+            </label>
+
+          </div>
+
+        </section>
+
+        {/* ================================================================ */}
+        {/* APPEARANCE */}
+        {/* ================================================================ */}
+
+        <section className="settings-section">
+
+          <div className="settings-section-header">
+            <div>
+              <h2>Appearance</h2>
+
+              <p>
+                Configure the admin dashboard
+                appearance.
+              </p>
+            </div>
+          </div>
+
+          <div className="settings-options">
+
+            <label className="settings-toggle">
+
+              <input
+                type="checkbox"
+                checked={
+                  Boolean(
+                    settings.darkMode
+                  )
+                }
+                onChange={(event) =>
+                  handleChange(event)
+                }
                 name="darkMode"
-                checked={Boolean(
-                  settings.darkMode
-                )}
-                onChange={
-                  handleBooleanChange
-                }
               />
 
-              <span>
-                Dark Mode
-              </span>
+              <span></span>
+
+              <div>
+                <strong>
+                  Dark Mode
+                </strong>
+
+                <p>
+                  Use the dark appearance
+                  throughout the admin dashboard.
+                </p>
+              </div>
 
             </label>
 
@@ -3410,18 +3239,29 @@ const AdminSettings = () => {
 
               <input
                 type="checkbox"
-                name="compactSidebar"
-                checked={Boolean(
-                  settings.compactSidebar
-                )}
-                onChange={
-                  handleBooleanChange
+                checked={
+                  Boolean(
+                    settings.compactSidebar
+                  )
                 }
+                onChange={(event) =>
+                  handleChange(event)
+                }
+                name="compactSidebar"
               />
 
-              <span>
-                Compact Sidebar
-              </span>
+              <span></span>
+
+              <div>
+                <strong>
+                  Compact Sidebar
+                </strong>
+
+                <p>
+                  Use a more compact admin
+                  sidebar layout.
+                </p>
+              </div>
 
             </label>
 
@@ -3429,9 +3269,9 @@ const AdminSettings = () => {
 
         </section>
 
-        {/* ==================================================================
-            SAVE BUTTON
-        ================================================================== */}
+        {/* ================================================================ */}
+        {/* FORM ACTIONS */}
+        {/* ================================================================ */}
 
         <div className="settings-form-actions">
 
@@ -3440,7 +3280,7 @@ const AdminSettings = () => {
             className="settings-save-button"
             disabled={isBusy}
           >
-            {saving
+            {isBusy
               ? "Saving..."
               : "Save Settings"}
           </button>
@@ -3448,6 +3288,7 @@ const AdminSettings = () => {
         </div>
 
       </form>
+
     </div>
   );
 };

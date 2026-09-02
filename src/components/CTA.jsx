@@ -1,130 +1,189 @@
-import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
-import API from "../api/axios";
-
 import "../styles/CTA.css";
+
 import ctaImg from "../assets/cta-bg.jpg";
 
-const CTA = ({ onDonateClick }) => {
-  const [cta, setCta] = useState({
-    eyebrow: "Make a Difference",
-    title: "Your Support Can Change a Life",
-    description:
-      "Whether through giving, volunteering or partnership, you can help us extend hope and support to more people.",
-    buttonText: "DONATE NOW",
-  });
+/*
+|--------------------------------------------------------------------------
+| DEFAULT CTA SETTINGS
+|--------------------------------------------------------------------------
+*/
 
-  const [loading, setLoading] = useState(true);
+const defaultCTA = {
+  eyebrow: "Make a Difference",
 
-  /* ============================================================
-     FETCH CTA SETTINGS
-  ============================================================ */
+  title:
+    "Your Support Can Change a Life",
 
-  const fetchCTA = async () => {
-    try {
-      setLoading(true);
+  description:
+    "Whether through giving, volunteering or partnership, you can help us extend hope and support to more people.",
 
-      const response = await API.get("/settings");
+  buttonText: "DONATE NOW",
 
-      if (response.data?.success) {
-        const ctaSettings =
-          response.data.settings?.homepage?.cta;
+  image: "",
+};
 
-        if (ctaSettings) {
-          setCta({
-            eyebrow:
-              ctaSettings.eyebrow ||
-              "Make a Difference",
+/*
+|--------------------------------------------------------------------------
+| GET PUBLIC IMAGE URL
+|--------------------------------------------------------------------------
+*/
 
-            title:
-              ctaSettings.title ||
-              "Your Support Can Change a Life",
+const getImageUrl = (image) => {
+  /*
+  |--------------------------------------------------------------------------
+  | NO IMAGE
+  |--------------------------------------------------------------------------
+  */
 
-            description:
-              ctaSettings.description ||
-              "Whether through giving, volunteering or partnership, you can help us extend hope and support to more people.",
+  if (
+    typeof image !== "string" ||
+    !image.trim()
+  ) {
+    return ctaImg;
+  }
 
-            buttonText:
-              ctaSettings.buttonText ||
-              "DONATE NOW",
-          });
-        }
-      }
-    } catch (error) {
-      console.error(
-        "FETCH CTA SETTINGS ERROR:",
-        error
-      );
-    } finally {
-      setLoading(false);
-    }
+  const cleanImage = image.trim();
+
+  /*
+  |--------------------------------------------------------------------------
+  | CLOUDINARY / EXTERNAL URL
+  |--------------------------------------------------------------------------
+  */
+
+  if (
+    cleanImage.startsWith("https://") ||
+    cleanImage.startsWith("http://") ||
+    cleanImage.startsWith("blob:")
+  ) {
+    return cleanImage;
+  }
+
+  /*
+  |--------------------------------------------------------------------------
+  | LEGACY LOCAL UPLOAD
+  |--------------------------------------------------------------------------
+  */
+
+  const apiUrl =
+    import.meta.env.VITE_API_URL ||
+    "http://localhost:5000/api";
+
+  const serverUrl = apiUrl.replace(
+    /\/api\/?$/,
+    ""
+  );
+
+  if (cleanImage.startsWith("/")) {
+    return `${serverUrl}${cleanImage}`;
+  }
+
+  return `${serverUrl}/${cleanImage}`;
+};
+
+/*
+|--------------------------------------------------------------------------
+| CTA
+|--------------------------------------------------------------------------
+*/
+
+const CTA = ({
+  settings,
+  onDonateClick,
+}) => {
+  const cta = {
+    ...defaultCTA,
+    ...(settings || {}),
   };
 
-  /* ============================================================
-     LOAD SETTINGS
-  ============================================================ */
+  const backgroundImage =
+    getImageUrl(cta.image);
 
-  useEffect(() => {
-    fetchCTA();
-  }, []);
+  /*
+  |--------------------------------------------------------------------------
+  | DEBUG
+  |--------------------------------------------------------------------------
+  */
 
-  /* ============================================================
-     RENDER
-  ============================================================ */
+  console.log(
+    "PUBLIC CTA IMAGE:",
+    cta.image
+  );
+
+  console.log(
+    "FINAL CTA IMAGE:",
+    backgroundImage
+  );
+
+  /*
+  |--------------------------------------------------------------------------
+  | RENDER
+  |--------------------------------------------------------------------------
+  */
 
   return (
     <section
       className="cta"
       id="involved"
       style={{
-        backgroundImage: `url(${ctaImg})`,
+        backgroundImage: `url("${backgroundImage}")`,
       }}
     >
       <div className="cta-overlay"></div>
 
       <div className="container cta-container">
+
         <div className="cta-content">
 
-          {/* EYEBROW */}
+          {/* ==============================================================
+              EYEBROW
+          ============================================================== */}
+
           <span className="cta-eyebrow">
-            {loading
-              ? "Make a Difference"
-              : cta.eyebrow}
+            {cta.eyebrow}
           </span>
 
-          {/* TITLE */}
+          {/* ==============================================================
+              TITLE
+          ============================================================== */}
+
           <h2>
-            {loading
-              ? "Your Support Can Change a Life"
-              : cta.title}
+            {cta.title}
           </h2>
 
-          {/* DESCRIPTION */}
+          {/* ==============================================================
+              DESCRIPTION
+          ============================================================== */}
+
           <p>
-            {loading
-              ? "Whether through giving, volunteering or partnership, you can help us extend hope and support to more people."
-              : cta.description}
+            {cta.description}
           </p>
 
-          {/* BUTTONS */}
+          {/* ==============================================================
+              BUTTONS
+          ============================================================== */}
+
           <div className="cta-buttons">
 
             {/* DONATE */}
+
             <button
               type="button"
               className="donate-btn"
               onClick={onDonateClick}
             >
-              {cta.buttonText || "DONATE NOW"}
+              {cta.buttonText}
             </button>
 
             {/* GET INVOLVED */}
+
             <Link
               to="/get-involved"
               className="outline-btn"
             >
               GET INVOLVED
+
               <span aria-hidden="true">
                 →
               </span>
@@ -133,6 +192,7 @@ const CTA = ({ onDonateClick }) => {
           </div>
 
         </div>
+
       </div>
     </section>
   );

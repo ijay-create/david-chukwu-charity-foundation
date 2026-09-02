@@ -1,7 +1,5 @@
 const express = require("express");
 const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
 
 const {
   getSettings,
@@ -20,60 +18,19 @@ const router = express.Router();
 
 /*
 |--------------------------------------------------------------------------
-| UPLOAD DIRECTORY
+| MULTER MEMORY STORAGE
+|--------------------------------------------------------------------------
+| Files are kept in memory temporarily.
+|
+| They will NOT be saved to:
+|
+| server/uploads/
+|
+| The controller will send them to Cloudinary.
 |--------------------------------------------------------------------------
 */
 
-const uploadDirectory = path.join(
-  process.cwd(),
-  "uploads"
-);
-
-/*
-|--------------------------------------------------------------------------
-| CREATE UPLOAD DIRECTORY
-|--------------------------------------------------------------------------
-*/
-
-if (!fs.existsSync(uploadDirectory)) {
-  fs.mkdirSync(uploadDirectory, {
-    recursive: true,
-  });
-}
-
-/*
-|--------------------------------------------------------------------------
-| MULTER STORAGE
-|--------------------------------------------------------------------------
-*/
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadDirectory);
-  },
-
-  filename: (req, file, cb) => {
-    const extension = path
-      .extname(file.originalname)
-      .toLowerCase();
-
-    const originalName = path.basename(
-      file.originalname,
-      path.extname(file.originalname)
-    );
-
-    const safeName = originalName
-      .replace(/[^a-zA-Z0-9-_]/g, "-")
-      .replace(/-+/g, "-")
-      .replace(/^-|-$/g, "")
-      .toLowerCase();
-
-    const filename =
-      `${safeName || "image"}-${Date.now()}${extension}`;
-
-    cb(null, filename);
-  },
-});
+const storage = multer.memoryStorage();
 
 /*
 |--------------------------------------------------------------------------
@@ -119,15 +76,20 @@ const upload = multer({
 | GET SETTINGS
 |--------------------------------------------------------------------------
 | GET /api/settings
+|--------------------------------------------------------------------------
 */
 
-router.get("/", getSettings);
+router.get(
+  "/",
+  getSettings
+);
 
 /*
 |--------------------------------------------------------------------------
 | UPDATE SETTINGS
 |--------------------------------------------------------------------------
 | PUT /api/settings
+|--------------------------------------------------------------------------
 */
 
 router.put(
@@ -142,6 +104,7 @@ router.put(
 |--------------------------------------------------------------------------
 | POST /api/settings/hero-image
 | FormData: heroImage
+|--------------------------------------------------------------------------
 */
 
 router.post(
@@ -157,6 +120,7 @@ router.post(
 |--------------------------------------------------------------------------
 | POST /api/settings/about-image
 | FormData: aboutImage
+|--------------------------------------------------------------------------
 */
 
 router.post(
@@ -172,6 +136,7 @@ router.post(
 |--------------------------------------------------------------------------
 | POST /api/settings/featured-image
 | FormData: featuredImage
+|--------------------------------------------------------------------------
 */
 
 router.post(
@@ -187,6 +152,7 @@ router.post(
 |--------------------------------------------------------------------------
 | POST /api/settings/cta-image
 | FormData: ctaImage
+|--------------------------------------------------------------------------
 */
 
 router.post(
@@ -206,24 +172,33 @@ router.post(
 |
 | causeImage
 | causeIndex
-|
+|--------------------------------------------------------------------------
 */
 
-const causesImageUpload = (req, res, next) => {
-  upload.single("causeImage")(req, res, (error) => {
-    if (error) {
-      return next(error);
-    }
+const causesImageUpload = (
+  req,
+  res,
+  next
+) => {
+  upload.single("causeImage")(
+    req,
+    res,
+    (error) => {
+      if (error) {
+        return next(error);
+      }
 
-    if (!req.file) {
-      return res.status(400).json({
-        success: false,
-        message: "Please select a cause image.",
-      });
-    }
+      if (!req.file) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "Please select a cause image.",
+        });
+      }
 
-    next();
-  });
+      next();
+    }
+  );
 };
 
 router.post(
@@ -238,6 +213,7 @@ router.post(
 | RESET SETTINGS
 |--------------------------------------------------------------------------
 | DELETE /api/settings
+|--------------------------------------------------------------------------
 */
 
 router.delete(
@@ -252,53 +228,64 @@ router.delete(
 |--------------------------------------------------------------------------
 */
 
-router.use((error, req, res, next) => {
-  console.error(
-    "SETTINGS ROUTE ERROR:",
-    error
-  );
+router.use(
+  (error, req, res, next) => {
+    console.error(
+      "SETTINGS ROUTE ERROR:",
+      error
+    );
 
-  /*
-  |------------------------------------------------------------------------
-  | MULTER ERROR
-  |------------------------------------------------------------------------
-  */
+    /*
+    |----------------------------------------------------------------------
+    | MULTER ERROR
+    |----------------------------------------------------------------------
+    */
 
-  if (error instanceof multer.MulterError) {
-    if (error.code === "LIMIT_FILE_SIZE") {
+    if (
+      error instanceof multer.MulterError
+    ) {
+      if (
+        error.code ===
+        "LIMIT_FILE_SIZE"
+      ) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "Image size cannot exceed 5MB.",
+        });
+      }
+
+      if (
+        error.code ===
+        "LIMIT_UNEXPECTED_FILE"
+      ) {
+        return res.status(400).json({
+          success: false,
+          message: `Unexpected upload field: ${error.field}`,
+        });
+      }
+
       return res.status(400).json({
         success: false,
-        message: "Image size cannot exceed 5MB.",
+        message:
+          error.message ||
+          "Image upload failed.",
       });
     }
 
-    if (error.code === "LIMIT_UNEXPECTED_FILE") {
-      return res.status(400).json({
-        success: false,
-        message: `Unexpected upload field: ${error.field}`,
-      });
-    }
+    /*
+    |----------------------------------------------------------------------
+    | CUSTOM IMAGE ERROR
+    |----------------------------------------------------------------------
+    */
 
     return res.status(400).json({
       success: false,
       message:
-        error.message ||
-        "Image upload failed.",
+        error?.message ||
+        "Settings request failed.",
     });
   }
-
-  /*
-  |------------------------------------------------------------------------
-  | CUSTOM IMAGE ERROR
-  |------------------------------------------------------------------------
-  */
-
-  return res.status(400).json({
-    success: false,
-    message:
-      error?.message ||
-      "Settings request failed.",
-  });
-});
+);
 
 module.exports = router;

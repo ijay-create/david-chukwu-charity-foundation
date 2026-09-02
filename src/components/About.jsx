@@ -28,43 +28,60 @@ const defaultAbout = {
 
 /*
 |--------------------------------------------------------------------------
-| GET IMAGE URL
+| GET PUBLIC IMAGE URL
 |--------------------------------------------------------------------------
 */
 
 const getImageUrl = (image) => {
-  if (!image) {
+  if (
+    typeof image !== "string" ||
+    !image.trim()
+  ) {
     return "";
   }
 
+  const cleanImage = image.trim();
+
+  /*
+  |--------------------------------------------------------------------------
+  | CLOUDINARY / EXTERNAL IMAGE
+  |--------------------------------------------------------------------------
+  */
+
   if (
-    image.startsWith("http://") ||
-    image.startsWith("https://") ||
-    image.startsWith("blob:")
+    cleanImage.startsWith("https://") ||
+    cleanImage.startsWith("http://") ||
+    cleanImage.startsWith("blob:")
   ) {
-    return image;
+    return cleanImage;
   }
 
-  const baseURL =
+  /*
+  |--------------------------------------------------------------------------
+  | LEGACY LOCAL IMAGE
+  |--------------------------------------------------------------------------
+  */
+
+  const apiUrl =
     API.defaults?.baseURL ||
     import.meta.env.VITE_API_URL ||
     "http://localhost:5000/api";
 
-  const serverURL = baseURL.replace(
+  const serverUrl = apiUrl.replace(
     /\/api\/?$/,
     ""
   );
 
-  if (image.startsWith("/")) {
-    return `${serverURL}${image}`;
+  if (cleanImage.startsWith("/")) {
+    return `${serverUrl}${cleanImage}`;
   }
 
-  return `${serverURL}/${image}`;
+  return `${serverUrl}/${cleanImage}`;
 };
 
 /*
 |--------------------------------------------------------------------------
-| ABOUT COMPONENT
+| ABOUT
 |--------------------------------------------------------------------------
 */
 
@@ -74,9 +91,30 @@ const About = ({ settings }) => {
     ...(settings || {}),
   };
 
-  const imageUrl = getImageUrl(
+  const imageUrl =
+    getImageUrl(about.image);
+
+  /*
+  |--------------------------------------------------------------------------
+  | DEBUG
+  |--------------------------------------------------------------------------
+  */
+
+  console.log(
+    "PUBLIC ABOUT IMAGE:",
     about.image
   );
+
+  console.log(
+    "FINAL ABOUT IMAGE:",
+    imageUrl
+  );
+
+  /*
+  |--------------------------------------------------------------------------
+  | RENDER
+  |--------------------------------------------------------------------------
+  */
 
   return (
     <section
@@ -90,6 +128,7 @@ const About = ({ settings }) => {
         ================================================================ */}
 
         <Reveal className="about-image">
+
           {imageUrl ? (
             <img
               src={imageUrl}
@@ -112,6 +151,7 @@ const About = ({ settings }) => {
               </span>
             </div>
           )}
+
         </Reveal>
 
         {/* ================================================================
@@ -119,6 +159,7 @@ const About = ({ settings }) => {
         ================================================================ */}
 
         <Reveal className="about-content">
+
           <span className="section-label">
             {about.eyebrow}
           </span>
@@ -147,7 +188,9 @@ const About = ({ settings }) => {
               →
             </span>
           </Link>
+
         </Reveal>
+
       </div>
     </section>
   );

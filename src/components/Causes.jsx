@@ -1,174 +1,110 @@
-import { useEffect, useState } from "react";
-
-import API from "../api/axios";
-
 import "../styles/Causes.css";
 
 import Reveal from "./Reveal";
 
-const Causes = () => {
-  const [causes, setCauses] = useState([]);
+/*
+|--------------------------------------------------------------------------
+| DEFAULT CAUSES SETTINGS
+|--------------------------------------------------------------------------
+*/
 
-  const [causesContent, setCausesContent] = useState({
-    eyebrow: "Our Causes",
-    title: "Where Your Support Makes a Difference",
-    description:
-      "Your support helps us provide meaningful assistance to communities and individuals who need it most."
-  });
+const defaultCauses = {
+  eyebrow: "Our Causes",
 
-  const [loading, setLoading] = useState(true);
+  title: "Where Your Support Makes a Difference",
 
-  /* 
-  |-------------------------------------------------------------------------- 
-  | GET IMAGE URL
-  |-------------------------------------------------------------------------- 
-  */
+  description:
+    "Your support helps us provide meaningful assistance to communities and individuals who need it most.",
 
-  const getImageUrl = (image) => {
-    if (!image) {
-      return "";
-    }
+  items: [],
+};
 
-    if (
-      image.startsWith("http://") ||
-      image.startsWith("https://") ||
-      image.startsWith("blob:")
-    ) {
-      return image;
-    }
+/*
+|--------------------------------------------------------------------------
+| GET PUBLIC IMAGE URL
+|--------------------------------------------------------------------------
+|
+| Cloudinary URLs are already complete URLs and must be used directly.
+|
+| Legacy /uploads images are still supported.
+|
+|--------------------------------------------------------------------------
+*/
 
-    const baseURL =
-      API.defaults?.baseURL ||
-      import.meta.env.VITE_API_URL ||
-      "http://localhost:5000/api";
-
-    const serverURL = baseURL.replace(/\/api\/?$/, "");
-
-    if (image.startsWith("/")) {
-      return `${serverURL}${image}`;
-    }
-
-    return `${serverURL}/${image}`;
-  };
-
-  /*
-  |--------------------------------------------------------------------------
-  | FETCH CAUSES
-  |--------------------------------------------------------------------------
-  */
-
-  const fetchCauses = async () => {
-    try {
-      setLoading(true);
-
-      const response = await API.get("/settings");
-
-      if (response.data?.success) {
-        const homepage = response.data.settings?.homepage;
-
-        const causesSettings = homepage?.causes;
-
-        /*
-        |--------------------------------------------------------------------------
-        | LOAD CAUSES HEADER CONTENT
-        |--------------------------------------------------------------------------
-        */
-
-        setCausesContent({
-          eyebrow:
-            causesSettings?.eyebrow ||
-            "Our Causes",
-
-          title:
-            causesSettings?.title ||
-            "Where Your Support Makes a Difference",
-
-          description:
-            causesSettings?.description ||
-            "Your support helps us provide meaningful assistance to communities and individuals who need it most."
-        });
-
-        /*
-        |--------------------------------------------------------------------------
-        | LOAD CAUSE ITEMS
-        |--------------------------------------------------------------------------
-        */
-
-        const loadedCauses =
-          causesSettings?.items || [];
-
-        setCauses(
-          loadedCauses.map((cause) => ({
-            ...cause,
-            image: getImageUrl(cause.image)
-          }))
-        );
-      }
-    } catch (error) {
-      console.error(
-        "FETCH CAUSES ERROR:",
-        error
-      );
-
-      setCauses([]);
-
-      setCausesContent({
-        eyebrow: "Our Causes",
-        title: "Where Your Support Makes a Difference",
-        description:
-          "Your support helps us provide meaningful assistance to communities and individuals who need it most."
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  /*
-  |--------------------------------------------------------------------------
-  | LOAD DATA
-  |--------------------------------------------------------------------------
-  */
-
-  useEffect(() => {
-    fetchCauses();
-  }, []);
-
-  /*
-  |--------------------------------------------------------------------------
-  | LOADING STATE
-  |--------------------------------------------------------------------------
-  */
-
-  if (loading) {
-    return (
-      <section
-        className="causes section"
-        id="causes"
-      >
-        <div className="container">
-
-          <div className="causes-header">
-
-            <span className="section-label">
-              OUR CAUSES
-            </span>
-
-            <h2>
-              Where Your Support Makes a Difference
-            </h2>
-
-            <p>
-              Your support helps us provide
-              meaningful assistance to communities
-              and individuals who need it most.
-            </p>
-
-          </div>
-
-        </div>
-      </section>
-    );
+const getImageUrl = (image) => {
+  if (
+    typeof image !== "string" ||
+    !image.trim()
+  ) {
+    return "";
   }
+
+  const cleanImage = image.trim();
+
+  /*
+  |--------------------------------------------------------------------------
+  | CLOUDINARY / EXTERNAL URL
+  |--------------------------------------------------------------------------
+  */
+
+  if (
+    cleanImage.startsWith("https://") ||
+    cleanImage.startsWith("http://") ||
+    cleanImage.startsWith("blob:")
+  ) {
+    return cleanImage;
+  }
+
+  /*
+  |--------------------------------------------------------------------------
+  | LEGACY LOCAL UPLOAD
+  |--------------------------------------------------------------------------
+  */
+
+  const apiUrl =
+    import.meta.env.VITE_API_URL ||
+    "http://localhost:5000/api";
+
+  const serverUrl = apiUrl.replace(
+    /\/api\/?$/,
+    ""
+  );
+
+  if (cleanImage.startsWith("/")) {
+    return `${serverUrl}${cleanImage}`;
+  }
+
+  return `${serverUrl}/${cleanImage}`;
+};
+
+/*
+|--------------------------------------------------------------------------
+| CAUSES
+|--------------------------------------------------------------------------
+*/
+
+const Causes = ({ settings }) => {
+  const causesSettings = {
+    ...defaultCauses,
+    ...(settings || {}),
+  };
+
+  const causes = Array.isArray(
+    causesSettings.items
+  )
+    ? causesSettings.items
+    : [];
+
+  /*
+  |--------------------------------------------------------------------------
+  | DEBUG
+  |--------------------------------------------------------------------------
+  */
+
+  console.log(
+    "PUBLIC CAUSES SETTINGS:",
+    causesSettings
+  );
 
   /*
   |--------------------------------------------------------------------------
@@ -183,85 +119,97 @@ const Causes = () => {
     >
       <div className="container">
 
-        {/* 
-        |--------------------------------------------------------------------------
-        | CAUSES HEADER
-        |--------------------------------------------------------------------------
-        */}
+        {/* ================================================================
+            CAUSES HEADER
+        ================================================================ */}
 
         <Reveal className="causes-header">
 
           <span className="section-label">
-            {causesContent.eyebrow}
+            {causesSettings.eyebrow}
           </span>
 
           <h2>
-            {causesContent.title}
+            {causesSettings.title}
           </h2>
 
           <p>
-            {causesContent.description}
+            {causesSettings.description}
           </p>
 
         </Reveal>
 
-        {/* 
-        |--------------------------------------------------------------------------
-        | CAUSES GRID
-        |--------------------------------------------------------------------------
-        */}
+        {/* ================================================================
+            CAUSES GRID
+        ================================================================ */}
 
         <div className="causes-grid">
 
-          {causes.map((cause, index) => (
+          {causes.map((cause, index) => {
+            const imageUrl =
+              getImageUrl(cause.image);
 
-            <Reveal
-              key={
-                cause._id ||
-                cause.id ||
-                cause.title ||
-                index
-              }
-            >
-
-              <article
-                className="cause-card"
-                style={{
-                  transitionDelay: `${index * 0.1}s`
-                }}
+            return (
+              <Reveal
+                key={
+                  cause._id ||
+                  cause.id ||
+                  `${cause.title}-${index}`
+                }
               >
+                <article
+                  className="cause-card"
+                  style={{
+                    transitionDelay: `${
+                      index * 0.1
+                    }s`,
+                  }}
+                >
 
-                {cause.image && (
-                  <img
-                    src={cause.image}
-                    alt={
-                      cause.title ||
-                      "Cause"
-                    }
-                    onError={(event) => {
-                      event.currentTarget.style.display =
-                        "none";
-                    }}
-                  />
-                )}
+                  {/* ====================================================
+                      IMAGE
+                  ==================================================== */}
 
-                <div className="cause-card-content">
+                  {imageUrl && (
+                    <img
+                      src={imageUrl}
+                      alt={
+                        cause.title ||
+                        "Cause"
+                      }
+                      loading="lazy"
+                      onError={(event) => {
+                        console.error(
+                          "CAUSE IMAGE FAILED:",
+                          imageUrl
+                        );
 
-                  <h3>
-                    {cause.title}
-                  </h3>
+                        event.currentTarget.style.display =
+                          "none";
+                      }}
+                    />
+                  )}
 
-                  <p>
-                    {cause.text}
-                  </p>
+                  {/* ====================================================
+                      CONTENT
+                  ==================================================== */}
 
-                </div>
+                  <div className="cause-card-content">
 
-              </article>
+                    <h3>
+                      {cause.title}
+                    </h3>
 
-            </Reveal>
+                    <p>
+                      {cause.text}
+                    </p>
 
-          ))}
+                  </div>
+
+                </article>
+              </Reveal>
+            );
+          })}
 
         </div>
 

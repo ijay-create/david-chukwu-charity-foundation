@@ -1,32 +1,5 @@
-const fs = require("fs");
-const path = require("path");
-
 const Settings = require("../models/Settings");
-
-/*
-|--------------------------------------------------------------------------
-| UPLOAD DIRECTORY
-|--------------------------------------------------------------------------
-*/
-
-const uploadDirectory = path.join(
-  process.cwd(),
-  "uploads"
-);
-
-/*
-|--------------------------------------------------------------------------
-| ENSURE UPLOAD DIRECTORY
-|--------------------------------------------------------------------------
-*/
-
-const ensureUploadDirectory = () => {
-  if (!fs.existsSync(uploadDirectory)) {
-    fs.mkdirSync(uploadDirectory, {
-      recursive: true,
-    });
-  }
-};
+const uploadToCloudinary = require("../utils/cloudinaryUpload");
 
 /*
 |--------------------------------------------------------------------------
@@ -57,73 +30,6 @@ const hasProperty = (object, property) => {
 
 /*
 |--------------------------------------------------------------------------
-| DELETE LOCAL FILE SAFELY
-|--------------------------------------------------------------------------
-*/
-
-const deleteFile = (filePath) => {
-  try {
-    if (!filePath) {
-      return;
-    }
-
-    /*
-    |----------------------------------------------------------------------
-    | NEVER DELETE EXTERNAL URLS
-    |----------------------------------------------------------------------
-    */
-
-    if (
-      filePath.startsWith("http://") ||
-      filePath.startsWith("https://") ||
-      filePath.startsWith("blob:")
-    ) {
-      return;
-    }
-
-    const filename = path.basename(filePath);
-
-    if (!filename) {
-      return;
-    }
-
-    const uploadRoot = path.resolve(
-      uploadDirectory
-    );
-
-    const targetFile = path.resolve(
-      uploadDirectory,
-      filename
-    );
-
-    /*
-    |----------------------------------------------------------------------
-    | PATH TRAVERSAL PROTECTION
-    |----------------------------------------------------------------------
-    */
-
-    if (
-      targetFile !== uploadRoot &&
-      !targetFile.startsWith(
-        `${uploadRoot}${path.sep}`
-      )
-    ) {
-      return;
-    }
-
-    if (fs.existsSync(targetFile)) {
-      fs.unlinkSync(targetFile);
-    }
-  } catch (error) {
-    console.error(
-      "DELETE FILE ERROR:",
-      error
-    );
-  }
-};
-
-/*
-|--------------------------------------------------------------------------
 | GET OR CREATE SETTINGS
 |--------------------------------------------------------------------------
 */
@@ -136,9 +42,9 @@ const getOrCreateSettings = async () => {
   }
 
   /*
-  |----------------------------------------------------------------------
+  |--------------------------------------------------------------------------
   | ENSURE HOMEPAGE STRUCTURE
-  |----------------------------------------------------------------------
+  |--------------------------------------------------------------------------
   */
 
   if (!settings.homepage) {
@@ -285,9 +191,9 @@ const updateSettings = async (
         body.homepage;
 
       /*
-      |----------------------------------------------------------------------
+      |--------------------------------------------------------------------------
       | ENSURE HOMEPAGE
-      |----------------------------------------------------------------------
+      |--------------------------------------------------------------------------
       */
 
       if (!settings.homepage) {
@@ -295,9 +201,9 @@ const updateSettings = async (
       }
 
       /*
-      |----------------------------------------------------------------------
+      |--------------------------------------------------------------------------
       | HERO
-      |----------------------------------------------------------------------
+      |--------------------------------------------------------------------------
       */
 
       if (
@@ -332,12 +238,9 @@ const updateSettings = async (
       }
 
       /*
-      |----------------------------------------------------------------------
+      |--------------------------------------------------------------------------
       | HOMEPAGE ABOUT
-      |----------------------------------------------------------------------
-      | IMPORTANT:
-      | This is ONLY the About section on the homepage.
-      |----------------------------------------------------------------------
+      |--------------------------------------------------------------------------
       */
 
       if (
@@ -371,9 +274,9 @@ const updateSettings = async (
       }
 
       /*
-      |----------------------------------------------------------------------
+      |--------------------------------------------------------------------------
       | CAUSES
-      |----------------------------------------------------------------------
+      |--------------------------------------------------------------------------
       */
 
       if (
@@ -419,9 +322,9 @@ const updateSettings = async (
       }
 
       /*
-      |----------------------------------------------------------------------
+      |--------------------------------------------------------------------------
       | FEATURED
-      |----------------------------------------------------------------------
+      |--------------------------------------------------------------------------
       */
 
       if (
@@ -458,9 +361,9 @@ const updateSettings = async (
       }
 
       /*
-      |----------------------------------------------------------------------
+      |--------------------------------------------------------------------------
       | CTA
-      |----------------------------------------------------------------------
+      |--------------------------------------------------------------------------
       */
 
       if (
@@ -665,6 +568,10 @@ const updateSettings = async (
         "linkedin",
       ];
 
+      if (!settings.footer) {
+        settings.footer = {};
+      }
+
       footerFields.forEach(
         (field) => {
           if (
@@ -746,7 +653,9 @@ const updateSettings = async (
 |--------------------------------------------------------------------------
 | HOMEPAGE IMAGE UPLOAD
 |--------------------------------------------------------------------------
-| This handles:
+| Cloudinary-powered image upload.
+|
+| Handles:
 |
 | /hero-image
 | /about-image
@@ -762,8 +671,6 @@ const uploadHomepageImage = async ({
   successMessage,
   errorMessage,
 }) => {
-  let newFilename = null;
-
   try {
     /*
     |--------------------------------------------------------------------------
@@ -777,11 +684,6 @@ const uploadHomepageImage = async ({
         message: `Please select a ${section} image.`,
       });
     }
-
-    newFilename =
-      req.file.filename;
-
-    ensureUploadDirectory();
 
     /*
     |--------------------------------------------------------------------------
@@ -817,31 +719,42 @@ const uploadHomepageImage = async ({
 
     /*
     |--------------------------------------------------------------------------
-    | OLD IMAGE
+    | UPLOAD TO CLOUDINARY
     |--------------------------------------------------------------------------
     */
 
-    const previousImage =
-      settings.homepage[section]
-        .image || "";
+    const cloudinaryResult =
+      await uploadToCloudinary(
+        req.file.buffer,
+        {
+          folder:
+            `david-chukwu-charity-foundation/homepage/${section}`,
+        }
+      );
 
     /*
     |--------------------------------------------------------------------------
-    | NEW IMAGE PATH
+    | GET CLOUDINARY URL
     |--------------------------------------------------------------------------
     */
 
-    const imagePath =
-      `/uploads/${req.file.filename}`;
+    const imageUrl =
+      cloudinaryResult.secure_url;
+
+    if (!imageUrl) {
+      throw new Error(
+        "Cloudinary did not return an image URL."
+      );
+    }
 
     /*
     |--------------------------------------------------------------------------
-    | SAVE IMAGE PATH
+    | SAVE CLOUDINARY URL
     |--------------------------------------------------------------------------
     */
 
     settings.homepage[section].image =
-      imagePath;
+      imageUrl;
 
     settings.markModified(
       `homepage.${section}`
@@ -851,42 +764,17 @@ const uploadHomepageImage = async ({
 
     /*
     |--------------------------------------------------------------------------
-    | DATABASE SAVE SUCCEEDED
+    | SUCCESS
     |--------------------------------------------------------------------------
     */
-
-    newFilename = null;
-
-    /*
-    |--------------------------------------------------------------------------
-    | DELETE OLD LOCAL IMAGE
-    |--------------------------------------------------------------------------
-    */
-
-    if (
-      previousImage &&
-      previousImage !== imagePath
-    ) {
-      deleteFile(previousImage);
-    }
 
     return res.status(200).json({
       success: true,
       message: successMessage,
-      image: imagePath,
+      image: imageUrl,
       settings,
     });
   } catch (error) {
-    /*
-    |--------------------------------------------------------------------------
-    | DELETE NEW FILE IF DATABASE SAVE FAILED
-    |--------------------------------------------------------------------------
-    */
-
-    if (newFilename) {
-      deleteFile(newFilename);
-    }
-
     console.error(
       `${section.toUpperCase()} IMAGE UPLOAD ERROR:`,
       error
@@ -928,13 +816,12 @@ const uploadHeroImage = (
 |--------------------------------------------------------------------------
 | HOMEPAGE ABOUT IMAGE
 |--------------------------------------------------------------------------
-| THIS IS THE IMPORTANT ONE.
 |
-| It saves to:
+| Saves to:
 |
 | settings.homepage.about.image
 |
-| It does NOT touch About Us.
+| This is ONLY the homepage About image.
 |--------------------------------------------------------------------------
 */
 
@@ -945,12 +832,9 @@ const uploadAboutImage = (
   return uploadHomepageImage({
     req,
     res,
-
     section: "about",
-
     successMessage:
       "Homepage About image uploaded successfully.",
-
     errorMessage:
       "Failed to upload homepage About image.",
   });
@@ -1002,15 +886,27 @@ const uploadCTAImage = (
 |--------------------------------------------------------------------------
 | HOMEPAGE CAUSE IMAGE
 |--------------------------------------------------------------------------
+|
+| POST /api/settings/causes-image
+|
+| FormData:
+|
+| causeImage
+| causeIndex
+|--------------------------------------------------------------------------
 */
 
 const uploadCausesImage = async (
   req,
   res
 ) => {
-  let newFilename = null;
-
   try {
+    /*
+    |--------------------------------------------------------------------------
+    | CHECK FILE
+    |--------------------------------------------------------------------------
+    */
+
     if (!req.file) {
       return res.status(400).json({
         success: false,
@@ -1019,8 +915,11 @@ const uploadCausesImage = async (
       });
     }
 
-    newFilename =
-      req.file.filename;
+    /*
+    |--------------------------------------------------------------------------
+    | GET CAUSE INDEX
+    |--------------------------------------------------------------------------
+    */
 
     const causeIndex = Number(
       req.body?.causeIndex
@@ -1031,12 +930,6 @@ const uploadCausesImage = async (
       causeIndex < 0 ||
       causeIndex > 3
     ) {
-      deleteFile(
-        req.file.filename
-      );
-
-      newFilename = null;
-
       return res.status(400).json({
         success: false,
         message:
@@ -1044,15 +937,61 @@ const uploadCausesImage = async (
       });
     }
 
-    ensureUploadDirectory();
+    /*
+    |--------------------------------------------------------------------------
+    | UPLOAD TO CLOUDINARY
+    |--------------------------------------------------------------------------
+    */
+
+    const cloudinaryResult =
+      await uploadToCloudinary(
+        req.file.buffer,
+        {
+          folder:
+            "david-chukwu-charity-foundation/homepage/causes",
+        }
+      );
+
+    /*
+    |--------------------------------------------------------------------------
+    | GET CLOUDINARY URL
+    |--------------------------------------------------------------------------
+    */
+
+    const imageUrl =
+      cloudinaryResult.secure_url;
+
+    if (!imageUrl) {
+      throw new Error(
+        "Cloudinary did not return an image URL."
+      );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | GET SETTINGS
+    |--------------------------------------------------------------------------
+    */
 
     const settings =
       await getOrCreateSettings();
+
+    /*
+    |--------------------------------------------------------------------------
+    | ENSURE CAUSES
+    |--------------------------------------------------------------------------
+    */
 
     if (!settings.homepage.causes) {
       settings.homepage.causes =
         {};
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | ENSURE CAUSE ITEMS
+    |--------------------------------------------------------------------------
+    */
 
     if (
       !Array.isArray(
@@ -1062,6 +1001,12 @@ const uploadCausesImage = async (
       settings.homepage.causes.items =
         [];
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | ENSURE CAUSE INDEX EXISTS
+    |--------------------------------------------------------------------------
+    */
 
     while (
       settings.homepage.causes.items
@@ -1074,17 +1019,15 @@ const uploadCausesImage = async (
       });
     }
 
-    const previousImage =
-      settings.homepage.causes
-        .items[causeIndex]
-        ?.image || "";
-
-    const imagePath =
-      `/uploads/${req.file.filename}`;
+    /*
+    |--------------------------------------------------------------------------
+    | SAVE CLOUDINARY URL
+    |--------------------------------------------------------------------------
+    */
 
     settings.homepage.causes.items[
       causeIndex
-    ].image = imagePath;
+    ].image = imageUrl;
 
     settings.markModified(
       "homepage.causes"
@@ -1092,29 +1035,22 @@ const uploadCausesImage = async (
 
     await settings.save();
 
-    newFilename = null;
-
-    if (
-      previousImage &&
-      previousImage !== imagePath
-    ) {
-      deleteFile(previousImage);
-    }
+    /*
+    |--------------------------------------------------------------------------
+    | SUCCESS
+    |--------------------------------------------------------------------------
+    */
 
     return res.status(200).json({
       success: true,
       message: `Cause ${
         causeIndex + 1
       } image uploaded successfully.`,
-      image: imagePath,
+      image: imageUrl,
       causeIndex,
       settings,
     });
   } catch (error) {
-    if (newFilename) {
-      deleteFile(newFilename);
-    }
-
     console.error(
       "UPLOAD CAUSE IMAGE ERROR:",
       error
@@ -1135,6 +1071,14 @@ const uploadCausesImage = async (
 /*
 |--------------------------------------------------------------------------
 | RESET SETTINGS
+|--------------------------------------------------------------------------
+|
+| IMPORTANT:
+| This resets the MongoDB settings document.
+|
+| Cloudinary images are NOT deleted here yet.
+| We will handle Cloudinary cleanup separately
+| after confirming the upload migration works.
 |--------------------------------------------------------------------------
 */
 
@@ -1158,53 +1102,12 @@ const resetSettings = async (
       });
     }
 
-    const images = [];
-
-    /*
-    |--------------------------------------------------------------------------
-    | HOMEPAGE IMAGES ONLY
-    |--------------------------------------------------------------------------
-    */
-
-    const homepageImages = [
-      settings.homepage?.hero?.image,
-      settings.homepage?.about?.image,
-      settings.homepage?.featured?.image,
-      settings.homepage?.cta?.image,
-    ];
-
-    homepageImages.forEach((image) => {
-      if (image) {
-        images.push(image);
-      }
-    });
-
-    const causes =
-      settings.homepage?.causes?.items ||
-      [];
-
-    causes.forEach((cause) => {
-      if (cause?.image) {
-        images.push(cause.image);
-      }
-    });
-
-    const uniqueImages = [
-      ...new Set(images),
-    ];
-
     await Settings.deleteOne({
       _id: settings._id,
     });
 
     const newSettings =
       await Settings.create({});
-
-    uniqueImages.forEach(
-      (image) => {
-        deleteFile(image);
-      }
-    );
 
     return res.status(200).json({
       success: true,

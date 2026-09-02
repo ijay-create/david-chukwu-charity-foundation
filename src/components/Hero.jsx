@@ -1,11 +1,15 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 
-import API from "../api/axios";
-
 import "../styles/Hero.css";
 
 import heroImg from "../assets/hero-bg.jpg";
+
+/*
+|--------------------------------------------------------------------------
+| ARROW ICON
+|--------------------------------------------------------------------------
+*/
 
 const ArrowIcon = () => (
   <svg
@@ -16,50 +20,74 @@ const ArrowIcon = () => (
   </svg>
 );
 
-const Hero = ({
-  settings = {},
-  onDonateClick
-}) => {
+/*
+|--------------------------------------------------------------------------
+| GET PUBLIC IMAGE URL
+|--------------------------------------------------------------------------
+|
+| Cloudinary URLs are already complete HTTPS URLs.
+|
+| Legacy /uploads images are converted to the API server.
+|
+|--------------------------------------------------------------------------
+*/
+
+const getImageUrl = (image) => {
+  if (
+    typeof image !== "string" ||
+    !image.trim()
+  ) {
+    return heroImg;
+  }
+
+  const cleanImage = image.trim();
+
   /*
-  |--------------------------------------------------------------------------
-  | API BASE URL
-  |--------------------------------------------------------------------------
+  |----------------------------------------------------------------------
+  | CLOUDINARY / EXTERNAL URL
+  |----------------------------------------------------------------------
   */
 
-  const API_URL =
+  if (
+    cleanImage.startsWith("https://") ||
+    cleanImage.startsWith("http://") ||
+    cleanImage.startsWith("blob:")
+  ) {
+    return cleanImage;
+  }
+
+  /*
+  |----------------------------------------------------------------------
+  | LEGACY LOCAL UPLOAD
+  |----------------------------------------------------------------------
+  */
+
+  const apiUrl =
     import.meta.env.VITE_API_URL ||
     "http://localhost:5000/api";
 
-  /*
-  |--------------------------------------------------------------------------
-  | BUILD IMAGE URL
-  |--------------------------------------------------------------------------
-  */
+  const serverUrl = apiUrl.replace(
+    /\/api\/?$/,
+    ""
+  );
 
-  const getImageUrl = (image) => {
-    if (!image) {
-      return heroImg;
-    }
+  if (cleanImage.startsWith("/")) {
+    return `${serverUrl}${cleanImage}`;
+  }
 
-    if (
-      image.startsWith("http://") ||
-      image.startsWith("https://")
-    ) {
-      return image;
-    }
+  return `${serverUrl}/${cleanImage}`;
+};
 
-    const serverUrl = API_URL.replace(
-      /\/api\/?$/,
-      ""
-    );
+/*
+|--------------------------------------------------------------------------
+| HERO
+|--------------------------------------------------------------------------
+*/
 
-    const imagePath = image.startsWith("/")
-      ? image
-      : `/${image}`;
-
-    return `${serverUrl}${imagePath}`;
-  };
-
+const Hero = ({
+  settings = {},
+  onDonateClick,
+}) => {
   /*
   |--------------------------------------------------------------------------
   | HERO CONTENT
@@ -92,8 +120,23 @@ const Hero = ({
   |--------------------------------------------------------------------------
   */
 
-  const backgroundImage = getImageUrl(
+  const backgroundImage =
+    getImageUrl(settings.image);
+
+  /*
+  |--------------------------------------------------------------------------
+  | DEBUG
+  |--------------------------------------------------------------------------
+  */
+
+  console.log(
+    "PUBLIC HERO IMAGE:",
     settings.image
+  );
+
+  console.log(
+    "FINAL HERO IMAGE:",
+    backgroundImage
   );
 
   /*
@@ -107,7 +150,7 @@ const Hero = ({
       className="hero"
       id="home"
       style={{
-        backgroundImage: `url("${backgroundImage}")`
+        backgroundImage: `url("${backgroundImage}")`,
       }}
     >
       <div className="hero-overlay"></div>
@@ -116,25 +159,21 @@ const Hero = ({
 
         <motion.div
           className="hero-content"
-
           initial={{
             opacity: 0,
-            x: -45
+            x: -45,
           }}
-
           whileInView={{
             opacity: 1,
-            x: 0
+            x: 0,
           }}
-
           viewport={{
             once: false,
-            amount: 0.25
+            amount: 0.25,
           }}
-
           transition={{
             duration: 0.8,
-            ease: [0.22, 1, 0.36, 1]
+            ease: [0.22, 1, 0.36, 1],
           }}
         >
 
@@ -142,26 +181,22 @@ const Hero = ({
 
           <motion.span
             className="hero-script"
-
             initial={{
               opacity: 0,
-              y: 18
+              y: 18,
             }}
-
             whileInView={{
               opacity: 1,
-              y: 0
+              y: 0,
             }}
-
             viewport={{
               once: false,
-              amount: 0.25
+              amount: 0.25,
             }}
-
             transition={{
               delay: 0.12,
               duration: 0.6,
-              ease: [0.22, 1, 0.36, 1]
+              ease: [0.22, 1, 0.36, 1],
             }}
           >
             {eyebrow}
@@ -172,23 +207,20 @@ const Hero = ({
           <motion.h1
             initial={{
               opacity: 0,
-              y: 22
+              y: 22,
             }}
-
             whileInView={{
               opacity: 1,
-              y: 0
+              y: 0,
             }}
-
             viewport={{
               once: false,
-              amount: 0.25
+              amount: 0.25,
             }}
-
             transition={{
               delay: 0.22,
               duration: 0.7,
-              ease: [0.22, 1, 0.36, 1]
+              ease: [0.22, 1, 0.36, 1],
             }}
           >
             {title}
@@ -199,23 +231,20 @@ const Hero = ({
           <motion.p
             initial={{
               opacity: 0,
-              y: 22
+              y: 22,
             }}
-
             whileInView={{
               opacity: 1,
-              y: 0
+              y: 0,
             }}
-
             viewport={{
               once: false,
-              amount: 0.25
+              amount: 0.25,
             }}
-
             transition={{
               delay: 0.32,
               duration: 0.7,
-              ease: [0.22, 1, 0.36, 1]
+              ease: [0.22, 1, 0.36, 1],
             }}
           >
             {description}
@@ -225,26 +254,22 @@ const Hero = ({
 
           <motion.div
             className="hero-buttons"
-
             initial={{
               opacity: 0,
-              y: 22
+              y: 22,
             }}
-
             whileInView={{
               opacity: 1,
-              y: 0
+              y: 0,
             }}
-
             viewport={{
               once: false,
-              amount: 0.25
+              amount: 0.25,
             }}
-
             transition={{
               delay: 0.42,
               duration: 0.7,
-              ease: [0.22, 1, 0.36, 1]
+              ease: [0.22, 1, 0.36, 1],
             }}
           >
 
