@@ -18,17 +18,15 @@ import {
 
 import "../../styles/Admin.causes.css";
 
-
 // ========================================
 // API
 // ========================================
 
 const API_URL =
-  "http://localhost:5000/api/causes";
+  `${import.meta.env.VITE_API_URL || "http://localhost:5000/api"}/causes`;
 
 const SERVER_URL =
-  "http://localhost:5000";
-
+  "https://david-chukwu-charity-api.onrender.com";
 
 // ========================================
 // DEFAULT DATA
@@ -115,13 +113,11 @@ const defaultCauses = {
   }
 };
 
-
 // ========================================
 // ADMIN CAUSES
 // ========================================
 
 const AdminCauses = () => {
-
   // ======================================
   // STATE
   // ======================================
@@ -140,7 +136,6 @@ const AdminCauses = () => {
 
   const [success, setSuccess] =
     useState("");
-
 
   // ======================================
   // IMAGE FILE STATE
@@ -164,7 +159,6 @@ const AdminCauses = () => {
   const [causePreviews, setCausePreviews] =
     useState({});
 
-
   // ======================================
   // INPUT REFS
   // ======================================
@@ -178,13 +172,11 @@ const AdminCauses = () => {
   const causeInputRefs =
     useRef({});
 
-
   // ========================================
   // MEDIA URL
   // ========================================
 
   const getMediaUrl = (fileUrl) => {
-
     if (!fileUrl) {
       return "";
     }
@@ -200,15 +192,12 @@ const AdminCauses = () => {
     return `${SERVER_URL}${fileUrl}`;
   };
 
-
   // ========================================
   // NORMALIZE BACKEND DATA
   // ========================================
 
   const normalizeCauses = (data) => {
-
     return {
-
       hero: {
         ...defaultCauses.hero,
         ...(data.hero || {})
@@ -252,20 +241,15 @@ const AdminCauses = () => {
         ...defaultCauses.cta,
         ...(data.cta || {})
       }
-
     };
-
   };
-
 
   // ========================================
   // LOAD CAUSES
   // ========================================
 
   const loadCauses = async () => {
-
     try {
-
       setLoading(true);
       setError("");
 
@@ -275,13 +259,14 @@ const AdminCauses = () => {
       const data =
         await response.json();
 
-      if (!response.ok || !data.success) {
-
+      if (
+        !response.ok ||
+        !data.success
+      ) {
         throw new Error(
           data.message ||
           "Unable to fetch causes."
         );
-
       }
 
       const normalized =
@@ -291,44 +276,33 @@ const AdminCauses = () => {
 
       setCauses(normalized);
 
-
       // HERO IMAGE
 
       if (
         normalized.hero.imageUrl
       ) {
-
         setHeroPreview(
           getMediaUrl(
             normalized.hero.imageUrl
           )
         );
-
       } else {
-
         setHeroPreview("");
-
       }
-
 
       // APPROACH IMAGE
 
       if (
         normalized.approach.imageUrl
       ) {
-
         setApproachPreview(
           getMediaUrl(
             normalized.approach.imageUrl
           )
         );
-
       } else {
-
         setApproachPreview("");
-
       }
-
 
       // CAUSE IMAGES
 
@@ -336,16 +310,12 @@ const AdminCauses = () => {
 
       normalized.items.forEach(
         (item, index) => {
-
           if (item.imageUrl) {
-
             previews[index] =
               getMediaUrl(
                 item.imageUrl
               );
-
           }
-
         }
       );
 
@@ -354,9 +324,7 @@ const AdminCauses = () => {
       );
 
       setCauseFiles({});
-
     } catch (loadError) {
-
       console.error(
         "LOAD CAUSES ERROR:",
         loadError
@@ -366,26 +334,18 @@ const AdminCauses = () => {
         loadError.message ||
         "Unable to load Causes content."
       );
-
     } finally {
-
       setLoading(false);
-
     }
-
   };
-
 
   // ========================================
   // INITIAL LOAD
   // ========================================
 
   useEffect(() => {
-
     loadCauses();
-
   }, []);
-
 
   // ========================================
   // UPDATE SECTION
@@ -396,28 +356,20 @@ const AdminCauses = () => {
     field,
     value
   ) => {
-
     setCauses(
       previous => ({
-
         ...previous,
 
         [section]: {
-
           ...previous[section],
-
           [field]: value
-
         }
-
       })
     );
 
     setError("");
     setSuccess("");
-
   };
-
 
   // ========================================
   // HERO IMAGE
@@ -426,7 +378,6 @@ const AdminCauses = () => {
   const handleHeroChange = (
     event
   ) => {
-
     const file =
       event.target.files?.[0];
 
@@ -437,7 +388,6 @@ const AdminCauses = () => {
     if (
       !file.type.startsWith("image/")
     ) {
-
       setError(
         "Please select a valid image."
       );
@@ -445,7 +395,6 @@ const AdminCauses = () => {
       event.target.value = "";
 
       return;
-
     }
 
     const preview =
@@ -457,9 +406,7 @@ const AdminCauses = () => {
 
     setError("");
     setSuccess("");
-
   };
-
 
   // ========================================
   // APPROACH IMAGE
@@ -468,7 +415,6 @@ const AdminCauses = () => {
   const handleApproachChange = (
     event
   ) => {
-
     const file =
       event.target.files?.[0];
 
@@ -479,7 +425,6 @@ const AdminCauses = () => {
     if (
       !file.type.startsWith("image/")
     ) {
-
       setError(
         "Please select a valid image."
       );
@@ -487,7 +432,6 @@ const AdminCauses = () => {
       event.target.value = "";
 
       return;
-
     }
 
     const preview =
@@ -499,9 +443,7 @@ const AdminCauses = () => {
 
     setError("");
     setSuccess("");
-
   };
-
 
   // ========================================
   // CAUSE IMAGE
@@ -511,7 +453,6 @@ const AdminCauses = () => {
     index,
     event
   ) => {
-
     const file =
       event.target.files?.[0];
 
@@ -522,7 +463,6 @@ const AdminCauses = () => {
     if (
       !file.type.startsWith("image/")
     ) {
-
       setError(
         "Please select a valid image."
       );
@@ -530,40 +470,28 @@ const AdminCauses = () => {
       event.target.value = "";
 
       return;
-
     }
 
     const preview =
       URL.createObjectURL(file);
 
-
     setCauseFiles(
       previous => ({
-
         ...previous,
-
         [index]: file
-
       })
     );
-
 
     setCausePreviews(
       previous => ({
-
         ...previous,
-
         [index]: preview
-
       })
     );
 
-
     setError("");
     setSuccess("");
-
   };
-
 
   // ========================================
   // UPDATE CAUSE
@@ -574,60 +502,44 @@ const AdminCauses = () => {
     field,
     value
   ) => {
-
     setCauses(
       previous => {
-
         const updatedItems =
           [...previous.items];
 
         updatedItems[index] = {
-
           ...updatedItems[index],
-
           [field]: value
-
         };
 
         return {
-
           ...previous,
-
           items: updatedItems
-
         };
-
       }
     );
 
     setError("");
     setSuccess("");
-
   };
-
 
   // ========================================
   // ADD CAUSE
   // ========================================
 
   const addCause = () => {
-
     setCauses(
       previous => {
-
         const nextOrder =
           previous.items.length + 1;
 
         return {
-
           ...previous,
 
           items: [
-
             ...previous.items,
 
             {
-
               number:
                 String(nextOrder)
                   .padStart(2, "0"),
@@ -639,21 +551,15 @@ const AdminCauses = () => {
               imageUrl: "",
 
               order: nextOrder
-
             }
-
           ]
-
         };
-
       }
     );
 
     setError("");
     setSuccess("");
-
   };
-
 
   // ========================================
   // REMOVE CAUSE
@@ -662,34 +568,26 @@ const AdminCauses = () => {
   const removeCause = (
     index
   ) => {
-
     if (
       causes.items.length <= 1
     ) {
-
       setError(
         "You must have at least one cause."
       );
 
       return;
-
     }
-
 
     setCauses(
       previous => {
-
         const updatedItems =
           previous.items
-
             .filter(
               (_, itemIndex) =>
                 itemIndex !== index
             )
-
             .map(
               (item, itemIndex) => ({
-
                 ...item,
 
                 number:
@@ -702,98 +600,71 @@ const AdminCauses = () => {
 
                 order:
                   itemIndex + 1
-
               })
             );
 
-
         return {
-
           ...previous,
-
           items: updatedItems
-
         };
-
       }
     );
-
 
     setCauseFiles(
       previous => {
-
         const updated = {};
 
         Object.keys(previous)
           .forEach(key => {
-
             const keyIndex =
               Number(key);
 
             if (
               keyIndex < index
             ) {
-
               updated[keyIndex] =
                 previous[key];
-
             } else if (
               keyIndex > index
             ) {
-
               updated[keyIndex - 1] =
                 previous[key];
-
             }
-
           });
 
         return updated;
-
       }
     );
-
 
     setCausePreviews(
       previous => {
-
         const updated = {};
 
         Object.keys(previous)
           .forEach(key => {
-
             const keyIndex =
               Number(key);
 
             if (
               keyIndex < index
             ) {
-
               updated[keyIndex] =
                 previous[key];
-
             } else if (
               keyIndex > index
             ) {
-
               updated[keyIndex - 1] =
                 previous[key];
-
             }
-
           });
 
         return updated;
-
       }
     );
 
-
     setError("");
     setSuccess("");
-
   };
-
 
   // ========================================
   // MOVE CAUSE
@@ -803,29 +674,22 @@ const AdminCauses = () => {
     index,
     direction
   ) => {
-
     const newIndex =
       direction === "up"
         ? index - 1
         : index + 1;
 
-
     if (
       newIndex < 0 ||
       newIndex >= causes.items.length
     ) {
-
       return;
-
     }
-
 
     setCauses(
       previous => {
-
         const updatedItems =
           [...previous.items];
-
 
         [
           updatedItems[index],
@@ -835,11 +699,9 @@ const AdminCauses = () => {
           updatedItems[index]
         ];
 
-
         const reordered =
           updatedItems.map(
             (item, itemIndex) => ({
-
               ...item,
 
               number:
@@ -852,28 +714,20 @@ const AdminCauses = () => {
 
               order:
                 itemIndex + 1
-
             })
           );
 
-
         return {
-
           ...previous,
-
           items: reordered
-
         };
-
       }
     );
-
 
     // Move pending files
 
     setCauseFiles(
       previous => {
-
         const updated = {
           ...previous
         };
@@ -884,46 +738,32 @@ const AdminCauses = () => {
         const target =
           updated[newIndex];
 
-
         if (
           current === undefined
         ) {
-
           delete updated[newIndex];
-
         } else {
-
           updated[newIndex] =
             current;
-
         }
-
 
         if (
           target === undefined
         ) {
-
           delete updated[index];
-
         } else {
-
           updated[index] =
             target;
-
         }
 
-
         return updated;
-
       }
     );
-
 
     // Move previews
 
     setCausePreviews(
       previous => {
-
         const updated = {
           ...previous
         };
@@ -934,180 +774,133 @@ const AdminCauses = () => {
         const target =
           updated[newIndex];
 
-
         if (
           current === undefined
         ) {
-
           delete updated[newIndex];
-
         } else {
-
           updated[newIndex] =
             current;
-
         }
-
 
         if (
           target === undefined
         ) {
-
           delete updated[index];
-
         } else {
-
           updated[index] =
             target;
-
         }
 
-
         return updated;
-
       }
     );
 
-
     setError("");
     setSuccess("");
-
   };
-
 
   // ========================================
   // VALIDATION
   // ========================================
 
   const validateForm = () => {
-
     if (
       !causes.hero.title?.trim()
     ) {
-
       setError(
         "Please enter the hero title."
       );
 
       return false;
-
     }
-
 
     if (
       !causes.hero.description?.trim()
     ) {
-
       setError(
         "Please enter the hero description."
       );
 
       return false;
-
     }
-
 
     if (
       !causes.intro.title?.trim()
     ) {
-
       setError(
         "Please enter the introduction title."
       );
 
       return false;
-
     }
-
 
     if (
       !causes.intro.description?.trim()
     ) {
-
       setError(
         "Please enter the introduction description."
       );
 
       return false;
-
     }
-
 
     for (
       const cause of causes.items
     ) {
-
       if (
         !cause.title?.trim()
       ) {
-
         setError(
           "Every cause must have a title."
         );
 
         return false;
-
       }
-
 
       if (
         !cause.description?.trim()
       ) {
-
         setError(
           "Every cause must have a description."
         );
 
         return false;
-
       }
-
     }
-
 
     if (
       !causes.approach.title?.trim()
     ) {
-
       setError(
         "Please enter the approach title."
       );
 
       return false;
-
     }
-
 
     if (
       !causes.approach.description?.trim()
     ) {
-
       setError(
         "Please enter the approach description."
       );
 
       return false;
-
     }
-
 
     if (
       !causes.cta.title?.trim()
     ) {
-
       setError(
         "Please enter the CTA title."
       );
 
       return false;
-
     }
 
-
     return true;
-
   };
-
 
   // ========================================
   // SAVE TO BACKEND
@@ -1116,26 +909,20 @@ const AdminCauses = () => {
   const handleSubmit = async (
     event
   ) => {
-
     event.preventDefault();
-
 
     if (!validateForm()) {
       return;
     }
 
-
     try {
-
       setSaving(true);
 
       setError("");
       setSuccess("");
 
-
       const formData =
         new FormData();
-
 
       // ------------------------------------
       // TEXT DATA
@@ -1148,14 +935,12 @@ const AdminCauses = () => {
         )
       );
 
-
       formData.append(
         "intro",
         JSON.stringify(
           causes.intro
         )
       );
-
 
       formData.append(
         "causes",
@@ -1164,14 +949,12 @@ const AdminCauses = () => {
         )
       );
 
-
       formData.append(
         "approach",
         JSON.stringify(
           causes.approach
         )
       );
-
 
       formData.append(
         "cta",
@@ -1180,34 +963,27 @@ const AdminCauses = () => {
         )
       );
 
-
       // ------------------------------------
       // HERO IMAGE
       // ------------------------------------
 
       if (heroFile) {
-
         formData.append(
           "heroImage",
           heroFile
         );
-
       }
-
 
       // ------------------------------------
       // APPROACH IMAGE
       // ------------------------------------
 
       if (approachFile) {
-
         formData.append(
           "approachImage",
           approachFile
         );
-
       }
-
 
       // ------------------------------------
       // CAUSE IMAGES
@@ -1217,15 +993,12 @@ const AdminCauses = () => {
         causeFiles
       ).forEach(
         ([index, file]) => {
-
           formData.append(
             `causeImage_${index}`,
             file
           );
-
         }
       );
-
 
       // ------------------------------------
       // API REQUEST
@@ -1240,23 +1013,18 @@ const AdminCauses = () => {
           }
         );
 
-
       const data =
         await response.json();
-
 
       if (
         !response.ok ||
         !data.success
       ) {
-
         throw new Error(
           data.message ||
           "Unable to save causes."
         );
-
       }
-
 
       // ------------------------------------
       // NORMALIZE RESPONSE
@@ -1267,11 +1035,9 @@ const AdminCauses = () => {
           data.causes
         );
 
-
       setCauses(
         normalized
       );
-
 
       // ------------------------------------
       // UPDATE IMAGE PREVIEWS
@@ -1280,51 +1046,39 @@ const AdminCauses = () => {
       if (
         normalized.hero.imageUrl
       ) {
-
         setHeroPreview(
           getMediaUrl(
             normalized.hero.imageUrl
           )
         );
-
       }
-
 
       if (
         normalized.approach.imageUrl
       ) {
-
         setApproachPreview(
           getMediaUrl(
             normalized.approach.imageUrl
           )
         );
-
       }
-
 
       const previews = {};
 
       normalized.items.forEach(
         (item, index) => {
-
           if (item.imageUrl) {
-
             previews[index] =
               getMediaUrl(
                 item.imageUrl
               );
-
           }
-
         }
       );
-
 
       setCausePreviews(
         previews
       );
-
 
       // ------------------------------------
       // CLEAR FILE STATE
@@ -1336,20 +1090,14 @@ const AdminCauses = () => {
 
       setCauseFiles({});
 
-
       setSuccess(
         "Causes content saved successfully."
       );
 
-
       setTimeout(() => {
-
         setSuccess("");
-
       }, 4000);
-
     } catch (saveError) {
-
       console.error(
         "SAVE CAUSES ERROR:",
         saveError
@@ -1359,32 +1107,24 @@ const AdminCauses = () => {
         saveError.message ||
         "Unable to save Causes content."
       );
-
     } finally {
-
       setSaving(false);
-
     }
-
   };
-
 
   // ========================================
   // RESET
   // ========================================
 
   const handleReset = async () => {
-
     const confirmed =
       window.confirm(
         "Reset the Causes form to the default content? This will not delete the current database content until you save."
       );
 
-
     if (!confirmed) {
       return;
     }
-
 
     setCauses(
       defaultCauses
@@ -1403,18 +1143,14 @@ const AdminCauses = () => {
     setSuccess(
       "Form reset to default content."
     );
-
   };
-
 
   // ========================================
   // LOADING
   // ========================================
 
   if (loading) {
-
     return (
-
       <div className="admin-page">
 
         <div className="admin-page-header">
@@ -1439,7 +1175,6 @@ const AdminCauses = () => {
 
         </div>
 
-
         <div className="admin-empty-state">
 
           <RefreshCw
@@ -1459,20 +1194,15 @@ const AdminCauses = () => {
         </div>
 
       </div>
-
     );
-
   }
-
 
   // ========================================
   // RENDER
   // ========================================
 
   return (
-
     <div className="admin-page admin-causes-page">
-
 
       {/* ====================================
           HEADER
@@ -1499,7 +1229,6 @@ const AdminCauses = () => {
 
         </div>
 
-
         <div className="admin-causes-header-actions">
 
           <button
@@ -1515,7 +1244,6 @@ const AdminCauses = () => {
 
           </button>
 
-
           <button
             type="button"
             className="btn-danger-outline"
@@ -1526,7 +1254,6 @@ const AdminCauses = () => {
             Reset
 
           </button>
-
 
           <button
             type="submit"
@@ -1547,13 +1274,11 @@ const AdminCauses = () => {
 
       </div>
 
-
       {/* ====================================
           ALERTS
       ==================================== */}
 
       {error && (
-
         <div className="admin-alert admin-alert-error">
 
           <strong>
@@ -1565,12 +1290,9 @@ const AdminCauses = () => {
           </span>
 
         </div>
-
       )}
 
-
       {success && (
-
         <div className="admin-alert admin-alert-success">
 
           <strong>
@@ -1582,9 +1304,7 @@ const AdminCauses = () => {
           </span>
 
         </div>
-
       )}
-
 
       {/* ====================================
           FORM
@@ -1595,7 +1315,6 @@ const AdminCauses = () => {
         className="admin-causes-form"
         onSubmit={handleSubmit}
       >
-
 
         {/* ==================================
             HERO
@@ -1629,20 +1348,16 @@ const AdminCauses = () => {
 
           </div>
 
-
           <div className="admin-causes-image-editor">
 
             <div className="admin-causes-large-image-preview">
 
               {heroPreview ? (
-
                 <img
                   src={heroPreview}
                   alt="Causes hero"
                 />
-
               ) : (
-
                 <div className="admin-causes-image-empty">
 
                   <ImageIcon size={44} />
@@ -1652,11 +1367,9 @@ const AdminCauses = () => {
                   </span>
 
                 </div>
-
               )}
 
             </div>
-
 
             <div className="admin-causes-image-info">
 
@@ -1677,7 +1390,6 @@ const AdminCauses = () => {
                 JPG, JPEG, PNG or WEBP · Max 5MB
               </span>
 
-
               <button
                 type="button"
                 className="btn-secondary"
@@ -1694,7 +1406,6 @@ const AdminCauses = () => {
 
               </button>
 
-
               <input
                 ref={heroInputRef}
                 type="file"
@@ -1706,7 +1417,6 @@ const AdminCauses = () => {
             </div>
 
           </div>
-
 
           <div className="admin-form-grid">
 
@@ -1733,7 +1443,6 @@ const AdminCauses = () => {
 
             </div>
 
-
             <div className="form-group">
 
               <label className="form-label">
@@ -1759,7 +1468,6 @@ const AdminCauses = () => {
 
           </div>
 
-
           <div className="form-group">
 
             <label className="form-label">
@@ -1784,7 +1492,6 @@ const AdminCauses = () => {
           </div>
 
         </section>
-
 
         {/* ==================================
             INTRO
@@ -1817,7 +1524,6 @@ const AdminCauses = () => {
 
           </div>
 
-
           <div className="admin-form-grid">
 
             <div className="form-group">
@@ -1842,7 +1548,6 @@ const AdminCauses = () => {
               />
 
             </div>
-
 
             <div className="form-group">
 
@@ -1869,7 +1574,6 @@ const AdminCauses = () => {
 
           </div>
 
-
           <div className="form-group">
 
             <label className="form-label">
@@ -1894,7 +1598,6 @@ const AdminCauses = () => {
           </div>
 
         </section>
-
 
         {/* ==================================
             CAUSES
@@ -1925,7 +1628,6 @@ const AdminCauses = () => {
 
             </div>
 
-
             <button
               type="button"
               className="btn-secondary"
@@ -1940,7 +1642,6 @@ const AdminCauses = () => {
 
           </div>
 
-
           <div className="admin-causes-list">
 
             {causes.items.map(
@@ -1952,9 +1653,7 @@ const AdminCauses = () => {
                     cause.imageUrl
                   );
 
-
                 return (
-
                   <article
                     className="admin-cause-card"
                     key={
@@ -1982,7 +1681,6 @@ const AdminCauses = () => {
 
                       </div>
 
-
                       <div>
 
                         <strong>
@@ -1994,7 +1692,6 @@ const AdminCauses = () => {
                         </span>
 
                       </div>
-
 
                       <div className="admin-cause-card-actions">
 
@@ -2019,7 +1716,6 @@ const AdminCauses = () => {
 
                         </button>
 
-
                         <button
                           type="button"
                           className="admin-icon-button"
@@ -2042,7 +1738,6 @@ const AdminCauses = () => {
 
                         </button>
 
-
                         <button
                           type="button"
                           className="admin-icon-button admin-icon-danger"
@@ -2064,16 +1759,13 @@ const AdminCauses = () => {
 
                     </div>
 
-
                     <div className="admin-cause-card-body">
-
 
                       <div className="admin-cause-image-column">
 
                         <div className="admin-cause-image-preview">
 
                           {preview ? (
-
                             <img
                               src={preview}
                               alt={
@@ -2081,9 +1773,7 @@ const AdminCauses = () => {
                                 `Cause ${index + 1}`
                               }
                             />
-
                           ) : (
-
                             <div className="admin-causes-image-empty">
 
                               <ImageIcon
@@ -2095,11 +1785,9 @@ const AdminCauses = () => {
                               </span>
 
                             </div>
-
                           )}
 
                         </div>
-
 
                         <button
                           type="button"
@@ -2119,14 +1807,11 @@ const AdminCauses = () => {
 
                         </button>
 
-
                         <input
                           ref={element => {
-
                             causeInputRefs.current[
                               index
                             ] = element;
-
                           }}
                           type="file"
                           accept="image/jpeg,image/jpg,image/png,image/webp"
@@ -2140,7 +1825,6 @@ const AdminCauses = () => {
                         />
 
                       </div>
-
 
                       <div className="admin-cause-fields">
 
@@ -2168,7 +1852,6 @@ const AdminCauses = () => {
                             />
 
                           </div>
-
 
                           <div className="form-group">
 
@@ -2198,7 +1881,6 @@ const AdminCauses = () => {
 
                         </div>
 
-
                         <div className="form-group">
 
                           <label className="form-label">
@@ -2222,7 +1904,6 @@ const AdminCauses = () => {
                           />
 
                         </div>
-
 
                         <div className="form-group">
 
@@ -2253,16 +1934,13 @@ const AdminCauses = () => {
                     </div>
 
                   </article>
-
                 );
-
               }
             )}
 
           </div>
 
         </section>
-
 
         {/* ==================================
             APPROACH
@@ -2295,20 +1973,16 @@ const AdminCauses = () => {
 
           </div>
 
-
           <div className="admin-causes-image-editor">
 
             <div className="admin-causes-large-image-preview">
 
               {approachPreview ? (
-
                 <img
                   src={approachPreview}
                   alt="Approach"
                 />
-
               ) : (
-
                 <div className="admin-causes-image-empty">
 
                   <ImageIcon size={44} />
@@ -2318,11 +1992,9 @@ const AdminCauses = () => {
                   </span>
 
                 </div>
-
               )}
 
             </div>
-
 
             <div className="admin-causes-image-info">
 
@@ -2343,7 +2015,6 @@ const AdminCauses = () => {
                 JPG, JPEG, PNG or WEBP · Max 5MB
               </span>
 
-
               <button
                 type="button"
                 className="btn-secondary"
@@ -2360,7 +2031,6 @@ const AdminCauses = () => {
 
               </button>
 
-
               <input
                 ref={approachInputRef}
                 type="file"
@@ -2374,7 +2044,6 @@ const AdminCauses = () => {
             </div>
 
           </div>
-
 
           <div className="admin-form-grid">
 
@@ -2401,7 +2070,6 @@ const AdminCauses = () => {
 
             </div>
 
-
             <div className="form-group">
 
               <label className="form-label">
@@ -2427,7 +2095,6 @@ const AdminCauses = () => {
 
           </div>
 
-
           <div className="form-group">
 
             <label className="form-label">
@@ -2452,7 +2119,6 @@ const AdminCauses = () => {
           </div>
 
         </section>
-
 
         {/* ==================================
             CTA
@@ -2485,7 +2151,6 @@ const AdminCauses = () => {
 
           </div>
 
-
           <div className="admin-form-grid">
 
             <div className="form-group">
@@ -2510,7 +2175,6 @@ const AdminCauses = () => {
               />
 
             </div>
-
 
             <div className="form-group">
 
@@ -2537,7 +2201,6 @@ const AdminCauses = () => {
 
           </div>
 
-
           <div className="form-group">
 
             <label className="form-label">
@@ -2560,7 +2223,6 @@ const AdminCauses = () => {
             />
 
           </div>
-
 
           <div className="admin-form-grid">
 
@@ -2586,7 +2248,6 @@ const AdminCauses = () => {
               />
 
             </div>
-
 
             <div className="form-group">
 
@@ -2615,7 +2276,6 @@ const AdminCauses = () => {
 
         </section>
 
-
         {/* ==================================
             SAVE BAR
         ================================== */}
@@ -2636,7 +2296,6 @@ const AdminCauses = () => {
 
           </div>
 
-
           <button
             type="submit"
             className="btn-primary"
@@ -2656,10 +2315,7 @@ const AdminCauses = () => {
       </form>
 
     </div>
-
   );
-
 };
-
 
 export default AdminCauses;

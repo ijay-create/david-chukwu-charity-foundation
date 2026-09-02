@@ -1,14 +1,10 @@
-import {
-  useEffect,
-  useState
-} from "react";
-
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import {
   Heart,
   ArrowRight,
-  RefreshCw
+  RefreshCw,
 } from "lucide-react";
 
 import "../styles/OurCauses.css";
@@ -16,136 +12,102 @@ import "../styles/OurCauses.css";
 import causesHeroImg from "../assets/causes-hero.jpg";
 import approachImg from "../assets/approach-bg.jpg";
 
-
-// ========================================
-// API URL
-// ========================================
+// ============================================================
+// API CONFIGURATION
+// ============================================================
 
 const API_URL =
-  "http://localhost:5000/api/causes";
+  `${import.meta.env.VITE_API_URL || "http://localhost:5000/api"}/causes`;
 
+const SERVER_URL =
+  "https://david-chukwu-charity-api.onrender.com";
 
-// ========================================
-// REVEAL ANIMATION
-// ========================================
-
-const Reveal = ({
-  children,
-  className = "",
-  delay = 0
-}) => {
-
-  return (
-    <motion.div
-      className={className}
-
-      initial={{
-        opacity: 0,
-        y: 35
-      }}
-
-      whileInView={{
-        opacity: 1,
-        y: 0
-      }}
-
-      viewport={{
-        once: true,
-        amount: 0.15
-      }}
-
-      transition={{
-        duration: 0.7,
-        delay,
-        ease: "easeOut"
-      }}
-    >
-      {children}
-    </motion.div>
-  );
-
-};
-
-
-// ========================================
-// DEFAULT CONTENT
-// ========================================
+// ============================================================
+// DEFAULT FALLBACK DATA
+// ============================================================
 
 const defaultCauses = {
-
   hero: {
-    eyebrow: "OUR CAUSES",
-
     title: "Our Causes",
-
-    description:
-      "Supporting people and communities where care is needed most.",
-
-    imageUrl: ""
+    subtitle:
+      "Creating lasting change by supporting communities, empowering lives, and restoring hope.",
+    imageUrl: "",
   },
-
 
   intro: {
-    eyebrow:
-      "WHAT WE CARE ABOUT",
-
-    title:
-      "Creating Change Where It Matters",
-
+    eyebrow: "WHAT WE DO",
+    title: "Causes That Matter",
     description:
-      "Our work focuses on providing care, support and opportunities to vulnerable individuals and communities."
+      "We are committed to addressing the needs of vulnerable individuals and communities through practical, compassionate, and sustainable initiatives.",
   },
 
+  causes: [
+    {
+      id: 1,
+      order: 1,
+      title: "Education & Empowerment",
+      description:
+        "Providing educational opportunities, learning resources, and support that help children and young people build brighter futures.",
+      imageUrl: "",
+    },
 
-  causes: [],
+    {
+      id: 2,
+      order: 2,
+      title: "Community Development",
+      description:
+        "Supporting communities with initiatives designed to improve living conditions, create opportunities, and promote sustainable development.",
+      imageUrl: "",
+    },
 
+    {
+      id: 3,
+      order: 3,
+      title: "Healthcare Support",
+      description:
+        "Helping vulnerable individuals and families gain access to essential healthcare, medical assistance, and wellness support.",
+      imageUrl: "",
+    },
+
+    {
+      id: 4,
+      order: 4,
+      title: "Food & Basic Needs",
+      description:
+        "Providing food, essential supplies, and immediate assistance to individuals and families facing difficult circumstances.",
+      imageUrl: "",
+    },
+
+    {
+      id: 5,
+      order: 5,
+      title: "Youth Development",
+      description:
+        "Creating opportunities for young people through mentorship, skills development, leadership, and empowerment programs.",
+      imageUrl: "",
+    },
+  ],
 
   approach: {
-    eyebrow:
-      "OUR APPROACH",
-
-    title:
-      "Compassion in Action",
-
+    eyebrow: "OUR APPROACH",
+    title: "Creating Impact That Lasts",
     description:
-      "We work through care, empowerment, advocacy and community partnerships to create meaningful change.",
-
-    imageUrl: ""
+      "Our work focuses on more than immediate relief. We seek to empower people, strengthen communities, and create sustainable opportunities that continue to make a difference.",
+    imageUrl: "",
   },
 
-
   cta: {
-    eyebrow:
-      "MAKE A DIFFERENCE",
-
-    title:
-      "Be Part of the Change",
-
+    title: "Be Part of the Change",
     description:
-      "Your support can help us reach those who need it most.",
-
-    donateText:
-      "DONATE NOW",
-
-    involvedText:
-      "GET INVOLVED"
-  }
-
+      "Your support can help us reach more people, strengthen communities, and create meaningful opportunities for those who need them most.",
+  },
 };
 
+// ============================================================
+// OUR CAUSES
+// ============================================================
 
-// ========================================
-// OUR CAUSES PAGE
-// ========================================
-
-const OurCauses = ({
-  onDonateClick
-}) => {
-
-  // ======================================
-  // STATE
-  // ======================================
-
+const OurCauses = ({ onDonateClick }) => {
   const [causes, setCauses] =
     useState(defaultCauses);
 
@@ -153,658 +115,457 @@ const OurCauses = ({
     useState(true);
 
   const [error, setError] =
-    useState("");
+    useState(false);
 
+  // ============================================================
+  // MEDIA URL HELPER
+  // ============================================================
 
-
-  // ======================================
-  // MEDIA URL
-  // ======================================
-
-  const getMediaUrl = (
-    imageUrl
-  ) => {
-
+  const getMediaUrl = (imageUrl) => {
     if (!imageUrl) {
       return "";
     }
 
-
-    // Already a complete URL
+    // Cloudinary / external URL
     if (
-      imageUrl.startsWith(
-        "http://"
-      ) ||
-      imageUrl.startsWith(
-        "https://"
-      ) ||
-      imageUrl.startsWith(
-        "blob:"
-      )
+      imageUrl.startsWith("http://") ||
+      imageUrl.startsWith("https://") ||
+      imageUrl.startsWith("blob:")
     ) {
-
       return imageUrl;
-
     }
 
-
-    // Backend uploaded image
+    // Local backend uploads
     if (
-      imageUrl.startsWith(
-        "/uploads"
-      )
+      imageUrl.startsWith("/uploads")
     ) {
-
-      return `http://localhost:5000${imageUrl}`;
-
+      return `${SERVER_URL}${imageUrl}`;
     }
-
 
     return imageUrl;
-
   };
 
-
-
-  // ======================================
+  // ============================================================
   // FETCH CAUSES
-  // ======================================
+  // ============================================================
 
   const fetchCauses = async () => {
-
     try {
-
       setLoading(true);
-
-      setError("");
-
+      setError(false);
 
       const response =
         await fetch(API_URL);
 
-
       if (!response.ok) {
-
         throw new Error(
-          `Request failed with status ${response.status}`
+          "Failed to fetch causes"
         );
-
       }
-
 
       const data =
         await response.json();
 
-
-      if (
-        !data.success
-      ) {
-
-        throw new Error(
-          data.message ||
-          "Unable to load causes."
-        );
-
+      if (data) {
+        setCauses({
+          ...defaultCauses,
+          ...data,
+          hero: {
+            ...defaultCauses.hero,
+            ...(data.hero || {}),
+          },
+          intro: {
+            ...defaultCauses.intro,
+            ...(data.intro || {}),
+          },
+          causes:
+            Array.isArray(data.causes)
+              ? data.causes
+              : defaultCauses.causes,
+          approach: {
+            ...defaultCauses.approach,
+            ...(data.approach || {}),
+          },
+          cta: {
+            ...defaultCauses.cta,
+            ...(data.cta || {}),
+          },
+        });
       }
-
-
-      if (
-        !data.causes
-      ) {
-
-        throw new Error(
-          "Causes data was not returned by the server."
-        );
-
-      }
-
-
-      setCauses({
-
-        ...defaultCauses,
-
-        ...data.causes,
-
-
-        hero: {
-          ...defaultCauses.hero,
-          ...(data.causes.hero || {})
-        },
-
-
-        intro: {
-          ...defaultCauses.intro,
-          ...(data.causes.intro || {})
-        },
-
-
-        causes:
-          Array.isArray(
-            data.causes.causes
-          )
-            ? data.causes.causes
-            : [],
-
-
-        approach: {
-          ...defaultCauses.approach,
-          ...(data.causes.approach || {})
-        },
-
-
-        cta: {
-          ...defaultCauses.cta,
-          ...(data.causes.cta || {})
-        }
-
-      });
-
-    } catch (fetchError) {
-
+    } catch (err) {
       console.error(
-        "FETCH CAUSES ERROR:",
-        fetchError
+        "CAUSES FETCH ERROR:",
+        err
       );
 
+      setError(true);
 
-      setError(
-        "Unable to load Causes content. Please try again."
-      );
-
+      // Keep fallback data visible
+      setCauses(defaultCauses);
     } finally {
-
       setLoading(false);
-
     }
-
   };
 
-
-
-  // ======================================
+  // ============================================================
   // INITIAL LOAD
-  // ======================================
+  // ============================================================
 
   useEffect(() => {
-
     fetchCauses();
-
   }, []);
 
-
-
-  // ======================================
+  // ============================================================
   // LOADING STATE
-  // ======================================
+  // ============================================================
 
   if (loading) {
-
     return (
-
-      <main className="causes-page">
-
+      <main className="our-causes-page">
         <section className="causes-loading">
-
           <RefreshCw
-            size={42}
-            className="causes-loading-icon"
+            size={36}
+            className="loading-icon"
           />
 
-          <h2>
-            Loading Our Causes...
-          </h2>
-
           <p>
-            Please wait while we load
-            our latest causes.
+            Loading our causes...
           </p>
-
         </section>
-
       </main>
-
     );
-
   }
 
-
-
-  // ======================================
-  // ERROR STATE
-  // ======================================
-
-  if (error) {
-
-    return (
-
-      <main className="causes-page">
-
-        <section className="causes-error">
-
-          <div className="causes-error-content">
-
-            <span className="causes-label">
-              SOMETHING WENT WRONG
-            </span>
-
-            <h2>
-              Unable to Load Our Causes
-            </h2>
-
-            <p>
-              {error}
-            </p>
-
-
-            <button
-              type="button"
-              className="donate-btn"
-              onClick={fetchCauses}
-            >
-
-              <RefreshCw size={18} />
-
-              TRY AGAIN
-
-            </button>
-
-          </div>
-
-        </section>
-
-      </main>
-
-    );
-
-  }
-
-
-
-  // ======================================
-  // HERO IMAGE
-  // ======================================
-
-  const heroBackground =
-    getMediaUrl(
-      causes.hero.imageUrl
-    ) ||
-    causesHeroImg;
-
-
-
-  // ======================================
-  // APPROACH IMAGE
-  // ======================================
-
-  const approachBackground =
-    getMediaUrl(
-      causes.approach.imageUrl
-    ) ||
-    approachImg;
-
-
-
-  // ======================================
-  // RENDER
-  // ======================================
+  // ============================================================
+  // PAGE
+  // ============================================================
 
   return (
+    <main className="our-causes-page">
 
-    <main className="causes-page">
-
-
-      {/* ==================================
-          HERO
-      ================================== */}
+      {/* ======================================================
+          HERO SECTION
+      ====================================================== */}
 
       <section
         className="causes-hero"
-
         style={{
-          backgroundImage:
-            `url(${heroBackground})`
+          backgroundImage: `url(${
+            getMediaUrl(
+              causes.hero?.imageUrl
+            ) || causesHeroImg
+          })`,
         }}
       >
-
-        <div className="causes-hero-overlay"></div>
-
-
-        <div className="container causes-hero-container">
-
+        <div className="causes-hero-overlay">
           <motion.div
             className="causes-hero-content"
-
             initial={{
               opacity: 0,
-              x: -50
+              y: 40,
             }}
-
             animate={{
               opacity: 1,
-              x: 0
+              y: 0,
             }}
-
             transition={{
               duration: 0.8,
-              ease: "easeOut"
             }}
           >
-
-            <span className="causes-label">
-
-              {causes.hero.eyebrow}
-
+            <span className="causes-hero-eyebrow">
+              DAVID CHUKWU CHARITY FOUNDATION
             </span>
 
-
             <h1>
-
-              {causes.hero.title}
-
+              {causes.hero?.title ||
+                "Our Causes"}
             </h1>
 
+            <p>
+              {causes.hero?.subtitle ||
+                "Creating lasting change by supporting communities, empowering lives, and restoring hope."}
+            </p>
+          </motion.div>
+        </div>
+      </section>
 
-            <span className="causes-underline"></span>
+      {/* ======================================================
+          INTRO SECTION
+      ====================================================== */}
 
+      <section className="causes-intro">
+        <div className="container">
+
+          <motion.div
+            className="causes-intro-content"
+            initial={{
+              opacity: 0,
+              y: 30,
+            }}
+            whileInView={{
+              opacity: 1,
+              y: 0,
+            }}
+            viewport={{
+              once: true,
+              amount: 0.2,
+            }}
+            transition={{
+              duration: 0.7,
+            }}
+          >
+            <span className="section-eyebrow">
+              {causes.intro?.eyebrow ||
+                "WHAT WE DO"}
+            </span>
+
+            <h2>
+              {causes.intro?.title ||
+                "Causes That Matter"}
+            </h2>
 
             <p>
-
-              {causes.hero.description}
-
+              {causes.intro?.description ||
+                "We are committed to addressing the needs of vulnerable individuals and communities through practical, compassionate, and sustainable initiatives."}
             </p>
-
           </motion.div>
 
         </div>
-
       </section>
 
+      {/* ======================================================
+          CAUSES GRID
+      ====================================================== */}
 
+      <section className="causes-list-section">
+        <div className="container">
 
-      {/* ==================================
-          INTRO
-      ================================== */}
+          <div className="causes-grid">
 
-      <section className="causes-intro">
-
-        <div className="container causes-intro-container">
-
-          <Reveal>
-
-            <span className="causes-label">
-
-              {causes.intro.eyebrow}
-
-            </span>
-
-
-            <h2>
-
-              {causes.intro.title}
-
-            </h2>
-
-
-            <span className="section-line"></span>
-
-
-            <p>
-
-              {causes.intro.description}
-
-            </p>
-
-          </Reveal>
-
-        </div>
-
-      </section>
-
-
-
-      {/* ==================================
-          CAUSES
-      ================================== */}
-
-      <section className="causes-list">
-
-        <div className="container causes-grid">
-
-          {causes.causes
-            .sort(
-              (a, b) =>
-                Number(a.order || 0) -
-                Number(b.order || 0)
-            )
-            .map(
-              (cause, index) => {
+            {causes.causes
+              ?.sort(
+                (a, b) =>
+                  (a.order || 0) -
+                  (b.order || 0)
+              )
+              .map((cause, index) => {
 
                 const image =
                   getMediaUrl(
                     cause.imageUrl
                   );
 
-
                 return (
-
-                  <Reveal
-                    className="cause-card"
+                  <motion.article
                     key={
+                      cause.id ||
                       cause._id ||
-                      `${cause.number}-${index}`
+                      index
                     }
-                    delay={
-                      index * 0.08
-                    }
+                    className="cause-card"
+                    initial={{
+                      opacity: 0,
+                      y: 40,
+                    }}
+                    whileInView={{
+                      opacity: 1,
+                      y: 0,
+                    }}
+                    viewport={{
+                      once: true,
+                      amount: 0.15,
+                    }}
+                    transition={{
+                      duration: 0.6,
+                      delay:
+                        index * 0.08,
+                    }}
                   >
 
                     {/* IMAGE */}
 
-                    <div className="cause-image">
-
-                      {image ? (
-
+                    {image ? (
+                      <div className="cause-card-image">
                         <img
                           src={image}
                           alt={
-                            cause.title
+                            cause.title ||
+                            "Charity cause"
                           }
                           loading="lazy"
                         />
-
-                      ) : (
-
-                        <div className="cause-image-placeholder">
-
-                          <span>
-                            {cause.number}
-                          </span>
-
-                        </div>
-
-                      )}
-
-                    </div>
-
-
+                      </div>
+                    ) : (
+                      <div className="cause-card-image cause-card-image-placeholder">
+                        <Heart
+                          size={42}
+                        />
+                      </div>
+                    )}
 
                     {/* CONTENT */}
 
-                    <div className="cause-content">
+                    <div className="cause-card-content">
 
                       <span className="cause-number">
-
-                        {cause.number ||
-                          String(
-                            index + 1
-                          ).padStart(
-                            2,
-                            "0"
-                          )}
-
+                        {String(
+                          index + 1
+                        ).padStart(
+                          2,
+                          "0"
+                        )}
                       </span>
 
+                      <h3>
+                        {cause.title}
+                      </h3>
 
-                      <div className="cause-text">
+                      <p>
+                        {cause.description}
+                      </p>
 
-                        <h3>
+                      <Link
+                        to="/donate"
+                        className="cause-card-link"
+                      >
+                        Support This Cause
 
-                          {cause.title}
-
-                        </h3>
-
-
-                        <p>
-
-                          {cause.description}
-
-                        </p>
-
-                      </div>
+                        <ArrowRight
+                          size={18}
+                        />
+                      </Link>
 
                     </div>
 
-                  </Reveal>
-
+                  </motion.article>
                 );
-
-              }
-            )}
-
-        </div>
-
-      </section>
-
-
-
-      {/* ==================================
-          APPROACH
-      ================================== */}
-
-      <section
-        className="approach-section"
-
-        style={{
-          backgroundImage:
-            `url(${approachBackground})`
-        }}
-      >
-
-        <div className="approach-overlay"></div>
-
-
-        <div className="container approach-container">
-
-          <Reveal className="approach-content">
-
-            <span className="causes-label">
-
-              {causes.approach.eyebrow}
-
-            </span>
-
-
-            <h2>
-
-              {causes.approach.title}
-
-            </h2>
-
-
-            <span className="section-line left"></span>
-
-
-            <p>
-
-              {causes.approach.description}
-
-            </p>
-
-          </Reveal>
-
-        </div>
-
-      </section>
-
-
-
-      {/* ==================================
-          CTA
-      ================================== */}
-
-      <section className="causes-cta">
-
-        <Reveal className="causes-cta-content">
-
-          <span className="causes-label">
-
-            {causes.cta.eyebrow}
-
-          </span>
-
-
-          <h2>
-
-            {causes.cta.title}
-
-          </h2>
-
-
-          <p>
-
-            {causes.cta.description}
-
-          </p>
-
-
-          <div className="causes-cta-buttons">
-
-
-            {/* DONATE */}
-
-            <button
-              type="button"
-              className="donate-btn"
-
-              onClick={
-                onDonateClick
-              }
-            >
-
-              <Heart size={18} />
-
-              {causes.cta.donateText}
-
-            </button>
-
-
-
-            {/* GET INVOLVED */}
-
-            <Link
-              to="/get-involved"
-              className="outline-btn"
-            >
-
-              {causes.cta.involvedText}
-
-              <ArrowRight
-                size={18}
-              />
-
-            </Link>
+              })}
 
           </div>
 
-        </Reveal>
+        </div>
+      </section>
 
+      {/* ======================================================
+          APPROACH SECTION
+      ====================================================== */}
+
+      <section
+        className="causes-approach"
+        style={{
+          backgroundImage: `url(${
+            getMediaUrl(
+              causes.approach?.imageUrl
+            ) || approachImg
+          })`,
+        }}
+      >
+        <div className="causes-approach-overlay">
+
+          <div className="container">
+
+            <motion.div
+              className="causes-approach-content"
+              initial={{
+                opacity: 0,
+                x: -40,
+              }}
+              whileInView={{
+                opacity: 1,
+                x: 0,
+              }}
+              viewport={{
+                once: true,
+                amount: 0.2,
+              }}
+              transition={{
+                duration: 0.8,
+              }}
+            >
+
+              <span className="section-eyebrow">
+                {causes.approach?.eyebrow ||
+                  "OUR APPROACH"}
+              </span>
+
+              <h2>
+                {causes.approach?.title ||
+                  "Creating Impact That Lasts"}
+              </h2>
+
+              <p>
+                {causes.approach?.description ||
+                  "Our work focuses on more than immediate relief. We seek to empower people, strengthen communities, and create sustainable opportunities that continue to make a difference."}
+              </p>
+
+            </motion.div>
+
+          </div>
+
+        </div>
+      </section>
+
+      {/* ======================================================
+          CTA SECTION
+      ====================================================== */}
+
+      <section className="causes-cta">
+        <div className="container">
+
+          <motion.div
+            className="causes-cta-content"
+            initial={{
+              opacity: 0,
+              y: 30,
+            }}
+            whileInView={{
+              opacity: 1,
+              y: 0,
+            }}
+            viewport={{
+              once: true,
+              amount: 0.2,
+            }}
+            transition={{
+              duration: 0.7,
+            }}
+          >
+
+            <div className="causes-cta-icon">
+              <Heart
+                size={32}
+              />
+            </div>
+
+            <h2>
+              {causes.cta?.title ||
+                "Be Part of the Change"}
+            </h2>
+
+            <p>
+              {causes.cta?.description ||
+                "Your support can help us reach more people, strengthen communities, and create meaningful opportunities for those who need them most."}
+            </p>
+
+            <button
+              type="button"
+              className="causes-cta-button"
+              onClick={onDonateClick}
+            >
+              Donate Now
+
+              <ArrowRight
+                size={19}
+              />
+            </button>
+
+          </motion.div>
+
+        </div>
       </section>
 
     </main>
-
   );
-
 };
-
 
 export default OurCauses;

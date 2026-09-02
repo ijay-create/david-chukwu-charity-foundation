@@ -1,5 +1,5 @@
 const Causes = require("../models/Causes");
-
+const uploadToCloudinary = require("../utils/cloudinaryUpload");
 
 // ========================================
 // DEFAULT CAUSES
@@ -12,7 +12,7 @@ const defaultCauses = [
     description:
       "Helping widows access practical support, resources and opportunities for greater independence.",
     imageUrl: "",
-    order: 1
+    order: 1,
   },
 
   {
@@ -21,7 +21,7 @@ const defaultCauses = [
     description:
       "Supporting the well-being, education and development of vulnerable children.",
     imageUrl: "",
-    order: 2
+    order: 2,
   },
 
   {
@@ -30,7 +30,7 @@ const defaultCauses = [
     description:
       "Supporting individuals with special needs through care, awareness and meaningful opportunities.",
     imageUrl: "",
-    order: 3
+    order: 3,
   },
 
   {
@@ -39,7 +39,7 @@ const defaultCauses = [
     description:
       "Providing care and support that promotes dignity and well-being among elderly people.",
     imageUrl: "",
-    order: 4
+    order: 4,
   },
 
   {
@@ -48,359 +48,288 @@ const defaultCauses = [
     description:
       "Extending practical assistance to individuals and communities in need.",
     imageUrl: "",
-    order: 5
-  }
+    order: 5,
+  },
 ];
-
 
 // ========================================
 // GET CAUSES
 // ========================================
 
 const getCauses = async (req, res) => {
-
   try {
-
     let causes = await Causes.findOne();
-
 
     // ------------------------------------
     // CREATE INITIAL DOCUMENT
     // ------------------------------------
 
     if (!causes) {
-
       causes = await Causes.create({
-
         hero: {
           title: "Our Causes",
-
           description:
             "Supporting people and communities where care is needed most.",
-
-          imageUrl: ""
+          imageUrl: "",
         },
-
 
         intro: {
-          eyebrow:
-            "WHAT WE CARE ABOUT",
-
-          title:
-            "Creating Change Where It Matters",
-
+          eyebrow: "WHAT WE CARE ABOUT",
+          title: "Creating Change Where It Matters",
           description:
-            "Our work focuses on providing care, support and opportunities to vulnerable individuals and communities."
+            "Our work focuses on providing care, support and opportunities to vulnerable individuals and communities.",
         },
-
 
         causes: defaultCauses,
 
-
         approach: {
-          eyebrow:
-            "OUR APPROACH",
-
-          title:
-            "Compassion in Action",
-
+          eyebrow: "OUR APPROACH",
+          title: "Compassion in Action",
           description:
             "We work through care, empowerment, advocacy and community partnerships to create meaningful change.",
-
-          imageUrl: ""
+          imageUrl: "",
         },
 
-
         cta: {
-          eyebrow:
-            "MAKE A DIFFERENCE",
-
-          title:
-            "Be Part of the Change",
-
+          eyebrow: "MAKE A DIFFERENCE",
+          title: "Be Part of the Change",
           description:
             "Your support can help us reach those who need it most.",
-
-          donateText:
-            "DONATE NOW",
-
-          involvedText:
-            "GET INVOLVED"
-        }
-
+          donateText: "DONATE NOW",
+          involvedText: "GET INVOLVED",
+        },
       });
-
     }
-
 
     // ------------------------------------
     // RETURN DATA
     // ------------------------------------
 
     return res.status(200).json({
-
       success: true,
-
-      causes
-
+      causes,
     });
-
   } catch (error) {
-
     console.error(
       "GET CAUSES ERROR:",
       error
     );
 
-
     return res.status(500).json({
-
       success: false,
-
-      message:
-        "Unable to fetch causes."
-
+      message: "Unable to fetch causes.",
     });
-
   }
-
 };
-
-
 
 // ========================================
 // UPDATE CAUSES
 // ========================================
 
 const updateCauses = async (req, res) => {
-
   try {
-
     // ------------------------------------
     // FIND EXISTING DOCUMENT
     // ------------------------------------
 
-    let causes =
-      await Causes.findOne();
-
+    let causes = await Causes.findOne();
 
     // ------------------------------------
     // CREATE IF NOT EXISTS
     // ------------------------------------
 
     if (!causes) {
-
-      causes =
-        new Causes();
-
+      causes = new Causes();
     }
-
 
     // ====================================
     // TEXT DATA
     // ====================================
 
     if (req.body.hero) {
-
-      causes.hero =
-        JSON.parse(
-          req.body.hero
-        );
-
+      causes.hero = JSON.parse(
+        req.body.hero
+      );
     }
-
 
     if (req.body.intro) {
-
-      causes.intro =
-        JSON.parse(
-          req.body.intro
-        );
-
+      causes.intro = JSON.parse(
+        req.body.intro
+      );
     }
-
 
     if (req.body.causes) {
-
-      causes.causes =
-        JSON.parse(
-          req.body.causes
-        );
-
+      causes.causes = JSON.parse(
+        req.body.causes
+      );
     }
-
 
     if (req.body.approach) {
-
-      causes.approach =
-        JSON.parse(
-          req.body.approach
-        );
-
+      causes.approach = JSON.parse(
+        req.body.approach
+      );
     }
-
 
     if (req.body.cta) {
-
-      causes.cta =
-        JSON.parse(
-          req.body.cta
-        );
-
+      causes.cta = JSON.parse(
+        req.body.cta
+      );
     }
-
 
     // ====================================
     // HERO IMAGE
     // ====================================
 
-    if (
-      req.files?.heroImage?.[0]
-    ) {
-
+    if (req.files?.heroImage?.[0]) {
       const heroFile =
         req.files.heroImage[0];
 
+      const cloudinaryResult =
+        await uploadToCloudinary(
+          heroFile.buffer,
+          {
+            folder:
+              "david-chukwu-charity-foundation/causes/hero",
+          }
+        );
+
+      if (
+        !cloudinaryResult?.secure_url
+      ) {
+        throw new Error(
+          "Cloudinary did not return a Causes Hero image URL."
+        );
+      }
 
       causes.hero.imageUrl =
-        `/uploads/causes/${heroFile.filename}`;
-
+        cloudinaryResult.secure_url;
     }
-
 
     // ====================================
     // APPROACH IMAGE
     // ====================================
 
-    if (
+    console.log(
+      "APPROACH FILE:",
       req.files?.approachImage?.[0]
-    ) {
+    );
 
+    if (req.files?.approachImage?.[0]) {
       const approachFile =
         req.files.approachImage[0];
 
+      const cloudinaryResult =
+        await uploadToCloudinary(
+          approachFile.buffer,
+          {
+            folder:
+              "david-chukwu-charity-foundation/causes/approach",
+          }
+        );
+
+      if (
+        !cloudinaryResult?.secure_url
+      ) {
+        throw new Error(
+          "Cloudinary did not return a Causes Approach image URL."
+        );
+      }
 
       causes.approach.imageUrl =
-        `/uploads/causes/${approachFile.filename}`;
-
+        cloudinaryResult.secure_url;
     }
-
 
     // ====================================
     // CAUSE IMAGES
     // ====================================
-    //
-    // IMPORTANT:
-    //
-    // Multer is configured with:
-    //
-    // causeImage_0
-    // causeImage_1
-    // causeImage_2
-    // causeImage_3
-    // etc.
-    //
-    // Therefore req.files is an OBJECT:
-    //
-    // {
-    //   heroImage: [...],
-    //   approachImage: [...],
-    //   causeImage_0: [...],
-    //   causeImage_1: [...],
-    //   causeImage_2: [...]
-    // }
-    //
-    // We must loop through the object
-    // and find the causeImage_X fields.
-    // ====================================
 
     if (req.files) {
-
-      Object.keys(req.files).forEach(
-        (fieldName) => {
-
-          // --------------------------------
-          // Ignore non-cause images
-          // --------------------------------
-
-          if (
-            !fieldName.startsWith(
+      const causeImageFields =
+        Object.keys(req.files).filter(
+          (fieldName) =>
+            fieldName.startsWith(
               "causeImage_"
             )
-          ) {
+        );
 
-            return;
+      for (
+        const fieldName of causeImageFields
+      ) {
+        // --------------------------------
+        // EXTRACT INDEX
+        // --------------------------------
 
-          }
+        const index = Number(
+          fieldName.replace(
+            "causeImage_",
+            ""
+          )
+        );
 
+        // --------------------------------
+        // VALIDATE INDEX
+        // --------------------------------
 
-          // --------------------------------
-          // Extract index
-          // --------------------------------
-
-          const index =
-            Number(
-              fieldName.replace(
-                "causeImage_",
-                ""
-              )
-            );
-
-
-          // --------------------------------
-          // Validate index
-          // --------------------------------
-
-          if (
-            Number.isNaN(index)
-          ) {
-
-            return;
-
-          }
-
-
-          // --------------------------------
-          // Get uploaded file
-          // --------------------------------
-
-          const file =
-            req.files[fieldName]?.[0];
-
-
-          if (!file) {
-
-            return;
-
-          }
-
-
-          // --------------------------------
-          // Make sure cause exists
-          // --------------------------------
-
-          if (
-            !causes.causes ||
-            !causes.causes[index]
-          ) {
-
-            return;
-
-          }
-
-
-          // --------------------------------
-          // SAVE IMAGE URL
-          // --------------------------------
-
-          causes.causes[index].imageUrl =
-            `/uploads/causes/${file.filename}`;
-
+        if (
+          Number.isNaN(index)
+        ) {
+          continue;
         }
-      );
 
+        // --------------------------------
+        // GET UPLOADED FILE
+        // --------------------------------
+
+        const file =
+          req.files[fieldName]?.[0];
+
+        if (!file) {
+          continue;
+        }
+
+        // --------------------------------
+        // MAKE SURE CAUSE EXISTS
+        // --------------------------------
+
+        if (
+          !causes.causes ||
+          !causes.causes[index]
+        ) {
+          continue;
+        }
+
+        // --------------------------------
+        // UPLOAD TO CLOUDINARY
+        // --------------------------------
+
+        const cloudinaryResult =
+          await uploadToCloudinary(
+            file.buffer,
+            {
+              folder:
+                "david-chukwu-charity-foundation/causes/items",
+
+              publicId:
+                `cause-${index + 1}`,
+            }
+          );
+
+        if (
+          !cloudinaryResult?.secure_url
+        ) {
+          throw new Error(
+            `Cloudinary did not return a URL for cause image ${index + 1}.`
+          );
+        }
+
+        // --------------------------------
+        // SAVE CLOUDINARY URL
+        // --------------------------------
+
+        causes.causes[index].imageUrl =
+          cloudinaryResult.secure_url;
+      }
     }
-
 
     // ====================================
     // NORMALIZE CAUSE ORDER
@@ -409,31 +338,24 @@ const updateCauses = async (req, res) => {
     if (
       Array.isArray(causes.causes)
     ) {
-
       causes.causes =
         causes.causes.map(
           (cause, index) => ({
-
             ...cause,
 
             number:
               cause.number ||
-              String(
-                index + 1
-              ).padStart(
+              String(index + 1).padStart(
                 2,
                 "0"
               ),
 
             order:
               cause.order ||
-              index + 1
-
+              index + 1,
           })
         );
-
     }
-
 
     // ====================================
     // SAVE DATABASE
@@ -441,54 +363,36 @@ const updateCauses = async (req, res) => {
 
     await causes.save();
 
-
     // ====================================
     // RETURN UPDATED DATA
     // ====================================
 
     return res.status(200).json({
-
       success: true,
-
       message:
         "Causes updated successfully.",
-
-      causes
-
+      causes,
     });
-
   } catch (error) {
-
     console.error(
       "UPDATE CAUSES ERROR:",
       error
     );
 
-
     return res.status(500).json({
-
       success: false,
-
       message:
         error.message ||
-        "Unable to update causes."
-
+        "Unable to update causes.",
     });
-
   }
-
 };
-
-
 
 // ========================================
 // EXPORT
 // ========================================
 
 module.exports = {
-
   getCauses,
-
-  updateCauses
-
+  updateCauses,
 };
