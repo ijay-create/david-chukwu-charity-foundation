@@ -1,80 +1,12 @@
 const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
-
-
-// ========================================
-// UPLOAD DIRECTORY
-// ========================================
-
-const uploadDirectory = path.join(
-  __dirname,
-  "../uploads/impact"
-);
-
-
-// ========================================
-// CREATE DIRECTORY
-// ========================================
-
-if (!fs.existsSync(uploadDirectory)) {
-
-  fs.mkdirSync(
-    uploadDirectory,
-    {
-      recursive: true
-    }
-  );
-
-}
 
 
 // ========================================
 // STORAGE
 // ========================================
 
-const storage = multer.diskStorage({
-
-  destination: (
-    req,
-    file,
-    cb
-  ) => {
-
-    cb(
-      null,
-      uploadDirectory
-    );
-
-  },
-
-
-  filename: (
-    req,
-    file,
-    cb
-  ) => {
-
-    const extension =
-      path.extname(
-        file.originalname
-      );
-
-
-    const filename =
-      `impact-${Date.now()}-${Math.round(
-        Math.random() * 1e9
-      )}${extension}`;
-
-
-    cb(
-      null,
-      filename
-    );
-
-  }
-
-});
+const storage =
+  multer.memoryStorage();
 
 
 // ========================================
@@ -145,4 +77,9 @@ const impactUpload = multer({
 });
 
 
-module.exports = impactUpload;
+// ========================================
+// EXPORT
+// ========================================
+
+module.exports =
+  impactUpload;

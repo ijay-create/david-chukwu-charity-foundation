@@ -21,34 +21,55 @@ import {
 
 import "../../styles/Admin.impact.css";
 
-
 // ========================================
 // API
 // ========================================
 
 const API_URL =
-  "http://localhost:5000/api/impact";
+  `${import.meta.env.VITE_API_URL || "http://localhost:5000/api"}/impact`;
 
 const SERVER_URL =
-  "http://localhost:5000";
+  "https://david-chukwu-charity-api.onrender.com";
 
+// ========================================
+// CONSTANTS
+// ========================================
+
+const MAX_FILE_SIZE =
+  5 * 1024 * 1024;
+
+const ALLOWED_IMAGE_TYPES = [
+  "image/jpeg",
+  "image/jpg",
+  "image/png",
+  "image/webp"
+];
+
+const MAX_PROJECTS = 10;
+const MAX_GALLERY_IMAGES = 20;
+const MAX_TESTIMONIALS = 10;
 
 // ========================================
 // DEFAULT DATA
 // ========================================
 
 const defaultImpact = {
-
   hero: {
     title: "Our Impact",
-    description:
-      "Real change, Stronger communities. A better tomorrow.",
+
+    tagline:
+      "Real change, Stronger communities",
+
+    lineOne:
+      "Real change, Stronger communities",
+
+    lineTwo:
+      "A better tomorrow",
+
     imageUrl: ""
   },
 
-
   projects: [
-
     {
       title:
         "Widows Support Outreach",
@@ -84,12 +105,9 @@ const defaultImpact = {
 
       order: 3
     }
-
   ],
 
-
   gallery: [
-
     {
       imageUrl: "",
       alt: "Children holding books",
@@ -98,7 +116,8 @@ const defaultImpact = {
 
     {
       imageUrl: "",
-      alt: "People receiving support packages",
+      alt:
+        "People receiving support packages",
       order: 2
     },
 
@@ -110,7 +129,8 @@ const defaultImpact = {
 
     {
       imageUrl: "",
-      alt: "Men receiving support packages",
+      alt:
+        "Men receiving support packages",
       order: 4
     },
 
@@ -119,12 +139,9 @@ const defaultImpact = {
       alt: "Widows receiving support",
       order: 5
     }
-
   ],
 
-
   stats: [
-
     {
       icon: "Users",
       number: "412+",
@@ -152,12 +169,9 @@ const defaultImpact = {
       label: "Volunteers",
       order: 4
     }
-
   ],
 
-
   testimonials: [
-
     {
       quote:
         "The support I received gave me hope and strength.",
@@ -181,11 +195,22 @@ const defaultImpact = {
 
       order: 2
     }
+  ],
 
-  ]
+  cta: {
+    title:
+      "Be Part of the Change",
 
+    description:
+      "Your support can help us reach those who need it most.",
+
+    donateText:
+      "DONATE NOW",
+
+    involvedText:
+      "GET INVOLVED"
+  }
 };
-
 
 // ========================================
 // ADMIN IMPACT
@@ -193,13 +218,16 @@ const defaultImpact = {
 
 const AdminImpact = () => {
 
-
   // ======================================
   // STATE
   // ======================================
 
   const [impact, setImpact] =
-    useState(defaultImpact);
+    useState(
+      JSON.parse(
+        JSON.stringify(defaultImpact)
+      )
+    );
 
   const [loading, setLoading] =
     useState(true);
@@ -213,7 +241,6 @@ const AdminImpact = () => {
   const [success, setSuccess] =
     useState("");
 
-
   // ======================================
   // HERO FILE
   // ======================================
@@ -223,7 +250,6 @@ const AdminImpact = () => {
 
   const [heroPreview, setHeroPreview] =
     useState("");
-
 
   // ======================================
   // PROJECT FILES
@@ -235,7 +261,6 @@ const AdminImpact = () => {
   const [projectPreviews, setProjectPreviews] =
     useState({});
 
-
   // ======================================
   // GALLERY FILES
   // ======================================
@@ -246,7 +271,6 @@ const AdminImpact = () => {
   const [galleryPreviews, setGalleryPreviews] =
     useState({});
 
-
   // ======================================
   // TESTIMONIAL FILES
   // ======================================
@@ -256,7 +280,6 @@ const AdminImpact = () => {
 
   const [testimonialPreviews, setTestimonialPreviews] =
     useState({});
-
 
   // ======================================
   // INPUT REFS
@@ -274,34 +297,147 @@ const AdminImpact = () => {
   const testimonialInputRefs =
     useRef({});
 
+  // ======================================
+  // PREVIEW URL TRACKING
+  // ======================================
 
-  // ========================================
+  const previewUrlsRef =
+    useRef([]);
+
+  // ======================================
+  // CREATE OBJECT URL
+  // ======================================
+
+  const createPreviewUrl = file => {
+
+    const url =
+      URL.createObjectURL(file);
+
+    previewUrlsRef.current.push(url);
+
+    return url;
+  };
+
+  // ======================================
+  // CLEAN PREVIEW URL
+  // ======================================
+
+  const revokePreviewUrl = url => {
+
+    if (
+      !url ||
+      !url.startsWith("blob:")
+    ) {
+      return;
+    }
+
+    URL.revokeObjectURL(url);
+
+    previewUrlsRef.current =
+      previewUrlsRef.current.filter(
+        item => item !== url
+      );
+  };
+
+  // ======================================
+  // CLEAN ALL PREVIEW URLS
+  // ======================================
+
+  useEffect(() => {
+
+    return () => {
+
+      previewUrlsRef.current.forEach(
+        url => {
+          URL.revokeObjectURL(url);
+        }
+      );
+
+      previewUrlsRef.current = [];
+    };
+
+  }, []);
+
+  // ======================================
   // MEDIA URL
-  // ========================================
+  // ======================================
 
-  const getMediaUrl = (fileUrl) => {
+  const getMediaUrl = fileUrl => {
 
     if (!fileUrl) {
       return "";
     }
 
-    if (
-      fileUrl.startsWith("http://") ||
-      fileUrl.startsWith("https://") ||
-      fileUrl.startsWith("blob:")
-    ) {
-      return fileUrl;
+    const normalizedUrl =
+      String(fileUrl).trim();
+
+    if (!normalizedUrl) {
+      return "";
     }
 
-    return `${SERVER_URL}${fileUrl}`;
+    // Cloudinary URLs
+    // and local blob previews
+    if (
+      normalizedUrl.startsWith(
+        "http://"
+      ) ||
+      normalizedUrl.startsWith(
+        "https://"
+      ) ||
+      normalizedUrl.startsWith(
+        "blob:"
+      )
+    ) {
+      return normalizedUrl;
+    }
+
+    // Old local uploads
+    // remain available from Render
+    if (
+      normalizedUrl.startsWith("/")
+    ) {
+      return `${SERVER_URL}${normalizedUrl}`;
+    }
+
+    return `${SERVER_URL}/${normalizedUrl}`;
   };
 
+  // ======================================
+  // VALIDATE IMAGE FILE
+  // ======================================
 
-  // ========================================
+  const validateImageFile = file => {
+
+    if (!file) {
+      return "No image selected.";
+    }
+
+    if (
+      !ALLOWED_IMAGE_TYPES.includes(
+        file.type
+      )
+    ) {
+      return (
+        "Only JPG, JPEG, PNG and WEBP images are allowed."
+      );
+    }
+
+    if (
+      file.size > MAX_FILE_SIZE
+    ) {
+      return (
+        "Image size must not exceed 5MB."
+      );
+    }
+
+    return "";
+  };
+
+  // ======================================
   // NORMALIZE BACKEND DATA
-  // ========================================
+  // ======================================
 
-  const normalizeImpact = (data) => {
+  const normalizeImpact = data => {
 
     const normalizedProjects =
       Array.isArray(data?.projects)
@@ -326,8 +462,11 @@ const AdminImpact = () => {
               order:
                 index + 1
             }))
-        : defaultImpact.projects;
-
+        : JSON.parse(
+            JSON.stringify(
+              defaultImpact.projects
+            )
+          );
 
     const normalizedGallery =
       Array.isArray(data?.gallery)
@@ -350,8 +489,11 @@ const AdminImpact = () => {
               order:
                 index + 1
             }))
-        : defaultImpact.gallery;
-
+        : JSON.parse(
+            JSON.stringify(
+              defaultImpact.gallery
+            )
+          );
 
     const normalizedStats =
       Array.isArray(data?.stats)
@@ -376,8 +518,11 @@ const AdminImpact = () => {
               order:
                 index + 1
             }))
-        : defaultImpact.stats;
-
+        : JSON.parse(
+            JSON.stringify(
+              defaultImpact.stats
+            )
+          );
 
     const normalizedTestimonials =
       Array.isArray(data?.testimonials)
@@ -402,50 +547,141 @@ const AdminImpact = () => {
               order:
                 index + 1
             }))
-        : defaultImpact.testimonials;
-
+        : JSON.parse(
+            JSON.stringify(
+              defaultImpact.testimonials
+            )
+          );
 
     return {
-
       hero: {
         ...defaultImpact.hero,
         ...(data?.hero || {})
       },
 
       projects:
-        normalizedProjects,
+        normalizedProjects.slice(
+          0,
+          MAX_PROJECTS
+        ),
 
       gallery:
-        normalizedGallery,
+        normalizedGallery.slice(
+          0,
+          MAX_GALLERY_IMAGES
+        ),
 
       stats:
         normalizedStats,
 
       testimonials:
-        normalizedTestimonials
+        normalizedTestimonials.slice(
+          0,
+          MAX_TESTIMONIALS
+        ),
 
+      cta: {
+        ...defaultImpact.cta,
+        ...(data?.cta || {})
+      }
     };
-
   };
 
+  // ======================================
+  // BUILD PREVIEWS
+  // ======================================
 
-  // ========================================
+  const buildPreviewData = items => {
+
+    const previewData = {};
+
+    items.forEach(
+      (item, index) => {
+
+        if (item.imageUrl) {
+
+          previewData[index] =
+            getMediaUrl(
+              item.imageUrl
+            );
+        }
+      }
+    );
+
+    return previewData;
+  };
+
+  // ======================================
+  // APPLY LOADED IMPACT
+  // ======================================
+
+  const applyImpactData = data => {
+
+    const normalized =
+      normalizeImpact(data);
+
+    setImpact(normalized);
+
+    setHeroPreview(
+      normalized.hero.imageUrl
+        ? getMediaUrl(
+            normalized.hero.imageUrl
+          )
+        : ""
+    );
+
+    setProjectPreviews(
+      buildPreviewData(
+        normalized.projects
+      )
+    );
+
+    setGalleryPreviews(
+      buildPreviewData(
+        normalized.gallery
+      )
+    );
+
+    setTestimonialPreviews(
+      buildPreviewData(
+        normalized.testimonials
+      )
+    );
+
+    setHeroFile(null);
+    setProjectFiles({});
+    setGalleryFiles({});
+    setTestimonialFiles({});
+  };
+
+  // ======================================
   // LOAD IMPACT
-  // ========================================
+  // ======================================
 
   const loadImpact = async () => {
 
     try {
 
       setLoading(true);
-
       setError("");
+      setSuccess("");
 
       const response =
         await fetch(API_URL);
 
-      const data =
-        await response.json();
+      let data;
+
+      try {
+
+        data =
+          await response.json();
+
+      } catch {
+
+        throw new Error(
+          `Server returned an invalid response (${response.status}).`
+        );
+      }
 
       if (
         !response.ok ||
@@ -456,129 +692,11 @@ const AdminImpact = () => {
           data.message ||
           "Unable to fetch impact content."
         );
-
       }
 
-
-      const normalized =
-        normalizeImpact(
-          data.impact
-        );
-
-
-      setImpact(normalized);
-
-
-      // ------------------------------------
-      // HERO PREVIEW
-      // ------------------------------------
-
-      if (
-        normalized.hero.imageUrl
-      ) {
-
-        setHeroPreview(
-          getMediaUrl(
-            normalized.hero.imageUrl
-          )
-        );
-
-      } else {
-
-        setHeroPreview("");
-
-      }
-
-
-      // ------------------------------------
-      // PROJECT PREVIEWS
-      // ------------------------------------
-
-      const projectPreviewData = {};
-
-      normalized.projects.forEach(
-        (project, index) => {
-
-          if (project.imageUrl) {
-
-            projectPreviewData[index] =
-              getMediaUrl(
-                project.imageUrl
-              );
-
-          }
-
-        }
+      applyImpactData(
+        data.impact
       );
-
-      setProjectPreviews(
-        projectPreviewData
-      );
-
-
-      // ------------------------------------
-      // GALLERY PREVIEWS
-      // ------------------------------------
-
-      const galleryPreviewData = {};
-
-      normalized.gallery.forEach(
-        (item, index) => {
-
-          if (item.imageUrl) {
-
-            galleryPreviewData[index] =
-              getMediaUrl(
-                item.imageUrl
-              );
-
-          }
-
-        }
-      );
-
-      setGalleryPreviews(
-        galleryPreviewData
-      );
-
-
-      // ------------------------------------
-      // TESTIMONIAL PREVIEWS
-      // ------------------------------------
-
-      const testimonialPreviewData = {};
-
-      normalized.testimonials.forEach(
-        (item, index) => {
-
-          if (item.imageUrl) {
-
-            testimonialPreviewData[index] =
-              getMediaUrl(
-                item.imageUrl
-              );
-
-          }
-
-        }
-      );
-
-      setTestimonialPreviews(
-        testimonialPreviewData
-      );
-
-
-      // ------------------------------------
-      // CLEAR PENDING FILES
-      // ------------------------------------
-
-      setHeroFile(null);
-
-      setProjectFiles({});
-
-      setGalleryFiles({});
-
-      setTestimonialFiles({});
 
     } catch (loadError) {
 
@@ -595,15 +713,12 @@ const AdminImpact = () => {
     } finally {
 
       setLoading(false);
-
     }
-
   };
 
-
-  // ========================================
+  // ======================================
   // INITIAL LOAD
-  // ========================================
+  // ======================================
 
   useEffect(() => {
 
@@ -611,10 +726,9 @@ const AdminImpact = () => {
 
   }, []);
 
-
-  // ========================================
+  // ======================================
   // UPDATE SECTION
-  // ========================================
+  // ======================================
 
   const updateSection = (
     section,
@@ -622,36 +736,25 @@ const AdminImpact = () => {
     value
   ) => {
 
-    setImpact(
-      previous => ({
+    setImpact(previous => ({
+      ...previous,
 
-        ...previous,
+      [section]: {
+        ...previous[section],
 
-        [section]: {
-
-          ...previous[section],
-
-          [field]: value
-
-        }
-
-      })
-    );
+        [field]: value
+      }
+    }));
 
     setError("");
-
     setSuccess("");
-
   };
 
-
-  // ========================================
+  // ======================================
   // HERO IMAGE
-  // ========================================
+  // ======================================
 
-  const handleHeroChange = (
-    event
-  ) => {
+  const handleHeroChange = event => {
 
     const file =
       event.target.files?.[0];
@@ -660,40 +763,43 @@ const AdminImpact = () => {
       return;
     }
 
+    const validationError =
+      validateImageFile(file);
 
-    if (
-      !file.type.startsWith("image/")
-    ) {
+    if (validationError) {
 
       setError(
-        "Please select a valid hero image."
+        validationError
       );
 
       event.target.value = "";
 
       return;
-
     }
 
+    if (
+      heroPreview.startsWith("blob:")
+    ) {
+      revokePreviewUrl(
+        heroPreview
+      );
+    }
 
     const preview =
-      URL.createObjectURL(file);
-
+      createPreviewUrl(file);
 
     setHeroFile(file);
-
     setHeroPreview(preview);
 
     setError("");
-
     setSuccess("");
 
+    event.target.value = "";
   };
 
-
-  // ========================================
+  // ======================================
   // PROJECT IMAGE
-  // ========================================
+  // ======================================
 
   const handleProjectImageChange = (
     index,
@@ -707,58 +813,55 @@ const AdminImpact = () => {
       return;
     }
 
+    const validationError =
+      validateImageFile(file);
 
-    if (
-      !file.type.startsWith("image/")
-    ) {
+    if (validationError) {
 
       setError(
-        "Please select a valid project image."
+        validationError
       );
 
       event.target.value = "";
 
       return;
-
     }
 
+    const previousPreview =
+      projectPreviews[index];
+
+    if (
+      previousPreview?.startsWith("blob:")
+    ) {
+      revokePreviewUrl(
+        previousPreview
+      );
+    }
 
     const preview =
-      URL.createObjectURL(file);
+      createPreviewUrl(file);
 
+    setProjectFiles(previous => ({
+      ...previous,
 
-    setProjectFiles(
-      previous => ({
+      [index]: file
+    }));
 
-        ...previous,
+    setProjectPreviews(previous => ({
+      ...previous,
 
-        [index]: file
-
-      })
-    );
-
-
-    setProjectPreviews(
-      previous => ({
-
-        ...previous,
-
-        [index]: preview
-
-      })
-    );
-
+      [index]: preview
+    }));
 
     setError("");
-
     setSuccess("");
 
+    event.target.value = "";
   };
 
-
-  // ========================================
+  // ======================================
   // GALLERY IMAGE
-  // ========================================
+  // ======================================
 
   const handleGalleryImageChange = (
     index,
@@ -772,59 +875,55 @@ const AdminImpact = () => {
       return;
     }
 
+    const validationError =
+      validateImageFile(file);
 
-    if (
-      !file.type.startsWith("image/")
-    ) {
+    if (validationError) {
 
       setError(
-        "Please select a valid gallery image."
+        validationError
       );
 
       event.target.value = "";
 
       return;
-
     }
 
+    const previousPreview =
+      galleryPreviews[index];
+
+    if (
+      previousPreview?.startsWith("blob:")
+    ) {
+      revokePreviewUrl(
+        previousPreview
+      );
+    }
 
     const preview =
-      URL.createObjectURL(file);
+      createPreviewUrl(file);
 
+    setGalleryFiles(previous => ({
+      ...previous,
 
-    setGalleryFiles(
-      previous => ({
+      [index]: file
+    }));
 
-        ...previous,
+    setGalleryPreviews(previous => ({
+      ...previous,
 
-        [index]: file
-
-      })
-    );
-
-
-    setGalleryPreviews(
-      previous => ({
-
-        ...previous,
-
-        [index]: preview
-
-      })
-
-    );
-
+      [index]: preview
+    }));
 
     setError("");
-
     setSuccess("");
 
+    event.target.value = "";
   };
 
-
-  // ========================================
+  // ======================================
   // TESTIMONIAL IMAGE
-  // ========================================
+  // ======================================
 
   const handleTestimonialImageChange = (
     index,
@@ -838,59 +937,55 @@ const AdminImpact = () => {
       return;
     }
 
+    const validationError =
+      validateImageFile(file);
 
-    if (
-      !file.type.startsWith("image/")
-    ) {
+    if (validationError) {
 
       setError(
-        "Please select a valid testimonial image."
+        validationError
       );
 
       event.target.value = "";
 
       return;
-
     }
 
+    const previousPreview =
+      testimonialPreviews[index];
+
+    if (
+      previousPreview?.startsWith("blob:")
+    ) {
+      revokePreviewUrl(
+        previousPreview
+      );
+    }
 
     const preview =
-      URL.createObjectURL(file);
+      createPreviewUrl(file);
 
+    setTestimonialFiles(previous => ({
+      ...previous,
 
-    setTestimonialFiles(
-      previous => ({
+      [index]: file
+    }));
 
-        ...previous,
+    setTestimonialPreviews(previous => ({
+      ...previous,
 
-        [index]: file
-
-      })
-    );
-
-
-    setTestimonialPreviews(
-      previous => ({
-
-        ...previous,
-
-        [index]: preview
-
-      })
-
-    );
-
+      [index]: preview
+    }));
 
     setError("");
-
     setSuccess("");
 
+    event.target.value = "";
   };
 
-
-  // ========================================
+  // ======================================
   // UPDATE PROJECT
-  // ========================================
+  // ======================================
 
   const updateProject = (
     index,
@@ -898,94 +993,76 @@ const AdminImpact = () => {
     value
   ) => {
 
-    setImpact(
-      previous => {
+    setImpact(previous => {
 
-        const updated =
-          [...previous.projects];
+      const updated =
+        [...previous.projects];
 
-        updated[index] = {
+      updated[index] = {
+        ...updated[index],
 
-          ...updated[index],
+        [field]: value
+      };
 
-          [field]: value
+      return {
+        ...previous,
 
-        };
-
-
-        return {
-
-          ...previous,
-
-          projects: updated
-
-        };
-
-      }
-    );
+        projects: updated
+      };
+    });
 
     setError("");
-
     setSuccess("");
-
   };
 
-
-  // ========================================
+  // ======================================
   // ADD PROJECT
-  // ========================================
+  // ======================================
 
   const addProject = () => {
 
-    setImpact(
-      previous => {
+    if (
+      impact.projects.length >=
+      MAX_PROJECTS
+    ) {
 
-        const nextOrder =
-          previous.projects.length + 1;
+      setError(
+        `You can have a maximum of ${MAX_PROJECTS} outreach projects.`
+      );
 
+      return;
+    }
 
-        return {
+    setImpact(previous => {
 
-          ...previous,
+      const nextOrder =
+        previous.projects.length + 1;
 
-          projects: [
+      return {
+        ...previous,
 
-            ...previous.projects,
+        projects: [
+          ...previous.projects,
 
-            {
-
-              title: "",
-
-              text: "",
-
-              imageUrl: "",
-
-              order: nextOrder
-
-            }
-
-          ]
-
-        };
-
-      }
-    );
-
+          {
+            title: "",
+            text: "",
+            imageUrl: "",
+            order: nextOrder
+          }
+        ]
+      };
+    });
 
     setError("");
-
     setSuccess("");
-
   };
 
-
-  // ========================================
+  // ======================================
   // REMOVE PROJECT
-  // ========================================
+  // ======================================
 
-  const removeProject = (
-    index
-  ) => {
+  const removeProject = index => {
 
     if (
       impact.projects.length <= 1
@@ -996,73 +1073,64 @@ const AdminImpact = () => {
       );
 
       return;
-
     }
 
+    const removedPreview =
+      projectPreviews[index];
 
-    setImpact(
-      previous => {
+    if (
+      removedPreview?.startsWith("blob:")
+    ) {
+      revokePreviewUrl(
+        removedPreview
+      );
+    }
 
-        const updated =
-          previous.projects
+    setImpact(previous => {
 
-            .filter(
-              (_, itemIndex) =>
-                itemIndex !== index
-            )
+      const updated =
+        previous.projects
+          .filter(
+            (_, itemIndex) =>
+              itemIndex !== index
+          )
+          .map(
+            (item, itemIndex) => ({
+              ...item,
 
-            .map(
-              (item, itemIndex) => ({
+              order:
+                itemIndex + 1
+            })
+          );
 
-                ...item,
+      return {
+        ...previous,
 
-                order:
-                  itemIndex + 1
+        projects: updated
+      };
+    });
 
-              })
-            );
-
-
-        return {
-
-          ...previous,
-
-          projects: updated
-
-        };
-
-      }
+    setProjectFiles(previous =>
+      shiftIndexedObject(
+        previous,
+        index
+      )
     );
 
-
-    setProjectFiles(
-      previous =>
-        shiftIndexedObject(
-          previous,
-          index
-        )
+    setProjectPreviews(previous =>
+      shiftIndexedObject(
+        previous,
+        index
+      )
     );
-
-
-    setProjectPreviews(
-      previous =>
-        shiftIndexedObject(
-          previous,
-          index
-        )
-    );
-
 
     setError("");
-
     setSuccess("");
-
   };
 
-
-  // ========================================
+  // ======================================
   // UPDATE GALLERY
-  // ========================================
+  // ======================================
 
   const updateGallery = (
     index,
@@ -1070,94 +1138,79 @@ const AdminImpact = () => {
     value
   ) => {
 
-    setImpact(
-      previous => {
+    setImpact(previous => {
 
-        const updated =
-          [...previous.gallery];
+      const updated =
+        [...previous.gallery];
 
-        updated[index] = {
+      updated[index] = {
+        ...updated[index],
 
-          ...updated[index],
+        [field]: value
+      };
 
-          [field]: value
+      return {
+        ...previous,
 
-        };
-
-
-        return {
-
-          ...previous,
-
-          gallery: updated
-
-        };
-
-      }
-    );
+        gallery: updated
+      };
+    });
 
     setError("");
-
     setSuccess("");
-
   };
 
-
-  // ========================================
+  // ======================================
   // ADD GALLERY
-  // ========================================
+  // ======================================
 
   const addGalleryImage = () => {
 
-    setImpact(
-      previous => {
+    if (
+      impact.gallery.length >=
+      MAX_GALLERY_IMAGES
+    ) {
 
-        const nextOrder =
-          previous.gallery.length + 1;
+      setError(
+        `You can have a maximum of ${MAX_GALLERY_IMAGES} gallery images.`
+      );
 
+      return;
+    }
 
-        return {
+    setImpact(previous => {
 
-          ...previous,
+      const nextOrder =
+        previous.gallery.length + 1;
 
-          gallery: [
+      return {
+        ...previous,
 
-            ...previous.gallery,
+        gallery: [
+          ...previous.gallery,
 
-            {
+          {
+            imageUrl: "",
 
-              imageUrl: "",
+            alt:
+              `Impact gallery image ${nextOrder}`,
 
-              alt:
-                `Impact gallery image ${nextOrder}`,
-
-              order:
-                nextOrder
-
-            }
-
-          ]
-
-        };
-
-      }
-    );
-
+            order:
+              nextOrder
+          }
+        ]
+      };
+    });
 
     setError("");
-
     setSuccess("");
-
   };
 
-
-  // ========================================
+  // ======================================
   // REMOVE GALLERY
-  // ========================================
+  // ======================================
 
-  const removeGalleryImage = (
-    index
-  ) => {
+  const removeGalleryImage = index => {
 
     if (
       impact.gallery.length <= 1
@@ -1168,73 +1221,64 @@ const AdminImpact = () => {
       );
 
       return;
-
     }
 
+    const removedPreview =
+      galleryPreviews[index];
 
-    setImpact(
-      previous => {
+    if (
+      removedPreview?.startsWith("blob:")
+    ) {
+      revokePreviewUrl(
+        removedPreview
+      );
+    }
 
-        const updated =
-          previous.gallery
+    setImpact(previous => {
 
-            .filter(
-              (_, itemIndex) =>
-                itemIndex !== index
-            )
+      const updated =
+        previous.gallery
+          .filter(
+            (_, itemIndex) =>
+              itemIndex !== index
+          )
+          .map(
+            (item, itemIndex) => ({
+              ...item,
 
-            .map(
-              (item, itemIndex) => ({
+              order:
+                itemIndex + 1
+            })
+          );
 
-                ...item,
+      return {
+        ...previous,
 
-                order:
-                  itemIndex + 1
+        gallery: updated
+      };
+    });
 
-              })
-            );
-
-
-        return {
-
-          ...previous,
-
-          gallery: updated
-
-        };
-
-      }
+    setGalleryFiles(previous =>
+      shiftIndexedObject(
+        previous,
+        index
+      )
     );
 
-
-    setGalleryFiles(
-      previous =>
-        shiftIndexedObject(
-          previous,
-          index
-        )
+    setGalleryPreviews(previous =>
+      shiftIndexedObject(
+        previous,
+        index
+      )
     );
-
-
-    setGalleryPreviews(
-      previous =>
-        shiftIndexedObject(
-          previous,
-          index
-        )
-    );
-
 
     setError("");
-
     setSuccess("");
-
   };
 
-
-  // ========================================
+  // ======================================
   // UPDATE STAT
-  // ========================================
+  // ======================================
 
   const updateStat = (
     index,
@@ -1242,95 +1286,64 @@ const AdminImpact = () => {
     value
   ) => {
 
-    setImpact(
-      previous => {
+    setImpact(previous => {
 
-        const updated =
-          [...previous.stats];
+      const updated =
+        [...previous.stats];
 
-        updated[index] = {
+      updated[index] = {
+        ...updated[index],
 
-          ...updated[index],
+        [field]: value
+      };
 
-          [field]: value
+      return {
+        ...previous,
 
-        };
-
-
-        return {
-
-          ...previous,
-
-          stats: updated
-
-        };
-
-      }
-    );
-
+        stats: updated
+      };
+    });
 
     setError("");
-
     setSuccess("");
-
   };
 
-
-  // ========================================
+  // ======================================
   // ADD STAT
-  // ========================================
+  // ======================================
 
   const addStat = () => {
 
-    setImpact(
-      previous => {
+    setImpact(previous => {
 
-        const nextOrder =
-          previous.stats.length + 1;
+      const nextOrder =
+        previous.stats.length + 1;
 
+      return {
+        ...previous,
 
-        return {
+        stats: [
+          ...previous.stats,
 
-          ...previous,
-
-          stats: [
-
-            ...previous.stats,
-
-            {
-
-              icon: "Users",
-
-              number: "",
-
-              label: "",
-
-              order: nextOrder
-
-            }
-
-          ]
-
-        };
-
-      }
-    );
-
+          {
+            icon: "Users",
+            number: "",
+            label: "",
+            order: nextOrder
+          }
+        ]
+      };
+    });
 
     setError("");
-
     setSuccess("");
-
   };
 
-
-  // ========================================
+  // ======================================
   // REMOVE STAT
-  // ========================================
+  // ======================================
 
-  const removeStat = (
-    index
-  ) => {
+  const removeStat = index => {
 
     if (
       impact.stats.length <= 1
@@ -1341,55 +1354,39 @@ const AdminImpact = () => {
       );
 
       return;
-
     }
 
+    setImpact(previous => {
 
-    setImpact(
-      previous => {
+      const updated =
+        previous.stats
+          .filter(
+            (_, itemIndex) =>
+              itemIndex !== index
+          )
+          .map(
+            (item, itemIndex) => ({
+              ...item,
 
-        const updated =
-          previous.stats
+              order:
+                itemIndex + 1
+            })
+          );
 
-            .filter(
-              (_, itemIndex) =>
-                itemIndex !== index
-            )
+      return {
+        ...previous,
 
-            .map(
-              (item, itemIndex) => ({
-
-                ...item,
-
-                order:
-                  itemIndex + 1
-
-              })
-            );
-
-
-        return {
-
-          ...previous,
-
-          stats: updated
-
-        };
-
-      }
-    );
-
+        stats: updated
+      };
+    });
 
     setError("");
-
     setSuccess("");
-
   };
 
-
-  // ========================================
+  // ======================================
   // UPDATE TESTIMONIAL
-  // ========================================
+  // ======================================
 
   const updateTestimonial = (
     index,
@@ -1397,95 +1394,76 @@ const AdminImpact = () => {
     value
   ) => {
 
-    setImpact(
-      previous => {
+    setImpact(previous => {
 
-        const updated =
-          [...previous.testimonials];
+      const updated =
+        [...previous.testimonials];
 
-        updated[index] = {
+      updated[index] = {
+        ...updated[index],
 
-          ...updated[index],
+        [field]: value
+      };
 
-          [field]: value
+      return {
+        ...previous,
 
-        };
-
-
-        return {
-
-          ...previous,
-
-          testimonials: updated
-
-        };
-
-      }
-    );
-
+        testimonials: updated
+      };
+    });
 
     setError("");
-
     setSuccess("");
-
   };
 
-
-  // ========================================
+  // ======================================
   // ADD TESTIMONIAL
-  // ========================================
+  // ======================================
 
   const addTestimonial = () => {
 
-    setImpact(
-      previous => {
+    if (
+      impact.testimonials.length >=
+      MAX_TESTIMONIALS
+    ) {
 
-        const nextOrder =
-          previous.testimonials.length + 1;
+      setError(
+        `You can have a maximum of ${MAX_TESTIMONIALS} testimonials.`
+      );
 
+      return;
+    }
 
-        return {
+    setImpact(previous => {
 
-          ...previous,
+      const nextOrder =
+        previous.testimonials.length + 1;
 
-          testimonials: [
+      return {
+        ...previous,
 
-            ...previous.testimonials,
+        testimonials: [
+          ...previous.testimonials,
 
-            {
-
-              quote: "",
-
-              name: "",
-
-              imageUrl: "",
-
-              order: nextOrder
-
-            }
-
-          ]
-
-        };
-
-      }
-    );
-
+          {
+            quote: "",
+            name: "",
+            imageUrl: "",
+            order: nextOrder
+          }
+        ]
+      };
+    });
 
     setError("");
-
     setSuccess("");
-
   };
 
-
-  // ========================================
+  // ======================================
   // REMOVE TESTIMONIAL
-  // ========================================
+  // ======================================
 
-  const removeTestimonial = (
-    index
-  ) => {
+  const removeTestimonial = index => {
 
     if (
       impact.testimonials.length <= 1
@@ -1496,73 +1474,64 @@ const AdminImpact = () => {
       );
 
       return;
-
     }
 
+    const removedPreview =
+      testimonialPreviews[index];
 
-    setImpact(
-      previous => {
+    if (
+      removedPreview?.startsWith("blob:")
+    ) {
+      revokePreviewUrl(
+        removedPreview
+      );
+    }
 
-        const updated =
-          previous.testimonials
+    setImpact(previous => {
 
-            .filter(
-              (_, itemIndex) =>
-                itemIndex !== index
-            )
+      const updated =
+        previous.testimonials
+          .filter(
+            (_, itemIndex) =>
+              itemIndex !== index
+          )
+          .map(
+            (item, itemIndex) => ({
+              ...item,
 
-            .map(
-              (item, itemIndex) => ({
+              order:
+                itemIndex + 1
+            })
+          );
 
-                ...item,
+      return {
+        ...previous,
 
-                order:
-                  itemIndex + 1
+        testimonials: updated
+      };
+    });
 
-              })
-            );
-
-
-        return {
-
-          ...previous,
-
-          testimonials: updated
-
-        };
-
-      }
+    setTestimonialFiles(previous =>
+      shiftIndexedObject(
+        previous,
+        index
+      )
     );
 
-
-    setTestimonialFiles(
-      previous =>
-        shiftIndexedObject(
-          previous,
-          index
-        )
+    setTestimonialPreviews(previous =>
+      shiftIndexedObject(
+        previous,
+        index
+      )
     );
-
-
-    setTestimonialPreviews(
-      previous =>
-        shiftIndexedObject(
-          previous,
-          index
-        )
-    );
-
 
     setError("");
-
     setSuccess("");
-
   };
 
-
-  // ========================================
+  // ======================================
   // MOVE ARRAY ITEM
-  // ========================================
+  // ======================================
 
   const moveArrayItem = (
     section,
@@ -1575,95 +1544,72 @@ const AdminImpact = () => {
     const items =
       impact[section];
 
-
     const newIndex =
       direction === "up"
         ? index - 1
         : index + 1;
 
-
     if (
       newIndex < 0 ||
       newIndex >= items.length
     ) {
-
       return;
-
     }
 
+    setImpact(previous => {
 
-    setImpact(
-      previous => {
+      const updated =
+        [...previous[section]];
 
-        const updated =
-          [...previous[section]];
+      [
+        updated[index],
+        updated[newIndex]
+      ] = [
+        updated[newIndex],
+        updated[index]
+      ];
 
+      const reordered =
+        updated.map(
+          (item, itemIndex) => ({
+            ...item,
 
-        [
-          updated[index],
-          updated[newIndex]
-        ] = [
-          updated[newIndex],
-          updated[index]
-        ];
+            order:
+              itemIndex + 1
+          })
+        );
 
+      return {
+        ...previous,
 
-        const reordered =
-          updated.map(
-            (item, itemIndex) => ({
+        [section]:
+          reordered
+      };
+    });
 
-              ...item,
-
-              order:
-                itemIndex + 1
-
-            })
-          );
-
-
-        return {
-
-          ...previous,
-
-          [section]:
-            reordered
-
-        };
-
-      }
+    setFiles(previous =>
+      swapIndexedObject(
+        previous,
+        index,
+        newIndex
+      )
     );
 
-
-    setFiles(
-      previous =>
-        swapIndexedObject(
-          previous,
-          index,
-          newIndex
-        )
+    setPreviews(previous =>
+      swapIndexedObject(
+        previous,
+        index,
+        newIndex
+      )
     );
-
-
-    setPreviews(
-      previous =>
-        swapIndexedObject(
-          previous,
-          index,
-          newIndex
-        )
-    );
-
 
     setError("");
-
     setSuccess("");
-
   };
 
-
-  // ========================================
+  // ======================================
   // MOVE STAT
-  // ========================================
+  // ======================================
 
   const moveStat = (
     index,
@@ -1673,78 +1619,58 @@ const AdminImpact = () => {
     const items =
       impact.stats;
 
-
     const newIndex =
       direction === "up"
         ? index - 1
         : index + 1;
 
-
     if (
       newIndex < 0 ||
       newIndex >= items.length
     ) {
-
       return;
-
     }
 
+    setImpact(previous => {
 
-    setImpact(
-      previous => {
+      const updated =
+        [...previous.stats];
 
-        const updated =
-          [...previous.stats];
+      [
+        updated[index],
+        updated[newIndex]
+      ] = [
+        updated[newIndex],
+        updated[index]
+      ];
 
+      const reordered =
+        updated.map(
+          (item, itemIndex) => ({
+            ...item,
 
-        [
-          updated[index],
-          updated[newIndex]
-        ] = [
-          updated[newIndex],
-          updated[index]
-        ];
+            order:
+              itemIndex + 1
+          })
+        );
 
+      return {
+        ...previous,
 
-        const reordered =
-          updated.map(
-            (item, itemIndex) => ({
-
-              ...item,
-
-              order:
-                itemIndex + 1
-
-            })
-          );
-
-
-        return {
-
-          ...previous,
-
-          stats:
-            reordered
-
-        };
-
-      }
-    );
-
+        stats:
+          reordered
+      };
+    });
 
     setError("");
-
     setSuccess("");
-
   };
 
-
-  // ========================================
+  // ======================================
   // VALIDATION
-  // ========================================
+  // ======================================
 
   const validateForm = () => {
-
 
     // HERO
 
@@ -1757,22 +1683,40 @@ const AdminImpact = () => {
       );
 
       return false;
-
     }
 
-
     if (
-      !impact.hero.description?.trim()
+      !impact.hero.tagline?.trim()
     ) {
 
       setError(
-        "Please enter the Impact hero description."
+        "Please enter the Impact hero tagline."
       );
 
       return false;
-
     }
 
+    if (
+      !impact.hero.lineOne?.trim()
+    ) {
+
+      setError(
+        "Please enter the first Impact hero line."
+      );
+
+      return false;
+    }
+
+    if (
+      !impact.hero.lineTwo?.trim()
+    ) {
+
+      setError(
+        "Please enter the second Impact hero line."
+      );
+
+      return false;
+    }
 
     // PROJECTS
 
@@ -1785,9 +1729,19 @@ const AdminImpact = () => {
       );
 
       return false;
-
     }
 
+    if (
+      impact.projects.length >
+      MAX_PROJECTS
+    ) {
+
+      setError(
+        `You can have a maximum of ${MAX_PROJECTS} outreach projects.`
+      );
+
+      return false;
+    }
 
     for (
       const project of impact.projects
@@ -1802,9 +1756,7 @@ const AdminImpact = () => {
         );
 
         return false;
-
       }
-
 
       if (
         !project.text?.trim()
@@ -1815,11 +1767,8 @@ const AdminImpact = () => {
         );
 
         return false;
-
       }
-
     }
-
 
     // STATS
 
@@ -1832,9 +1781,7 @@ const AdminImpact = () => {
       );
 
       return false;
-
     }
-
 
     for (
       const stat of impact.stats
@@ -1849,9 +1796,7 @@ const AdminImpact = () => {
         );
 
         return false;
-
       }
-
 
       if (
         !stat.label?.trim()
@@ -1862,11 +1807,8 @@ const AdminImpact = () => {
         );
 
         return false;
-
       }
-
     }
-
 
     // GALLERY
 
@@ -1879,9 +1821,19 @@ const AdminImpact = () => {
       );
 
       return false;
-
     }
 
+    if (
+      impact.gallery.length >
+      MAX_GALLERY_IMAGES
+    ) {
+
+      setError(
+        `You can have a maximum of ${MAX_GALLERY_IMAGES} gallery images.`
+      );
+
+      return false;
+    }
 
     for (
       const gallery of impact.gallery
@@ -1896,11 +1848,8 @@ const AdminImpact = () => {
         );
 
         return false;
-
       }
-
     }
-
 
     // TESTIMONIALS
 
@@ -1913,9 +1862,19 @@ const AdminImpact = () => {
       );
 
       return false;
-
     }
 
+    if (
+      impact.testimonials.length >
+      MAX_TESTIMONIALS
+    ) {
+
+      setError(
+        `You can have a maximum of ${MAX_TESTIMONIALS} testimonials.`
+      );
+
+      return false;
+    }
 
     for (
       const testimonial of impact.testimonials
@@ -1930,9 +1889,7 @@ const AdminImpact = () => {
         );
 
         return false;
-
       }
-
 
       if (
         !testimonial.name?.trim()
@@ -1943,53 +1900,38 @@ const AdminImpact = () => {
         );
 
         return false;
-
       }
-
     }
 
-
     return true;
-
   };
 
-
-  // ========================================
+  // ======================================
   // SAVE TO BACKEND
-  // ========================================
+  // ======================================
 
-  const handleSubmit = async (
-    event
-  ) => {
+  const handleSubmit = async event => {
 
     event.preventDefault();
-
 
     if (
       !validateForm()
     ) {
-
       return;
-
     }
-
 
     try {
 
       setSaving(true);
-
       setError("");
-
       setSuccess("");
-
 
       const formData =
         new FormData();
 
-
-      // ------------------------------------
+      // ==================================
       // TEXT DATA
-      // ------------------------------------
+      // ==================================
 
       formData.append(
         "hero",
@@ -1998,14 +1940,12 @@ const AdminImpact = () => {
         )
       );
 
-
       formData.append(
         "projects",
         JSON.stringify(
           impact.projects
         )
       );
-
 
       formData.append(
         "gallery",
@@ -2014,14 +1954,12 @@ const AdminImpact = () => {
         )
       );
 
-
       formData.append(
         "stats",
         JSON.stringify(
           impact.stats
         )
       );
-
 
       formData.append(
         "testimonials",
@@ -2030,80 +1968,85 @@ const AdminImpact = () => {
         )
       );
 
+      formData.append(
+        "cta",
+        JSON.stringify(
+          impact.cta
+        )
+      );
 
-      // ------------------------------------
+      // ==================================
       // HERO IMAGE
-      // ------------------------------------
+      // ==================================
 
-      if (
-        heroFile
-      ) {
+      if (heroFile) {
 
         formData.append(
           "heroImage",
           heroFile
         );
-
       }
 
-
-      // ------------------------------------
+      // ==================================
       // PROJECT IMAGES
-      // ------------------------------------
+      // ==================================
 
       Object.entries(
         projectFiles
       ).forEach(
         ([index, file]) => {
 
-          formData.append(
-            `projectImage_${index}`,
-            file
-          );
+          if (file) {
 
+            formData.append(
+              `projectImage_${index}`,
+              file
+            );
+          }
         }
       );
 
-
-      // ------------------------------------
+      // ==================================
       // GALLERY IMAGES
-      // ------------------------------------
+      // ==================================
 
       Object.entries(
         galleryFiles
       ).forEach(
         ([index, file]) => {
 
-          formData.append(
-            `galleryImage_${index}`,
-            file
-          );
+          if (file) {
 
+            formData.append(
+              `galleryImage_${index}`,
+              file
+            );
+          }
         }
       );
 
-
-      // ------------------------------------
+      // ==================================
       // TESTIMONIAL IMAGES
-      // ------------------------------------
+      // ==================================
 
       Object.entries(
         testimonialFiles
       ).forEach(
         ([index, file]) => {
 
-          formData.append(
-            `testimonialImage_${index}`,
-            file
-          );
+          if (file) {
 
+            formData.append(
+              `testimonialImage_${index}`,
+              file
+            );
+          }
         }
       );
 
-
-      // ------------------------------------
+      // ==================================
       // API REQUEST
-      // ------------------------------------
+      // ==================================
 
       const response =
         await fetch(
@@ -2114,10 +2057,19 @@ const AdminImpact = () => {
           }
         );
 
+      let data;
 
-      const data =
-        await response.json();
+      try {
 
+        data =
+          await response.json();
+
+      } catch {
+
+        throw new Error(
+          `Server returned an invalid response (${response.status}).`
+        );
+      }
 
       if (
         !response.ok ||
@@ -2128,144 +2080,23 @@ const AdminImpact = () => {
           data.message ||
           "Unable to save Impact content."
         );
-
       }
 
+      // ==================================
+      // APPLY RESPONSE
+      // ==================================
 
-      // ------------------------------------
-      // NORMALIZE RESPONSE
-      // ------------------------------------
-
-      const normalized =
-        normalizeImpact(
-          data.impact
-        );
-
-
-      setImpact(
-        normalized
+      applyImpactData(
+        data.impact
       );
 
-
-      // ------------------------------------
-      // HERO PREVIEW
-      // ------------------------------------
-
-      if (
-        normalized.hero.imageUrl
-      ) {
-
-        setHeroPreview(
-          getMediaUrl(
-            normalized.hero.imageUrl
-          )
-        );
-
-      }
-
-
-      // ------------------------------------
-      // PROJECT PREVIEWS
-      // ------------------------------------
-
-      const projectPreviewData = {};
-
-      normalized.projects.forEach(
-        (project, index) => {
-
-          if (project.imageUrl) {
-
-            projectPreviewData[index] =
-              getMediaUrl(
-                project.imageUrl
-              );
-
-          }
-
-        }
-      );
-
-
-      setProjectPreviews(
-        projectPreviewData
-      );
-
-
-      // ------------------------------------
-      // GALLERY PREVIEWS
-      // ------------------------------------
-
-      const galleryPreviewData = {};
-
-      normalized.gallery.forEach(
-        (item, index) => {
-
-          if (item.imageUrl) {
-
-            galleryPreviewData[index] =
-              getMediaUrl(
-                item.imageUrl
-              );
-
-          }
-
-        }
-      );
-
-
-      setGalleryPreviews(
-        galleryPreviewData
-      );
-
-
-      // ------------------------------------
-      // TESTIMONIAL PREVIEWS
-      // ------------------------------------
-
-      const testimonialPreviewData = {};
-
-      normalized.testimonials.forEach(
-        (item, index) => {
-
-          if (item.imageUrl) {
-
-            testimonialPreviewData[index] =
-              getMediaUrl(
-                item.imageUrl
-              );
-
-          }
-
-        }
-      );
-
-
-      setTestimonialPreviews(
-        testimonialPreviewData
-      );
-
-
-      // ------------------------------------
-      // CLEAR FILE STATE
-      // ------------------------------------
-
-      setHeroFile(null);
-
-      setProjectFiles({});
-
-      setGalleryFiles({});
-
-      setTestimonialFiles({});
-
-
-      // ------------------------------------
+      // ==================================
       // SUCCESS
-      // ------------------------------------
+      // ==================================
 
       setSuccess(
         "Impact content saved successfully."
       );
-
 
       setTimeout(() => {
 
@@ -2288,15 +2119,12 @@ const AdminImpact = () => {
     } finally {
 
       setSaving(false);
-
     }
-
   };
 
-
-  // ========================================
+  // ======================================
   // RESET
-  // ========================================
+  // ======================================
 
   const handleReset = () => {
 
@@ -2305,11 +2133,36 @@ const AdminImpact = () => {
         "Reset the Impact form to the default content? This will not change the database until you save."
       );
 
-
     if (!confirmed) {
       return;
     }
 
+    // Clean temporary previews
+    if (
+      heroPreview.startsWith("blob:")
+    ) {
+      revokePreviewUrl(
+        heroPreview
+      );
+    }
+
+    Object.values(
+      projectPreviews
+    ).forEach(
+      revokePreviewUrl
+    );
+
+    Object.values(
+      galleryPreviews
+    ).forEach(
+      revokePreviewUrl
+    );
+
+    Object.values(
+      testimonialPreviews
+    ).forEach(
+      revokePreviewUrl
+    );
 
     setImpact(
       JSON.parse(
@@ -2319,21 +2172,14 @@ const AdminImpact = () => {
       )
     );
 
-
     setHeroFile(null);
-
     setProjectFiles({});
-
     setGalleryFiles({});
-
     setTestimonialFiles({});
 
     setHeroPreview("");
-
     setProjectPreviews({});
-
     setGalleryPreviews({});
-
     setTestimonialPreviews({});
 
     setError("");
@@ -2341,18 +2187,15 @@ const AdminImpact = () => {
     setSuccess(
       "Impact form reset to default content."
     );
-
   };
 
-
-  // ========================================
+  // ======================================
   // LOADING
-  // ========================================
+  // ======================================
 
   if (loading) {
 
     return (
-
       <div className="admin-page admin-impact-page">
 
         <div className="admin-page-header">
@@ -2376,7 +2219,6 @@ const AdminImpact = () => {
 
         </div>
 
-
         <div className="admin-empty-state">
 
           <RefreshCw
@@ -2395,24 +2237,17 @@ const AdminImpact = () => {
         </div>
 
       </div>
-
     );
-
   }
 
-
-  // ========================================
+  // ======================================
   // RENDER
-  // ========================================
+  // ======================================
 
   return (
-
     <div className="admin-page admin-impact-page">
 
-
-      {/* ====================================
-          HEADER
-      ==================================== */}
+      {/* HEADER */}
 
       <div className="admin-page-header">
 
@@ -2434,7 +2269,6 @@ const AdminImpact = () => {
 
         </div>
 
-
         <div className="admin-impact-header-actions">
 
           <button
@@ -2443,13 +2277,10 @@ const AdminImpact = () => {
             onClick={loadImpact}
             disabled={saving}
           >
-
             <RefreshCw size={17} />
 
             Refresh
-
           </button>
-
 
           <button
             type="button"
@@ -2457,11 +2288,8 @@ const AdminImpact = () => {
             onClick={handleReset}
             disabled={saving}
           >
-
             Reset
-
           </button>
-
 
           <button
             type="submit"
@@ -2469,26 +2297,20 @@ const AdminImpact = () => {
             className="btn-primary"
             disabled={saving}
           >
-
             <Save size={17} />
 
             {saving
               ? "Saving..."
               : "Save Changes"}
-
           </button>
 
         </div>
 
       </div>
 
-
-      {/* ====================================
-          ALERTS
-      ==================================== */}
+      {/* ALERTS */}
 
       {error && (
-
         <div className="admin-alert admin-alert-error">
 
           <strong>
@@ -2500,12 +2322,9 @@ const AdminImpact = () => {
           </span>
 
         </div>
-
       )}
 
-
       {success && (
-
         <div className="admin-alert admin-alert-success">
 
           <strong>
@@ -2517,20 +2336,15 @@ const AdminImpact = () => {
           </span>
 
         </div>
-
       )}
 
-
-      {/* ====================================
-          FORM
-      ==================================== */}
+      {/* FORM */}
 
       <form
         id="impact-management-form"
         className="admin-impact-form"
         onSubmit={handleSubmit}
       >
-
 
         {/* ==================================
             HERO
@@ -2564,7 +2378,6 @@ const AdminImpact = () => {
 
           </div>
 
-
           <div className="admin-impact-image-editor">
 
             <div className="admin-impact-large-image-preview">
@@ -2592,7 +2405,6 @@ const AdminImpact = () => {
 
             </div>
 
-
             <div className="admin-impact-image-info">
 
               <span className="admin-section-eyebrow">
@@ -2612,7 +2424,6 @@ const AdminImpact = () => {
                 JPG, JPEG, PNG or WEBP · Max 5MB
               </span>
 
-
               <button
                 type="button"
                 className="btn-secondary"
@@ -2620,15 +2431,12 @@ const AdminImpact = () => {
                   heroInputRef.current?.click()
                 }
               >
-
                 <Upload size={17} />
 
                 {heroPreview
                   ? "Replace Image"
                   : "Upload Image"}
-
               </button>
-
 
               <input
                 ref={heroInputRef}
@@ -2642,7 +2450,6 @@ const AdminImpact = () => {
 
           </div>
 
-
           <div className="admin-form-grid">
 
             <div className="form-group">
@@ -2655,7 +2462,7 @@ const AdminImpact = () => {
                 type="text"
                 className="form-input"
                 value={
-                  impact.hero.title
+                  impact.hero.title || ""
                 }
                 onChange={event =>
                   updateSection(
@@ -2664,30 +2471,79 @@ const AdminImpact = () => {
                     event.target.value
                   )
                 }
+                placeholder="e.g. Our Impact"
               />
 
             </div>
 
-
             <div className="form-group">
 
               <label className="form-label">
-                Hero Description
+                Hero Tagline
               </label>
 
               <input
                 type="text"
                 className="form-input"
                 value={
-                  impact.hero.description
+                  impact.hero.tagline || ""
                 }
                 onChange={event =>
                   updateSection(
                     "hero",
-                    "description",
+                    "tagline",
                     event.target.value
                   )
                 }
+                placeholder="e.g. Real change, Stronger communities"
+              />
+
+            </div>
+
+            <div className="form-group">
+
+              <label className="form-label">
+                Hero First Line
+              </label>
+
+              <input
+                type="text"
+                className="form-input"
+                value={
+                  impact.hero.lineOne || ""
+                }
+                onChange={event =>
+                  updateSection(
+                    "hero",
+                    "lineOne",
+                    event.target.value
+                  )
+                }
+                placeholder="Enter the first hero line"
+              />
+
+            </div>
+
+            <div className="form-group">
+
+              <label className="form-label">
+                Hero Second Line
+              </label>
+
+              <input
+                type="text"
+                className="form-input"
+                value={
+                  impact.hero.lineTwo || ""
+                }
+                onChange={event =>
+                  updateSection(
+                    "hero",
+                    "lineTwo",
+                    event.target.value
+                  )
+                }
+                placeholder="Enter the second hero line"
               />
 
             </div>
@@ -2695,7 +2551,6 @@ const AdminImpact = () => {
           </div>
 
         </section>
-
 
         {/* ==================================
             PROJECTS
@@ -2727,21 +2582,21 @@ const AdminImpact = () => {
 
             </div>
 
-
             <button
               type="button"
               className="btn-secondary"
               onClick={addProject}
+              disabled={
+                impact.projects.length >=
+                MAX_PROJECTS
+              }
             >
-
               <Plus size={17} />
 
               Add Project
-
             </button>
 
           </div>
-
 
           <div className="admin-impact-list">
 
@@ -2754,9 +2609,7 @@ const AdminImpact = () => {
                     project.imageUrl
                   );
 
-
                 return (
-
                   <article
                     className="admin-impact-card"
                     key={
@@ -2784,7 +2637,6 @@ const AdminImpact = () => {
 
                       </div>
 
-
                       <div>
 
                         <strong>
@@ -2796,7 +2648,6 @@ const AdminImpact = () => {
                         </span>
 
                       </div>
-
 
                       <div className="admin-impact-card-actions">
 
@@ -2817,11 +2668,8 @@ const AdminImpact = () => {
                             )
                           }
                         >
-
                           <ArrowUp size={17} />
-
                         </button>
-
 
                         <button
                           type="button"
@@ -2841,11 +2689,8 @@ const AdminImpact = () => {
                             )
                           }
                         >
-
                           <ArrowDown size={17} />
-
                         </button>
-
 
                         <button
                           type="button"
@@ -2857,15 +2702,12 @@ const AdminImpact = () => {
                             )
                           }
                         >
-
                           <Trash2 size={17} />
-
                         </button>
 
                       </div>
 
                     </div>
-
 
                     <div className="admin-impact-card-body">
 
@@ -2899,7 +2741,6 @@ const AdminImpact = () => {
 
                         </div>
 
-
                         <button
                           type="button"
                           className="btn-secondary admin-impact-upload-button"
@@ -2909,23 +2750,18 @@ const AdminImpact = () => {
                             ]?.click()
                           }
                         >
-
                           <Upload size={16} />
 
                           {preview
                             ? "Replace Image"
                             : "Upload Image"}
-
                         </button>
-
 
                         <input
                           ref={element => {
-
                             projectInputRefs.current[
                               index
                             ] = element;
-
                           }}
                           type="file"
                           accept="image/jpeg,image/jpg,image/png,image/webp"
@@ -2939,7 +2775,6 @@ const AdminImpact = () => {
                         />
 
                       </div>
-
 
                       <div className="admin-impact-fields">
 
@@ -2966,7 +2801,6 @@ const AdminImpact = () => {
                           />
 
                         </div>
-
 
                         <div className="form-group">
 
@@ -2997,16 +2831,13 @@ const AdminImpact = () => {
                     </div>
 
                   </article>
-
                 );
-
               }
             )}
 
           </div>
 
         </section>
-
 
         {/* ==================================
             STATS
@@ -3037,21 +2868,17 @@ const AdminImpact = () => {
 
             </div>
 
-
             <button
               type="button"
               className="btn-secondary"
               onClick={addStat}
             >
-
               <Plus size={17} />
 
               Add Statistic
-
             </button>
 
           </div>
-
 
           <div className="admin-impact-stats-list">
 
@@ -3083,7 +2910,6 @@ const AdminImpact = () => {
 
                     </div>
 
-
                     <div className="admin-impact-stat-actions">
 
                       <button
@@ -3100,11 +2926,8 @@ const AdminImpact = () => {
                           )
                         }
                       >
-
                         <ArrowUp size={17} />
-
                       </button>
-
 
                       <button
                         type="button"
@@ -3121,11 +2944,8 @@ const AdminImpact = () => {
                           )
                         }
                       >
-
                         <ArrowDown size={17} />
-
                       </button>
-
 
                       <button
                         type="button"
@@ -3137,15 +2957,12 @@ const AdminImpact = () => {
                           )
                         }
                       >
-
                         <Trash2 size={17} />
-
                       </button>
 
                     </div>
 
                   </div>
-
 
                   <div className="admin-impact-stat-body">
 
@@ -3168,7 +2985,6 @@ const AdminImpact = () => {
                           )
                         }
                       >
-
                         <option value="Users">
                           Users
                         </option>
@@ -3188,7 +3004,6 @@ const AdminImpact = () => {
                       </select>
 
                     </div>
-
 
                     <div className="form-group">
 
@@ -3213,7 +3028,6 @@ const AdminImpact = () => {
                       />
 
                     </div>
-
 
                     <div className="form-group">
 
@@ -3242,14 +3056,12 @@ const AdminImpact = () => {
                   </div>
 
                 </article>
-
               )
             )}
 
           </div>
 
         </section>
-
 
         {/* ==================================
             GALLERY
@@ -3280,21 +3092,21 @@ const AdminImpact = () => {
 
             </div>
 
-
             <button
               type="button"
               className="btn-secondary"
               onClick={addGalleryImage}
+              disabled={
+                impact.gallery.length >=
+                MAX_GALLERY_IMAGES
+              }
             >
-
               <Plus size={17} />
 
               Add Image
-
             </button>
 
           </div>
-
 
           <div className="admin-impact-gallery-grid">
 
@@ -3307,9 +3119,7 @@ const AdminImpact = () => {
                     item.imageUrl
                   );
 
-
                 return (
-
                   <article
                     className="admin-impact-gallery-card"
                     key={
@@ -3337,7 +3147,6 @@ const AdminImpact = () => {
 
                       </div>
 
-
                       <div className="admin-impact-card-actions">
 
                         <button
@@ -3357,11 +3166,8 @@ const AdminImpact = () => {
                             )
                           }
                         >
-
                           <ArrowUp size={16} />
-
                         </button>
-
 
                         <button
                           type="button"
@@ -3381,11 +3187,8 @@ const AdminImpact = () => {
                             )
                           }
                         >
-
                           <ArrowDown size={16} />
-
                         </button>
-
 
                         <button
                           type="button"
@@ -3397,15 +3200,12 @@ const AdminImpact = () => {
                             )
                           }
                         >
-
                           <Trash2 size={16} />
-
                         </button>
 
                       </div>
 
                     </div>
-
 
                     <div className="admin-impact-gallery-preview">
 
@@ -3435,7 +3235,6 @@ const AdminImpact = () => {
 
                     </div>
 
-
                     <button
                       type="button"
                       className="btn-secondary admin-impact-gallery-upload"
@@ -3445,23 +3244,18 @@ const AdminImpact = () => {
                         ]?.click()
                       }
                     >
-
                       <Upload size={15} />
 
                       {preview
                         ? "Replace Image"
                         : "Upload Image"}
-
                     </button>
-
 
                     <input
                       ref={element => {
-
                         galleryInputRefs.current[
                           index
                         ] = element;
-
                       }}
                       type="file"
                       accept="image/jpeg,image/jpg,image/png,image/webp"
@@ -3473,7 +3267,6 @@ const AdminImpact = () => {
                         )
                       }
                     />
-
 
                     <div className="form-group">
 
@@ -3500,16 +3293,13 @@ const AdminImpact = () => {
                     </div>
 
                   </article>
-
                 );
-
               }
             )}
 
           </div>
 
         </section>
-
 
         {/* ==================================
             TESTIMONIALS
@@ -3540,21 +3330,21 @@ const AdminImpact = () => {
 
             </div>
 
-
             <button
               type="button"
               className="btn-secondary"
               onClick={addTestimonial}
+              disabled={
+                impact.testimonials.length >=
+                MAX_TESTIMONIALS
+              }
             >
-
               <Plus size={17} />
 
               Add Testimonial
-
             </button>
 
           </div>
-
 
           <div className="admin-impact-testimonials-list">
 
@@ -3567,9 +3357,7 @@ const AdminImpact = () => {
                     testimonial.imageUrl
                   );
 
-
                 return (
-
                   <article
                     className="admin-impact-testimonial-card"
                     key={
@@ -3597,7 +3385,6 @@ const AdminImpact = () => {
 
                       </div>
 
-
                       <div>
 
                         <strong>
@@ -3609,7 +3396,6 @@ const AdminImpact = () => {
                         </span>
 
                       </div>
-
 
                       <div className="admin-impact-card-actions">
 
@@ -3630,11 +3416,8 @@ const AdminImpact = () => {
                             )
                           }
                         >
-
                           <ArrowUp size={17} />
-
                         </button>
-
 
                         <button
                           type="button"
@@ -3654,11 +3437,8 @@ const AdminImpact = () => {
                             )
                           }
                         >
-
                           <ArrowDown size={17} />
-
                         </button>
-
 
                         <button
                           type="button"
@@ -3670,15 +3450,12 @@ const AdminImpact = () => {
                             )
                           }
                         >
-
                           <Trash2 size={17} />
-
                         </button>
 
                       </div>
 
                     </div>
-
 
                     <div className="admin-impact-testimonial-body">
 
@@ -3714,7 +3491,6 @@ const AdminImpact = () => {
 
                         </div>
 
-
                         <button
                           type="button"
                           className="btn-secondary"
@@ -3724,23 +3500,18 @@ const AdminImpact = () => {
                             ]?.click()
                           }
                         >
-
                           <Upload size={15} />
 
                           {preview
                             ? "Replace Image"
                             : "Upload Image"}
-
                         </button>
-
 
                         <input
                           ref={element => {
-
                             testimonialInputRefs.current[
                               index
                             ] = element;
-
                           }}
                           type="file"
                           accept="image/jpeg,image/jpg,image/png,image/webp"
@@ -3754,7 +3525,6 @@ const AdminImpact = () => {
                         />
 
                       </div>
-
 
                       <div className="admin-impact-testimonial-fields">
 
@@ -3781,7 +3551,6 @@ const AdminImpact = () => {
                           />
 
                         </div>
-
 
                         <div className="form-group">
 
@@ -3812,16 +3581,13 @@ const AdminImpact = () => {
                     </div>
 
                   </article>
-
                 );
-
               }
             )}
 
           </div>
 
         </section>
-
 
         {/* ==================================
             SAVE BAR
@@ -3843,19 +3609,16 @@ const AdminImpact = () => {
 
           </div>
 
-
           <button
             type="submit"
             className="btn-primary"
             disabled={saving}
           >
-
             <Save size={18} />
 
             {saving
               ? "Saving Changes..."
               : "Save Impact"}
-
           </button>
 
         </div>
@@ -3863,11 +3626,8 @@ const AdminImpact = () => {
       </form>
 
     </div>
-
   );
-
 };
-
 
 // ========================================
 // INDEX HELPERS
@@ -3886,7 +3646,6 @@ const shiftIndexedObject = (
       const index =
         Number(key);
 
-
       if (
         index < removedIndex
       ) {
@@ -3900,17 +3659,16 @@ const shiftIndexedObject = (
 
         updated[index - 1] =
           source[key];
-
       }
-
     }
   );
 
-
   return updated;
-
 };
 
+// ========================================
+// SWAP INDEXED OBJECT
+// ========================================
 
 const swapIndexedObject = (
   source,
@@ -3922,13 +3680,11 @@ const swapIndexedObject = (
     ...source
   };
 
-
   const first =
     updated[firstIndex];
 
   const second =
     updated[secondIndex];
-
 
   if (
     first === undefined
@@ -3940,9 +3696,7 @@ const swapIndexedObject = (
 
     updated[secondIndex] =
       first;
-
   }
-
 
   if (
     second === undefined
@@ -3954,13 +3708,9 @@ const swapIndexedObject = (
 
     updated[firstIndex] =
       second;
-
   }
 
-
   return updated;
-
 };
-
 
 export default AdminImpact;
