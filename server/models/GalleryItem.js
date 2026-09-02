@@ -5,42 +5,59 @@ const galleryItemSchema = new mongoose.Schema(
     title: {
       type: String,
       required: true,
-      trim: true
+      trim: true,
     },
 
     category: {
       type: String,
       required: true,
-      trim: true
+      trim: true,
     },
 
     type: {
       type: String,
       enum: ["image", "video"],
-      required: true
+      required: true,
     },
 
     fileUrl: {
       type: String,
-      required: true
+      required: true,
     },
 
     thumbnailUrl: {
-      type: String
+      type: String,
+      default: "",
+    },
+
+    // ============================================================
+    // CLOUDINARY
+    // ============================================================
+
+    cloudinaryPublicId: {
+      type: String,
+      default: "",
+    },
+
+    cloudinaryResourceType: {
+      type: String,
+      enum: ["image", "video", ""],
+      default: "",
     },
 
     description: {
       type: String,
-      trim: true
+      trim: true,
+      default: "",
     },
 
     order: {
       type: Number,
-      default: 0
-    }
+      default: 0,
+    },
   },
   {
-    timestamps: true
+    timestamps: true,
   }
 );
 
