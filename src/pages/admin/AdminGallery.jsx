@@ -2,7 +2,7 @@ import {
   useEffect,
   useMemo,
   useRef,
-  useState
+  useState,
 } from "react";
 
 import {
@@ -14,33 +14,30 @@ import {
   X,
   Upload,
   Video,
-  Image as ImageIcon
+  Image as ImageIcon,
 } from "lucide-react";
 
 import API from "../../api/axios";
 
 import "../../styles/Admin.gallery.css";
 
-
 // ========================================
 // CONSTANTS
 // ========================================
-
-const API_BASE_URL = "http://localhost:5000";
 
 const categories = [
   "All",
   "Outreach",
   "Events",
   "Impact",
-  "Success Stories"
+  "Success Stories",
 ];
 
 const formCategories = [
   "Outreach",
   "Events",
   "Impact",
-  "Success Stories"
+  "Success Stories",
 ];
 
 const emptyForm = {
@@ -50,16 +47,14 @@ const emptyForm = {
   description: "",
   file: null,
   preview: "",
-  order: ""
+  order: "",
 };
-
 
 // ========================================
 // ADMIN GALLERY
 // ========================================
 
 const AdminGallery = () => {
-
   // ======================================
   // STATE
   // ======================================
@@ -87,7 +82,7 @@ const AdminGallery = () => {
 
   const [formData, setFormData] =
     useState({
-      ...emptyForm
+      ...emptyForm,
     });
 
   const [loading, setLoading] =
@@ -105,37 +100,42 @@ const AdminGallery = () => {
   const fileInputRef =
     useRef(null);
 
-
   // ======================================
-  // MEDIA URL
+  // GET MEDIA URL
+  // ======================================
+  //
+  // Gallery media should come from Cloudinary.
+  //
+  // We allow:
+  // - https:// Cloudinary URLs
+  // - blob: temporary browser previews
+  //
+  // We intentionally do NOT convert relative
+  // /uploads paths to localhost.
   // ======================================
 
   const getMediaUrl = (fileUrl) => {
-
     if (!fileUrl) {
       return "";
     }
 
     if (
-      fileUrl.startsWith("http://") ||
       fileUrl.startsWith("https://") ||
+      fileUrl.startsWith("http://") ||
       fileUrl.startsWith("blob:")
     ) {
       return fileUrl;
     }
 
-    return `${API_BASE_URL}${fileUrl}`;
+    return "";
   };
-
 
   // ======================================
   // FETCH GALLERY
   // ======================================
 
   const fetchGallery = async () => {
-
     try {
-
       setLoading(true);
       setError("");
 
@@ -143,11 +143,20 @@ const AdminGallery = () => {
         await API.get("/gallery");
 
       /*
-       * Your backend controller currently
-       * returns the gallery array directly:
-       *
-       * return res.status(200).json(gallery);
-       */
+      |----------------------------------------------------------------------
+      | CURRENT BACKEND RESPONSE
+      |----------------------------------------------------------------------
+      |
+      | Your Gallery controller currently returns:
+      |
+      | res.status(200).json(gallery)
+      |
+      | Therefore response.data is normally the array.
+      |
+      | The additional checks below simply keep the
+      | frontend tolerant of future response wrappers.
+      |
+      */
 
       const items =
         Array.isArray(response.data)
@@ -159,7 +168,6 @@ const AdminGallery = () => {
 
       const normalizedItems =
         items.map((item) => {
-
           const mediaUrl =
             item.fileUrl ||
             item.src ||
@@ -186,17 +194,14 @@ const AdminGallery = () => {
                 : "",
 
             order:
-              item.order ?? 0
+              item.order ?? 0,
           };
-
         });
 
       setGalleryItems(
         normalizedItems
       );
-
     } catch (requestError) {
-
       console.error(
         "GET GALLERY ERROR:",
         requestError
@@ -204,27 +209,20 @@ const AdminGallery = () => {
 
       setError(
         requestError.response?.data?.message ||
-        "Unable to load gallery items."
+          "Unable to load gallery items."
       );
-
     } finally {
-
       setLoading(false);
-
     }
   };
-
 
   // ======================================
   // LOAD GALLERY
   // ======================================
 
   useEffect(() => {
-
     fetchGallery();
-
   }, []);
-
 
   // ======================================
   // FILTER GALLERY
@@ -232,7 +230,6 @@ const AdminGallery = () => {
 
   const filteredItems =
     useMemo(() => {
-
       const search =
         searchTerm
           .toLowerCase()
@@ -240,14 +237,11 @@ const AdminGallery = () => {
 
       return galleryItems.filter(
         (item) => {
-
           const title =
-            item.title ||
-            "";
+            item.title || "";
 
           const description =
-            item.description ||
-            "";
+            item.description || "";
 
           const matchesSearch =
             !search ||
@@ -269,24 +263,21 @@ const AdminGallery = () => {
           );
         }
       );
-
     }, [
       galleryItems,
       searchTerm,
-      categoryFilter
+      categoryFilter,
     ]);
-
 
   // ======================================
   // OPEN ADD MODAL
   // ======================================
 
   const openAddModal = () => {
-
     setEditingItem(null);
 
     setFormData({
-      ...emptyForm
+      ...emptyForm,
     });
 
     setError("");
@@ -294,17 +285,14 @@ const AdminGallery = () => {
     setModalOpen(true);
   };
 
-
   // ======================================
   // OPEN EDIT MODAL
   // ======================================
 
   const openEditModal = (item) => {
-
     setEditingItem(item);
 
     setFormData({
-
       title:
         item.title || "",
 
@@ -323,14 +311,14 @@ const AdminGallery = () => {
       file: null,
 
       preview:
-        item.src ||
         getMediaUrl(
-          item.fileUrl
+          item.fileUrl ||
+            item.src ||
+            ""
         ),
 
       order:
-        item.order ?? ""
-
+        item.order ?? "",
     });
 
     setError("");
@@ -338,15 +326,26 @@ const AdminGallery = () => {
     setModalOpen(true);
   };
 
-
   // ======================================
   // CLOSE MODAL
   // ======================================
 
-  const closeModal = () => {
-
-    if (saving) {
+  const closeModal = (
+    force = false
+  ) => {
+    if (saving && !force) {
       return;
+    }
+
+    if (
+      formData.preview &&
+      formData.preview.startsWith(
+        "blob:"
+      )
+    ) {
+      URL.revokeObjectURL(
+        formData.preview
+      );
     }
 
     setModalOpen(false);
@@ -354,48 +353,44 @@ const AdminGallery = () => {
     setEditingItem(null);
 
     setFormData({
-      ...emptyForm
+      ...emptyForm,
     });
 
     setError("");
 
     if (fileInputRef.current) {
-
       fileInputRef.current.value =
         "";
-
     }
   };
-
 
   // ======================================
   // FORM CHANGE
   // ======================================
 
   const handleChange = (event) => {
-
     const {
       name,
-      value
+      value,
     } = event.target;
 
     setFormData(
       (previous) => ({
         ...previous,
-        [name]: value
+        [name]: value,
       })
     );
 
     setError("");
   };
 
-
   // ======================================
   // FILE CHANGE
   // ======================================
 
-  const handleFileChange = (event) => {
-
+  const handleFileChange = (
+    event
+  ) => {
     const file =
       event.target.files?.[0];
 
@@ -403,12 +398,12 @@ const AdminGallery = () => {
       return;
     }
 
-    // Validate file type
     const allowedTypes = [
       "image/jpeg",
       "image/jpg",
       "image/png",
-      "video/mp4"
+      "image/webp",
+      "video/mp4",
     ];
 
     if (
@@ -416,9 +411,8 @@ const AdminGallery = () => {
         file.type
       )
     ) {
-
       setError(
-        "Only JPG, JPEG, PNG and MP4 files are allowed."
+        "Only JPG, JPEG, PNG, WEBP and MP4 files are allowed."
       );
 
       event.target.value = "";
@@ -426,12 +420,10 @@ const AdminGallery = () => {
       return;
     }
 
-    // Validate size
     const maxSize =
       50 * 1024 * 1024;
 
     if (file.size > maxSize) {
-
       setError(
         "File size cannot exceed 50MB."
       );
@@ -451,9 +443,25 @@ const AdminGallery = () => {
     const previewUrl =
       URL.createObjectURL(file);
 
+    /*
+    |----------------------------------------------------------------------
+    | REMOVE PREVIOUS TEMPORARY PREVIEW
+    |----------------------------------------------------------------------
+    */
+
+    if (
+      formData.preview &&
+      formData.preview.startsWith(
+        "blob:"
+      )
+    ) {
+      URL.revokeObjectURL(
+        formData.preview
+      );
+    }
+
     setFormData(
       (previous) => ({
-
         ...previous,
 
         file,
@@ -462,25 +470,21 @@ const AdminGallery = () => {
           detectedType,
 
         preview:
-          previewUrl
-
+          previewUrl,
       })
     );
 
     setError("");
   };
 
-
   // ======================================
   // VALIDATE FORM
   // ======================================
 
   const validateForm = () => {
-
     if (
       !formData.title.trim()
     ) {
-
       setError(
         "Please enter a title."
       );
@@ -491,7 +495,6 @@ const AdminGallery = () => {
     if (
       !formData.description.trim()
     ) {
-
       setError(
         "Please enter a description."
       );
@@ -503,7 +506,6 @@ const AdminGallery = () => {
       !editingItem &&
       !formData.file
     ) {
-
       setError(
         "Please select an image or video."
       );
@@ -514,119 +516,121 @@ const AdminGallery = () => {
     return true;
   };
 
-
   // ======================================
   // CREATE GALLERY ITEM
   // ======================================
 
-  const createGalleryItem = async () => {
+  const createGalleryItem =
+    async () => {
+      const data =
+        new FormData();
 
-    const data =
-      new FormData();
+      data.append(
+        "title",
+        formData.title.trim()
+      );
 
-    data.append(
-      "title",
-      formData.title.trim()
-    );
+      data.append(
+        "category",
+        formData.category
+      );
 
-    data.append(
-      "category",
-      formData.category
-    );
+      data.append(
+        "type",
+        formData.type
+      );
 
-    data.append(
-      "type",
-      formData.type
-    );
+      data.append(
+        "description",
+        formData.description.trim()
+      );
 
-    data.append(
-      "description",
-      formData.description.trim()
-    );
-
-    data.append(
-      "order",
-      String(
-        Number(formData.order) ||
-        galleryItems.length + 1
-      )
-    );
-
-    data.append(
-      "file",
-      formData.file
-    );
-
-    /*
-     * IMPORTANT:
-     *
-     * Do NOT manually set:
-     *
-     * Content-Type: multipart/form-data
-     *
-     * Axios/browser will automatically
-     * create the correct multipart boundary.
-     */
-
-    await API.post(
-      "/gallery",
-      data
-    );
-  };
-
-
-  // ======================================
-  // UPDATE GALLERY ITEM
-  // ======================================
-
-  const updateGalleryItem = async () => {
-
-    const data =
-      new FormData();
-
-    data.append(
-      "title",
-      formData.title.trim()
-    );
-
-    data.append(
-      "category",
-      formData.category
-    );
-
-    data.append(
-      "type",
-      formData.type
-    );
-
-    data.append(
-      "description",
-      formData.description.trim()
-    );
-
-    data.append(
-      "order",
-      String(
-        Number(formData.order) ||
-        editingItem?.order ||
-        1
-      )
-    );
-
-    if (formData.file) {
+      data.append(
+        "order",
+        String(
+          Number(
+            formData.order
+          ) ||
+            galleryItems.length +
+              1
+        )
+      );
 
       data.append(
         "file",
         formData.file
       );
-    }
 
-    await API.put(
-      `/gallery/${editingItem.id}`,
-      data
-    );
-  };
+      await API.post(
+        "/gallery",
+        data
+      );
+    };
 
+  // ======================================
+  // UPDATE GALLERY ITEM
+  // ======================================
+
+  const updateGalleryItem =
+    async () => {
+      const data =
+        new FormData();
+
+      data.append(
+        "title",
+        formData.title.trim()
+      );
+
+      data.append(
+        "category",
+        formData.category
+      );
+
+      data.append(
+        "type",
+        formData.type
+      );
+
+      data.append(
+        "description",
+        formData.description.trim()
+      );
+
+      data.append(
+        "order",
+        String(
+          Number(
+            formData.order
+          ) ||
+            editingItem?.order ||
+            1
+        )
+      );
+
+      /*
+      |----------------------------------------------------------------------
+      | FILE IS OPTIONAL DURING UPDATE
+      |----------------------------------------------------------------------
+      |
+      | If a new file is selected, the backend uploads it to Cloudinary.
+      |
+      | If no file is selected, the backend keeps the existing
+      | Cloudinary URL.
+      |
+      */
+
+      if (formData.file) {
+        data.append(
+          "file",
+          formData.file
+        );
+      }
+
+      await API.put(
+        `/gallery/${editingItem.id}`,
+        data
+      );
+    };
 
   // ======================================
   // SUBMIT FORM
@@ -635,7 +639,6 @@ const AdminGallery = () => {
   const handleSubmit = async (
     event
   ) => {
-
     event.preventDefault();
 
     if (!validateForm()) {
@@ -643,26 +646,38 @@ const AdminGallery = () => {
     }
 
     try {
-
       setSaving(true);
       setError("");
 
       if (editingItem) {
-
         await updateGalleryItem();
-
       } else {
-
         await createGalleryItem();
-
       }
+
+      /*
+      |----------------------------------------------------------------------
+      | REFRESH FROM RENDER / MONGODB
+      |----------------------------------------------------------------------
+      |
+      | This ensures the UI uses the actual Cloudinary URL returned
+      | by the database rather than a local browser preview.
+      |
+      */
 
       await fetchGallery();
 
-      closeModal();
+      /*
+      |----------------------------------------------------------------------
+      | FORCE CLOSE
+      |----------------------------------------------------------------------
+      |
+      | saving is still true here, so force allows the modal to close.
+      |
+      */
 
+      closeModal(true);
     } catch (requestError) {
-
       console.error(
         "SAVE GALLERY ERROR:",
         requestError
@@ -670,16 +685,13 @@ const AdminGallery = () => {
 
       setError(
         requestError.response?.data?.message ||
-        "Unable to save gallery item."
+          requestError.message ||
+          "Unable to save gallery item."
       );
-
     } finally {
-
       setSaving(false);
-
     }
   };
-
 
   // ======================================
   // DELETE ITEM
@@ -688,7 +700,6 @@ const AdminGallery = () => {
   const handleDelete = async (
     id
   ) => {
-
     const confirmed =
       window.confirm(
         "Are you sure you want to delete this gallery item?"
@@ -699,7 +710,6 @@ const AdminGallery = () => {
     }
 
     try {
-
       setDeleting(true);
       setError("");
 
@@ -722,9 +732,7 @@ const AdminGallery = () => {
               itemId !== id
           )
       );
-
     } catch (requestError) {
-
       console.error(
         "DELETE GALLERY ERROR:",
         requestError
@@ -732,16 +740,12 @@ const AdminGallery = () => {
 
       setError(
         requestError.response?.data?.message ||
-        "Unable to delete gallery item."
+          "Unable to delete gallery item."
       );
-
     } finally {
-
       setDeleting(false);
-
     }
   };
-
 
   // ======================================
   // SELECT ITEM
@@ -750,14 +754,11 @@ const AdminGallery = () => {
   const toggleSelectItem = (
     id
   ) => {
-
     setSelectedItems(
       (previous) => {
-
         if (
           previous.includes(id)
         ) {
-
           return previous.filter(
             (itemId) =>
               itemId !== id
@@ -766,24 +767,26 @@ const AdminGallery = () => {
 
         return [
           ...previous,
-          id
+          id,
         ];
       }
     );
   };
-
 
   // ======================================
   // SELECT ALL
   // ======================================
 
   const toggleSelectAll = () => {
-
     if (
-      selectedItems.length ===
-      filteredItems.length
+      filteredItems.length > 0 &&
+      filteredItems.every(
+        (item) =>
+          selectedItems.includes(
+            item.id
+          )
+      )
     ) {
-
       setSelectedItems([]);
 
       return;
@@ -797,17 +800,14 @@ const AdminGallery = () => {
     );
   };
 
-
   // ======================================
   // DELETE SELECTED
   // ======================================
 
   const deleteSelected =
     async () => {
-
       if (
-        selectedItems.length ===
-        0
+        selectedItems.length === 0
       ) {
         return;
       }
@@ -822,7 +822,6 @@ const AdminGallery = () => {
       }
 
       try {
-
         setDeleting(true);
         setError("");
 
@@ -846,9 +845,7 @@ const AdminGallery = () => {
         );
 
         setSelectedItems([]);
-
       } catch (requestError) {
-
         console.error(
           "DELETE SELECTED ERROR:",
           requestError
@@ -856,30 +853,22 @@ const AdminGallery = () => {
 
         setError(
           requestError.response?.data?.message ||
-          "Unable to delete selected items."
+            "Unable to delete selected items."
         );
-
       } finally {
-
         setDeleting(false);
-
       }
     };
-
 
   // ======================================
   // LOADING
   // ======================================
 
   if (loading) {
-
     return (
       <div className="admin-page">
-
         <div className="admin-page-header">
-
           <div>
-
             <h1>
               Gallery Management
             </h1>
@@ -889,13 +878,10 @@ const AdminGallery = () => {
               media displayed on your
               website.
             </p>
-
           </div>
-
         </div>
 
         <div className="admin-empty-state">
-
           <ImageIcon size={45} />
 
           <h3>
@@ -906,13 +892,10 @@ const AdminGallery = () => {
             Fetching your media
             from the server.
           </p>
-
         </div>
-
       </div>
     );
   }
-
 
   // ======================================
   // RENDER
@@ -920,15 +903,8 @@ const AdminGallery = () => {
 
   return (
     <div className="admin-page">
-
-      {/* ==================================
-          HEADER
-      ================================== */}
-
       <div className="admin-page-header">
-
         <div>
-
           <h1>
             Gallery Management
           </h1>
@@ -938,138 +914,96 @@ const AdminGallery = () => {
             media displayed on your
             website.
           </p>
-
         </div>
 
         <button
           type="button"
           className="btn-primary"
-          onClick={
-            openAddModal
-          }
+          onClick={openAddModal}
         >
           <Plus size={18} />
 
           Add New Media
         </button>
-
       </div>
 
-
-      {/* ==================================
-          ERROR
-      ================================== */}
-
       {error && (
-
         <div className="admin-alert admin-alert-error">
-
           {error}
-
         </div>
-
       )}
 
-
-      {/* ==================================
-          TOOLBAR
-      ================================== */}
-
       <div className="admin-toolbar">
-
         <div className="admin-search">
-
           <Search size={18} />
 
           <input
             type="text"
             placeholder="Search gallery..."
-            value={
-              searchTerm
-            }
-            onChange={
-              (event) =>
-                setSearchTerm(
-                  event.target.value
-                )
+            value={searchTerm}
+            onChange={(event) =>
+              setSearchTerm(
+                event.target.value
+              )
             }
           />
-
         </div>
-
 
         <select
           className="admin-filter"
-          value={
-            categoryFilter
-          }
-          onChange={
-            (event) =>
-              setCategoryFilter(
-                event.target.value
-              )
+          value={categoryFilter}
+          onChange={(event) =>
+            setCategoryFilter(
+              event.target.value
+            )
           }
         >
-
           {categories.map(
             (category) => (
-
               <option
                 key={category}
                 value={category}
               >
                 {category}
               </option>
-
             )
           )}
-
         </select>
-
 
         {selectedItems.length >
           0 && (
-
           <button
             type="button"
             className="btn-danger"
             onClick={
               deleteSelected
             }
-            disabled={
-              deleting
-            }
+            disabled={deleting}
           >
-
             <Trash2 size={16} />
 
             {deleting
               ? "Deleting..."
               : `Delete Selected (${selectedItems.length})`}
-
           </button>
-
         )}
-
       </div>
-
-
-      {/* ==================================
-          SELECT ALL
-      ================================== */}
 
       {filteredItems.length >
         0 && (
-
         <div className="gallery-select-all">
-
           <label>
-
             <input
               type="checkbox"
               checked={
-                selectedItems.length ===
-                  filteredItems.length
+                filteredItems.length >
+                  0 &&
+                filteredItems.every(
+                  (item) =>
+                    selectedItems.includes(
+                      item.id
+                    )
+                )
               }
               onChange={
                 toggleSelectAll
@@ -1077,76 +1011,52 @@ const AdminGallery = () => {
             />
 
             Select All
-
           </label>
 
           <span>
-
             {filteredItems.length}{" "}
-
             {filteredItems.length ===
             1
               ? "item"
               : "items"}
-
           </span>
-
         </div>
-
       )}
-
-
-      {/* ==================================
-          GALLERY
-      ================================== */}
 
       {filteredItems.length >
       0 ? (
-
         <div className="admin-gallery-grid">
-
           {filteredItems.map(
             (item) => (
-
               <article
                 className="admin-gallery-card"
                 key={item.id}
               >
-
-                {/* MEDIA */}
-
                 <div className="admin-gallery-media">
-
                   {item.type ===
                   "video" ? (
-
                     <video
                       src={item.src}
                       muted
                       preload="metadata"
                     />
-
-                  ) : (
-
+                  ) : item.src ? (
                     <img
                       src={item.src}
                       alt={
                         item.title
                       }
                       loading="lazy"
-                      onError={() =>
-                        console.error(
-                          "IMAGE FAILED TO LOAD:",
-                          item.src
-                        )
-                      }
                     />
-
+                  ) : (
+                    <div className="admin-gallery-media-placeholder">
+                      <ImageIcon
+                        size={40}
+                      />
+                    </div>
                   )}
 
-
                   <div className="admin-gallery-type">
-
                     {item.type ===
                     "video" ? (
                       <Video
@@ -1159,12 +1069,9 @@ const AdminGallery = () => {
                     )}
 
                     {item.type}
-
                   </div>
 
-
                   <label className="gallery-checkbox">
-
                     <input
                       type="checkbox"
                       checked={selectedItems.includes(
@@ -1176,60 +1083,37 @@ const AdminGallery = () => {
                         )
                       }
                     />
-
                   </label>
-
                 </div>
 
-
-                {/* CONTENT */}
-
                 <div className="admin-gallery-content">
-
                   <span className="admin-category-badge">
-
                     {item.category}
-
                   </span>
-
 
                   <h3>
                     {item.title}
                   </h3>
 
-
                   <p>
                     {item.description}
                   </p>
 
-
                   <div className="admin-gallery-meta">
-
                     <span>
-
                       Added:{" "}
-
                       {item.date ||
                         "—"}
-
                     </span>
 
                     <span>
-
                       Order:{" "}
-
                       {item.order ??
                         "—"}
-
                     </span>
-
                   </div>
 
-
-                  {/* ACTIONS */}
-
                   <div className="admin-gallery-actions">
-
                     <button
                       type="button"
                       className="admin-action-view"
@@ -1245,7 +1129,6 @@ const AdminGallery = () => {
                       />
                     </button>
 
-
                     <button
                       type="button"
                       className="admin-action-edit"
@@ -1260,7 +1143,6 @@ const AdminGallery = () => {
                         size={17}
                       />
                     </button>
-
 
                     <button
                       type="button"
@@ -1279,22 +1161,14 @@ const AdminGallery = () => {
                         size={17}
                       />
                     </button>
-
                   </div>
-
                 </div>
-
               </article>
-
             )
           )}
-
         </div>
-
       ) : (
-
         <div className="admin-empty-state">
-
           <ImageIcon size={45} />
 
           <h3>
@@ -1302,12 +1176,10 @@ const AdminGallery = () => {
           </h3>
 
           <p>
-
             {galleryItems.length ===
             0
               ? "Your gallery is currently empty. Add your first media item."
               : "Try changing your search or category filter."}
-
           </p>
 
           <button
@@ -1317,80 +1189,53 @@ const AdminGallery = () => {
               openAddModal
             }
           >
-
             <Plus size={17} />
 
             Add New Media
-
           </button>
-
         </div>
-
       )}
 
-
-      {/* ==================================
-          ADD / EDIT MODAL
-      ================================== */}
-
       {modalOpen && (
-
         <div
           className="modal-overlay"
-          onClick={closeModal}
+          onClick={() =>
+            closeModal()
+          }
         >
-
           <div
             className="modal-content admin-gallery-modal"
-            onClick={
-              (event) =>
-                event.stopPropagation()
+            onClick={(event) =>
+              event.stopPropagation()
             }
           >
-
-            {/* MODAL HEADER */}
-
             <div className="modal-header">
-
               <div>
-
                 <h2>
-
                   {editingItem
                     ? "Edit Gallery Item"
                     : "Add New Media"}
-
                 </h2>
 
                 <p>
-
                   {editingItem
                     ? "Update this gallery item."
                     : "Add new media to your gallery."}
-
                 </p>
-
               </div>
-
 
               <button
                 type="button"
                 className="modal-close"
-                onClick={
-                  closeModal
+                onClick={() =>
+                  closeModal()
                 }
-                disabled={
-                  saving
-                }
+                disabled={saving}
                 aria-label="Close modal"
               >
                 <X size={22} />
               </button>
-
             </div>
-
-
-            {/* FORM */}
 
             <form
               className="admin-form"
@@ -1398,11 +1243,7 @@ const AdminGallery = () => {
                 handleSubmit
               }
             >
-
-              {/* TITLE */}
-
               <div className="form-group">
-
                 <label
                   className="form-label"
                   htmlFor="gallery-title"
@@ -1424,14 +1265,9 @@ const AdminGallery = () => {
                   }
                   required
                 />
-
               </div>
 
-
-              {/* CATEGORY */}
-
               <div className="form-group">
-
                 <label
                   className="form-label"
                   htmlFor="gallery-category"
@@ -1450,37 +1286,26 @@ const AdminGallery = () => {
                     handleChange
                   }
                 >
-
                   {formCategories.map(
                     (category) => (
-
                       <option
                         key={category}
                         value={category}
                       >
                         {category}
                       </option>
-
                     )
                   )}
-
                 </select>
-
               </div>
 
-
-              {/* MEDIA TYPE */}
-
               <div className="form-group">
-
                 <label className="form-label">
                   Media Type
                 </label>
 
                 <div className="admin-radio-group">
-
                   <label>
-
                     <input
                       type="radio"
                       name="type"
@@ -1495,12 +1320,9 @@ const AdminGallery = () => {
                     />
 
                     Image
-
                   </label>
 
-
                   <label>
-
                     <input
                       type="radio"
                       name="type"
@@ -1515,18 +1337,11 @@ const AdminGallery = () => {
                     />
 
                     Video
-
                   </label>
-
                 </div>
-
               </div>
 
-
-              {/* DESCRIPTION */}
-
               <div className="form-group">
-
                 <label
                   className="form-label"
                   htmlFor="gallery-description"
@@ -1548,20 +1363,12 @@ const AdminGallery = () => {
                   }
                   required
                 />
-
               </div>
 
-
-              {/* FILE */}
-
               <div className="form-group">
-
                 <label className="form-label">
-
                   Media File
-
                 </label>
-
 
                 <div
                   className="admin-upload-box"
@@ -1570,99 +1377,76 @@ const AdminGallery = () => {
                   }
                   role="button"
                   tabIndex={0}
-                  onKeyDown={
-                    (event) => {
+                  onKeyDown={(
+                    event
+                  ) => {
+                    if (
+                      event.key ===
+                        "Enter" ||
+                      event.key ===
+                        " "
+                    ) {
+                      event.preventDefault();
 
-                      if (
-                        event.key ===
-                          "Enter" ||
-                        event.key ===
-                          " "
-                      ) {
-
-                        fileInputRef.current?.click();
-
-                      }
-
+                      fileInputRef.current?.click();
                     }
-                  }
+                  }}
                 >
-
-                  <Upload size={30} />
+                  <Upload
+                    size={30}
+                  />
 
                   <strong>
-
                     {editingItem
                       ? "Click to replace file"
                       : "Click to upload"}
-
                   </strong>
 
                   <span>
-
-                    JPG, JPEG, PNG or MP4
-
+                    JPG, JPEG, PNG,
+                    WEBP or MP4
                   </span>
-
                 </div>
-
 
                 <input
                   ref={
                     fileInputRef
                   }
                   type="file"
-                  accept="image/jpeg,image/jpg,image/png,video/mp4"
+                  accept="image/jpeg,image/jpg,image/png,image/webp,video/mp4"
                   hidden
                   onChange={
                     handleFileChange
                   }
                 />
-
               </div>
 
-
-              {/* PREVIEW */}
-
               {formData.preview && (
-
                 <div className="admin-upload-preview">
-
                   <span>
                     Preview
                   </span>
 
-
                   {formData.type ===
                   "video" ? (
-
                     <video
                       src={
                         formData.preview
                       }
                       controls
                     />
-
                   ) : (
-
                     <img
                       src={
                         formData.preview
                       }
                       alt="Upload preview"
                     />
-
                   )}
-
                 </div>
-
               )}
 
-
-              {/* ORDER */}
-
               <div className="form-group">
-
                 <label
                   className="form-label"
                   htmlFor="gallery-order"
@@ -1684,76 +1468,50 @@ const AdminGallery = () => {
                     handleChange
                   }
                 />
-
               </div>
 
-
-              {/* BUTTONS */}
-
               <div className="admin-form-actions">
-
                 <button
                   type="button"
                   className="btn-secondary"
-                  onClick={
-                    closeModal
+                  onClick={() =>
+                    closeModal()
                   }
-                  disabled={
-                    saving
-                  }
+                  disabled={saving}
                 >
                   Cancel
                 </button>
 
-
                 <button
                   type="submit"
                   className="btn-primary"
-                  disabled={
-                    saving
-                  }
+                  disabled={saving}
                 >
-
                   {saving
                     ? "Saving..."
                     : editingItem
                     ? "Update Media"
                     : "Save Media"}
-
                 </button>
-
               </div>
-
             </form>
-
           </div>
-
         </div>
-
       )}
 
-
-      {/* ==================================
-          PREVIEW MODAL
-      ================================== */}
-
       {previewItem && (
-
         <div
           className="modal-overlay"
           onClick={() =>
             setPreviewItem(null)
           }
         >
-
           <div
             className="modal-content gallery-preview-modal"
-            onClick={
-              (event) =>
-                event.stopPropagation()
+            onClick={(event) =>
+              event.stopPropagation()
             }
           >
-
             <button
               type="button"
               className="modal-close"
@@ -1765,12 +1523,9 @@ const AdminGallery = () => {
               <X size={22} />
             </button>
 
-
             <div className="gallery-preview-media">
-
               {previewItem.type ===
               "video" ? (
-
                 <video
                   src={
                     previewItem.src
@@ -1778,9 +1533,7 @@ const AdminGallery = () => {
                   controls
                   autoPlay
                 />
-
-              ) : (
-
+              ) : previewItem.src ? (
                 <img
                   src={
                     previewItem.src
@@ -1789,25 +1542,27 @@ const AdminGallery = () => {
                     previewItem.title
                   }
                 />
-
+              ) : (
+                <div className="admin-gallery-media-placeholder">
+                  <ImageIcon
+                    size={50}
+                  />
+                </div>
               )}
-
             </div>
 
-
             <div className="gallery-preview-info">
-
               <span className="admin-category-badge">
-
-                {previewItem.category}
-
+                {
+                  previewItem.category
+                }
               </span>
 
-
               <h2>
-                {previewItem.title}
+                {
+                  previewItem.title
+                }
               </h2>
-
 
               <p>
                 {
@@ -1815,44 +1570,25 @@ const AdminGallery = () => {
                 }
               </p>
 
-
               <div className="admin-gallery-meta">
-
                 <span>
-
                   Date:{" "}
-
                   {previewItem.date ||
                     "—"}
-
                 </span>
 
                 <span>
-
                   Order:{" "}
-
                   {previewItem.order ??
                     "—"}
-
                 </span>
-
               </div>
-
             </div>
-
           </div>
-
         </div>
-
       )}
-
     </div>
   );
 };
-
-
-// ========================================
-// EXPORT
-// ========================================
 
 export default AdminGallery;
