@@ -20,7 +20,48 @@ import API from "../../api/axios";
 
 import "../../styles/Admin.outreach.css";
 
-const API_BASE_URL = "http://localhost:5000";
+// ============================================================
+// IMAGE URL HELPER
+// ============================================================
+
+const getImageUrl = (imageUrl) => {
+  if (!imageUrl) {
+    return "";
+  }
+
+  // Cloudinary / external URLs
+  if (
+    imageUrl.startsWith("http://") ||
+    imageUrl.startsWith("https://") ||
+    imageUrl.startsWith("blob:")
+  ) {
+    return imageUrl;
+  }
+
+  // Legacy relative image paths
+  const apiUrl =
+    import.meta.env.VITE_API_URL;
+
+  if (!apiUrl) {
+    console.warn(
+      "VITE_API_URL is not configured."
+    );
+
+    return imageUrl;
+  }
+
+  const apiOrigin =
+    apiUrl.replace(
+      /\/api\/?$/,
+      ""
+    );
+
+  return `${apiOrigin}${imageUrl}`;
+};
+
+// ============================================================
+// CATEGORIES
+// ============================================================
 
 const categories = [
   "Widows Support",
@@ -30,6 +71,10 @@ const categories = [
   "Community Outreach",
   "Humanitarian"
 ];
+
+// ============================================================
+// EMPTY FORM
+// ============================================================
 
 const emptyForm = {
   title: "",
@@ -43,10 +88,16 @@ const emptyForm = {
   preview: ""
 };
 
-const AdminOutreach = () => {
-  const [programs, setPrograms] = useState([]);
+// ============================================================
+// COMPONENT
+// ============================================================
 
-  const [search, setSearch] = useState("");
+const AdminOutreach = () => {
+  const [programs, setPrograms] =
+    useState([]);
+
+  const [search, setSearch] =
+    useState("");
 
   const [showModal, setShowModal] =
     useState(false);
@@ -77,21 +128,9 @@ const AdminOutreach = () => {
   const fileInputRef =
     useRef(null);
 
-  const getImageUrl = (imageUrl) => {
-    if (!imageUrl) {
-      return "";
-    }
-
-    if (
-      imageUrl.startsWith("http://") ||
-      imageUrl.startsWith("https://") ||
-      imageUrl.startsWith("blob:")
-    ) {
-      return imageUrl;
-    }
-
-    return `${API_BASE_URL}${imageUrl}`;
-  };
+  // ==========================================================
+  // FETCH OUTREACH PROGRAMS
+  // ==========================================================
 
   const fetchPrograms = async () => {
     try {
@@ -140,16 +179,24 @@ const AdminOutreach = () => {
 
       setError(
         requestError.response?.data?.message ||
-        "Unable to load outreach programs."
+          "Unable to load outreach programs."
       );
     } finally {
       setLoading(false);
     }
   };
 
+  // ==========================================================
+  // INITIAL LOAD
+  // ==========================================================
+
   useEffect(() => {
     fetchPrograms();
   }, []);
+
+  // ==========================================================
+  // SEARCH / FILTER
+  // ==========================================================
 
   const filteredPrograms =
     useMemo(() => {
@@ -163,27 +210,28 @@ const AdminOutreach = () => {
       }
 
       return programs.filter(
-        (program) => {
-          return (
-            program.title
-              ?.toLowerCase()
-              .includes(searchValue) ||
-            program.category
-              ?.toLowerCase()
-              .includes(searchValue) ||
-            program.location
-              ?.toLowerCase()
-              .includes(searchValue) ||
-            program.description
-              ?.toLowerCase()
-              .includes(searchValue)
-          );
-        }
+        (program) =>
+          program.title
+            ?.toLowerCase()
+            .includes(searchValue) ||
+          program.category
+            ?.toLowerCase()
+            .includes(searchValue) ||
+          program.location
+            ?.toLowerCase()
+            .includes(searchValue) ||
+          program.description
+            ?.toLowerCase()
+            .includes(searchValue)
       );
     }, [
       programs,
       search
     ]);
+
+  // ==========================================================
+  // OPEN ADD MODAL
+  // ==========================================================
 
   const openAddModal = () => {
     setEditingProgram(null);
@@ -197,7 +245,13 @@ const AdminOutreach = () => {
     setShowModal(true);
   };
 
-  const openEditModal = (program) => {
+  // ==========================================================
+  // OPEN EDIT MODAL
+  // ==========================================================
+
+  const openEditModal = (
+    program
+  ) => {
     setEditingProgram(program);
 
     const formattedDate =
@@ -250,6 +304,10 @@ const AdminOutreach = () => {
     setShowModal(true);
   };
 
+  // ==========================================================
+  // CLOSE MODAL
+  // ==========================================================
+
   const closeModal = () => {
     if (saving) {
       return;
@@ -266,9 +324,14 @@ const AdminOutreach = () => {
     setError("");
 
     if (fileInputRef.current) {
-      fileInputRef.current.value = "";
+      fileInputRef.current.value =
+        "";
     }
   };
+
+  // ==========================================================
+  // HANDLE INPUT CHANGE
+  // ==========================================================
 
   const handleChange = (
     event
@@ -287,6 +350,10 @@ const AdminOutreach = () => {
 
     setError("");
   };
+
+  // ==========================================================
+  // HANDLE IMAGE CHANGE
+  // ==========================================================
 
   const handleImageChange = (
     event
@@ -345,6 +412,10 @@ const AdminOutreach = () => {
     setError("");
   };
 
+  // ==========================================================
+  // VALIDATE FORM
+  // ==========================================================
+
   const validateForm = () => {
     if (
       !formData.title.trim()
@@ -400,6 +471,10 @@ const AdminOutreach = () => {
     return true;
   };
 
+  // ==========================================================
+  // CREATE PROGRAM
+  // ==========================================================
+
   const createProgram = async () => {
     const data =
       new FormData();
@@ -453,6 +528,10 @@ const AdminOutreach = () => {
       data
     );
   };
+
+  // ==========================================================
+  // UPDATE PROGRAM
+  // ==========================================================
 
   const updateProgram = async () => {
     const data =
@@ -510,6 +589,10 @@ const AdminOutreach = () => {
     );
   };
 
+  // ==========================================================
+  // HANDLE FORM SUBMIT
+  // ==========================================================
+
   const handleSubmit = async (
     event
   ) => {
@@ -540,12 +623,16 @@ const AdminOutreach = () => {
 
       setError(
         requestError.response?.data?.message ||
-        "Unable to save outreach program."
+          "Unable to save outreach program."
       );
     } finally {
       setSaving(false);
     }
   };
+
+  // ==========================================================
+  // DELETE PROGRAM
+  // ==========================================================
 
   const handleDelete = async (
     id
@@ -588,12 +675,16 @@ const AdminOutreach = () => {
 
       setError(
         requestError.response?.data?.message ||
-        "Unable to delete outreach program."
+          "Unable to delete outreach program."
       );
     } finally {
       setDeleting(false);
     }
   };
+
+  // ==========================================================
+  // TOGGLE STATUS
+  // ==========================================================
 
   const toggleStatus = async (
     program
@@ -678,10 +769,14 @@ const AdminOutreach = () => {
 
       setError(
         requestError.response?.data?.message ||
-        "Unable to update program status."
+          "Unable to update program status."
       );
     }
   };
+
+  // ==========================================================
+  // LOADING STATE
+  // ==========================================================
 
   if (loading) {
     return (
@@ -720,8 +815,16 @@ const AdminOutreach = () => {
     );
   }
 
+  // ==========================================================
+  // MAIN RENDER
+  // ==========================================================
+
   return (
     <div className="admin-page">
+
+      {/* ======================================================
+          PAGE HEADER
+      ====================================================== */}
 
       <div className="admin-page-header">
 
@@ -748,11 +851,19 @@ const AdminOutreach = () => {
 
       </div>
 
+      {/* ======================================================
+          ERROR MESSAGE
+      ====================================================== */}
+
       {error && (
         <div className="admin-alert admin-alert-error">
           {error}
         </div>
       )}
+
+      {/* ======================================================
+          TOOLBAR
+      ====================================================== */}
 
       <div className="admin-toolbar">
 
@@ -788,11 +899,16 @@ const AdminOutreach = () => {
 
       </div>
 
+      {/* ======================================================
+          PROGRAM TABLE
+      ====================================================== */}
+
       <div className="admin-table-wrapper">
 
         <table className="admin-table">
 
           <thead>
+
             <tr>
               <th>Program</th>
               <th>Category</th>
@@ -802,6 +918,7 @@ const AdminOutreach = () => {
               <th>Status</th>
               <th>Actions</th>
             </tr>
+
           </thead>
 
           <tbody>
@@ -813,7 +930,10 @@ const AdminOutreach = () => {
                     key={program.id}
                   >
 
+                    {/* PROGRAM */}
+
                     <td>
+
                       <div className="outreach-program-name">
 
                         <div className="outreach-table-image">
@@ -854,13 +974,20 @@ const AdminOutreach = () => {
                         </div>
 
                       </div>
+
                     </td>
 
+                    {/* CATEGORY */}
+
                     <td>
+
                       <span className="admin-category-badge">
                         {program.category}
                       </span>
+
                     </td>
+
+                    {/* DATE */}
 
                     <td>
                       {program.date
@@ -870,14 +997,20 @@ const AdminOutreach = () => {
                         : "Not provided"}
                     </td>
 
+                    {/* LOCATION */}
+
                     <td>
                       {program.location ||
                         "Not provided"}
                     </td>
 
+                    {/* PEOPLE HELPED */}
+
                     <td>
                       {program.peopleHelped}
                     </td>
+
+                    {/* STATUS */}
 
                     <td>
 
@@ -899,6 +1032,8 @@ const AdminOutreach = () => {
                       </button>
 
                     </td>
+
+                    {/* ACTIONS */}
 
                     <td>
 
@@ -961,12 +1096,14 @@ const AdminOutreach = () => {
               )
             ) : (
               <tr>
+
                 <td
                   colSpan="7"
                   className="admin-empty-state"
                 >
                   No outreach programs found.
                 </td>
+
               </tr>
             )}
 
@@ -975,6 +1112,10 @@ const AdminOutreach = () => {
         </table>
 
       </div>
+
+      {/* ======================================================
+          ADD / EDIT MODAL
+      ====================================================== */}
 
       {showModal && (
         <div
@@ -989,9 +1130,12 @@ const AdminOutreach = () => {
             }
           >
 
+            {/* MODAL HEADER */}
+
             <div className="admin-modal-header">
 
               <div>
+
                 <h2>
                   {editingProgram
                     ? "Edit Outreach Program"
@@ -1003,6 +1147,7 @@ const AdminOutreach = () => {
                     ? "Update the details of this outreach program."
                     : "Add a new outreach program to your foundation."}
                 </p>
+
               </div>
 
               <button
@@ -1016,9 +1161,13 @@ const AdminOutreach = () => {
 
             </div>
 
+            {/* FORM */}
+
             <form
               onSubmit={handleSubmit}
             >
+
+              {/* TITLE */}
 
               <div className="form-group">
 
@@ -1042,6 +1191,8 @@ const AdminOutreach = () => {
                 />
 
               </div>
+
+              {/* CATEGORY */}
 
               <div className="form-group">
 
@@ -1076,6 +1227,8 @@ const AdminOutreach = () => {
 
               </div>
 
+              {/* DESCRIPTION */}
+
               <div className="form-group">
 
                 <label className="form-label">
@@ -1098,6 +1251,8 @@ const AdminOutreach = () => {
                 />
 
               </div>
+
+              {/* DATE + LOCATION */}
 
               <div className="admin-form-row">
 
@@ -1147,6 +1302,8 @@ const AdminOutreach = () => {
 
               </div>
 
+              {/* PEOPLE HELPED + STATUS */}
+
               <div className="admin-form-row">
 
                 <div className="form-group">
@@ -1189,6 +1346,7 @@ const AdminOutreach = () => {
                     }
                     disabled={saving}
                   >
+
                     <option value="Active">
                       Active
                     </option>
@@ -1196,11 +1354,14 @@ const AdminOutreach = () => {
                     <option value="Inactive">
                       Inactive
                     </option>
+
                   </select>
 
                 </div>
 
               </div>
+
+              {/* IMAGE UPLOAD */}
 
               <div className="form-group">
 
@@ -1216,6 +1377,7 @@ const AdminOutreach = () => {
                   role="button"
                   tabIndex={0}
                   onKeyDown={(event) => {
+
                     if (
                       event.key ===
                         "Enter" ||
@@ -1223,6 +1385,7 @@ const AdminOutreach = () => {
                     ) {
                       fileInputRef.current?.click();
                     }
+
                   }}
                 >
 
@@ -1254,6 +1417,8 @@ const AdminOutreach = () => {
 
               </div>
 
+              {/* IMAGE PREVIEW */}
+
               {formData.preview && (
                 <div className="admin-upload-preview">
 
@@ -1270,6 +1435,8 @@ const AdminOutreach = () => {
 
                 </div>
               )}
+
+              {/* FORM ACTIONS */}
 
               <div className="admin-form-actions">
 
@@ -1303,6 +1470,10 @@ const AdminOutreach = () => {
         </div>
       )}
 
+      {/* ======================================================
+          VIEW PROGRAM MODAL
+      ====================================================== */}
+
       {viewProgram && (
         <div
           className="modal-overlay"
@@ -1317,6 +1488,8 @@ const AdminOutreach = () => {
               event.stopPropagation()
             }
           >
+
+            {/* HEADER */}
 
             <div className="admin-modal-header">
 
@@ -1344,6 +1517,8 @@ const AdminOutreach = () => {
 
             </div>
 
+            {/* IMAGE */}
+
             {viewProgram.image && (
               <div className="outreach-view-image">
 
@@ -1358,6 +1533,8 @@ const AdminOutreach = () => {
 
               </div>
             )}
+
+            {/* DETAILS */}
 
             <div className="outreach-details">
 
@@ -1416,6 +1593,8 @@ const AdminOutreach = () => {
 
             </div>
 
+            {/* DESCRIPTION */}
+
             <div className="outreach-description">
 
               <h3>
@@ -1427,6 +1606,8 @@ const AdminOutreach = () => {
               </p>
 
             </div>
+
+            {/* ACTIONS */}
 
             <div className="admin-form-actions">
 
@@ -1445,6 +1626,7 @@ const AdminOutreach = () => {
                 className="btn-primary"
                 onClick={() => {
                   setViewProgram(null);
+
                   openEditModal(
                     viewProgram
                   );
