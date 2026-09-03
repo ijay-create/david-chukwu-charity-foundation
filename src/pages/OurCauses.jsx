@@ -29,6 +29,8 @@ const SERVER_URL =
 const defaultCauses = {
   hero: {
     title: "Our Causes",
+    description:
+      "Creating lasting change by supporting communities, empowering lives, and restoring hope.",
     subtitle:
       "Creating lasting change by supporting communities, empowering lives, and restoring hope.",
     imageUrl: "",
@@ -45,6 +47,7 @@ const defaultCauses = {
     {
       id: 1,
       order: 1,
+      number: "01",
       title: "Education & Empowerment",
       description:
         "Providing educational opportunities, learning resources, and support that help children and young people build brighter futures.",
@@ -54,6 +57,7 @@ const defaultCauses = {
     {
       id: 2,
       order: 2,
+      number: "02",
       title: "Community Development",
       description:
         "Supporting communities with initiatives designed to improve living conditions, create opportunities, and promote sustainable development.",
@@ -63,6 +67,7 @@ const defaultCauses = {
     {
       id: 3,
       order: 3,
+      number: "03",
       title: "Healthcare Support",
       description:
         "Helping vulnerable individuals and families gain access to essential healthcare, medical assistance, and wellness support.",
@@ -72,6 +77,7 @@ const defaultCauses = {
     {
       id: 4,
       order: 4,
+      number: "04",
       title: "Food & Basic Needs",
       description:
         "Providing food, essential supplies, and immediate assistance to individuals and families facing difficult circumstances.",
@@ -81,6 +87,7 @@ const defaultCauses = {
     {
       id: 5,
       order: 5,
+      number: "05",
       title: "Youth Development",
       description:
         "Creating opportunities for young people through mentorship, skills development, leadership, and empowerment programs.",
@@ -97,9 +104,12 @@ const defaultCauses = {
   },
 
   cta: {
+    eyebrow: "MAKE A DIFFERENCE",
     title: "Be Part of the Change",
     description:
       "Your support can help us reach more people, strengthen communities, and create meaningful opportunities for those who need them most.",
+    donateText: "DONATE NOW",
+    involvedText: "GET INVOLVED",
   },
 };
 
@@ -135,7 +145,7 @@ const OurCauses = ({ onDonateClick }) => {
       return imageUrl;
     }
 
-    // Local backend uploads
+    // Legacy local backend uploads
     if (
       imageUrl.startsWith("/uploads")
     ) {
@@ -146,7 +156,68 @@ const OurCauses = ({ onDonateClick }) => {
   };
 
   // ============================================================
-  // FETCH CAUSES
+  // NORMALIZE BACKEND DATA
+  // ============================================================
+
+  const normalizeCauses = (data) => {
+    if (!data) {
+      return defaultCauses;
+    }
+
+    return {
+      ...defaultCauses,
+
+      hero: {
+        ...defaultCauses.hero,
+        ...(data.hero || {}),
+      },
+
+      intro: {
+        ...defaultCauses.intro,
+        ...(data.intro || {}),
+      },
+
+      causes:
+        Array.isArray(data.causes)
+          ? data.causes.map(
+              (cause, index) => ({
+                ...cause,
+
+                id:
+                  cause.id ||
+                  cause._id ||
+                  index + 1,
+
+                order:
+                  cause.order ||
+                  index + 1,
+
+                number:
+                  cause.number ||
+                  String(
+                    index + 1
+                  ).padStart(2, "0"),
+
+                imageUrl:
+                  cause.imageUrl || "",
+              })
+            )
+          : defaultCauses.causes,
+
+      approach: {
+        ...defaultCauses.approach,
+        ...(data.approach || {}),
+      },
+
+      cta: {
+        ...defaultCauses.cta,
+        ...(data.cta || {}),
+      },
+    };
+  };
+
+  // ============================================================
+  // FETCH CAUSES FROM BACKEND
   // ============================================================
 
   const fetchCauses = async () => {
@@ -154,44 +225,61 @@ const OurCauses = ({ onDonateClick }) => {
       setLoading(true);
       setError(false);
 
+      console.log(
+        "FETCHING CAUSES FROM:",
+        API_URL
+      );
+
       const response =
         await fetch(API_URL);
 
       if (!response.ok) {
         throw new Error(
-          "Failed to fetch causes"
+          `Failed to fetch causes. Status: ${response.status}`
         );
       }
 
       const data =
         await response.json();
 
-      if (data) {
-        setCauses({
-          ...defaultCauses,
-          ...data,
-          hero: {
-            ...defaultCauses.hero,
-            ...(data.hero || {}),
-          },
-          intro: {
-            ...defaultCauses.intro,
-            ...(data.intro || {}),
-          },
-          causes:
-            Array.isArray(data.causes)
-              ? data.causes
-              : defaultCauses.causes,
-          approach: {
-            ...defaultCauses.approach,
-            ...(data.approach || {}),
-          },
-          cta: {
-            ...defaultCauses.cta,
-            ...(data.cta || {}),
-          },
-        });
+      console.log(
+        "CAUSES API RESPONSE:",
+        data
+      );
+
+      /*
+       * Backend response structure:
+       *
+       * {
+       *   success: true,
+       *   causes: {
+       *     hero: {...},
+       *     intro: {...},
+       *     causes: [...],
+       *     approach: {...},
+       *     cta: {...}
+       *   }
+       * }
+       */
+
+      if (
+        !data ||
+        data.success === false
+      ) {
+        throw new Error(
+          data?.message ||
+            "Invalid causes response."
+        );
       }
+
+      const backendCauses =
+        data.causes || data;
+
+      setCauses(
+        normalizeCauses(
+          backendCauses
+        )
+      );
     } catch (err) {
       console.error(
         "CAUSES FETCH ERROR:",
@@ -258,6 +346,7 @@ const OurCauses = ({ onDonateClick }) => {
         }}
       >
         <div className="causes-hero-overlay">
+
           <motion.div
             className="causes-hero-content"
             initial={{
@@ -272,6 +361,7 @@ const OurCauses = ({ onDonateClick }) => {
               duration: 0.8,
             }}
           >
+
             <span className="causes-hero-eyebrow">
               DAVID CHUKWU CHARITY FOUNDATION
             </span>
@@ -282,10 +372,13 @@ const OurCauses = ({ onDonateClick }) => {
             </h1>
 
             <p>
-              {causes.hero?.subtitle ||
+              {causes.hero?.description ||
+                causes.hero?.subtitle ||
                 "Creating lasting change by supporting communities, empowering lives, and restoring hope."}
             </p>
+
           </motion.div>
+
         </div>
       </section>
 
@@ -294,6 +387,7 @@ const OurCauses = ({ onDonateClick }) => {
       ====================================================== */}
 
       <section className="causes-intro">
+
         <div className="container">
 
           <motion.div
@@ -314,6 +408,7 @@ const OurCauses = ({ onDonateClick }) => {
               duration: 0.7,
             }}
           >
+
             <span className="section-eyebrow">
               {causes.intro?.eyebrow ||
                 "WHAT WE DO"}
@@ -328,9 +423,11 @@ const OurCauses = ({ onDonateClick }) => {
               {causes.intro?.description ||
                 "We are committed to addressing the needs of vulnerable individuals and communities through practical, compassionate, and sustainable initiatives."}
             </p>
+
           </motion.div>
 
         </div>
+
       </section>
 
       {/* ======================================================
@@ -338,112 +435,124 @@ const OurCauses = ({ onDonateClick }) => {
       ====================================================== */}
 
       <section className="causes-list-section">
+
         <div className="container">
 
           <div className="causes-grid">
 
-            {causes.causes
-              ?.sort(
+            {[...(causes.causes || [])]
+              .sort(
                 (a, b) =>
                   (a.order || 0) -
                   (b.order || 0)
               )
-              .map((cause, index) => {
+              .map(
+                (
+                  cause,
+                  index
+                ) => {
 
-                const image =
-                  getMediaUrl(
-                    cause.imageUrl
+                  const image =
+                    getMediaUrl(
+                      cause.imageUrl
+                    );
+
+                  return (
+                    <motion.article
+                      key={
+                        cause.id ||
+                        cause._id ||
+                        index
+                      }
+                      className="cause-card"
+                      initial={{
+                        opacity: 0,
+                        y: 40,
+                      }}
+                      whileInView={{
+                        opacity: 1,
+                        y: 0,
+                      }}
+                      viewport={{
+                        once: true,
+                        amount: 0.15,
+                      }}
+                      transition={{
+                        duration: 0.6,
+                        delay:
+                          index * 0.08,
+                      }}
+                    >
+
+                      {/* IMAGE */}
+
+                      {image ? (
+                        <div className="cause-card-image">
+
+                          <img
+                            src={image}
+                            alt={
+                              cause.title ||
+                              "Charity cause"
+                            }
+                            loading="lazy"
+                          />
+
+                        </div>
+                      ) : (
+                        <div className="cause-card-image cause-card-image-placeholder">
+
+                          <Heart
+                            size={42}
+                          />
+
+                        </div>
+                      )}
+
+                      {/* CONTENT */}
+
+                      <div className="cause-card-content">
+
+                        <span className="cause-number">
+                          {cause.number ||
+                            String(
+                              index + 1
+                            ).padStart(
+                              2,
+                              "0"
+                            )}
+                        </span>
+
+                        <h3>
+                          {cause.title}
+                        </h3>
+
+                        <p>
+                          {cause.description}
+                        </p>
+
+                        <Link
+                          to="/donate"
+                          className="cause-card-link"
+                        >
+                          Support This Cause
+
+                          <ArrowRight
+                            size={18}
+                          />
+                        </Link>
+
+                      </div>
+
+                    </motion.article>
                   );
-
-                return (
-                  <motion.article
-                    key={
-                      cause.id ||
-                      cause._id ||
-                      index
-                    }
-                    className="cause-card"
-                    initial={{
-                      opacity: 0,
-                      y: 40,
-                    }}
-                    whileInView={{
-                      opacity: 1,
-                      y: 0,
-                    }}
-                    viewport={{
-                      once: true,
-                      amount: 0.15,
-                    }}
-                    transition={{
-                      duration: 0.6,
-                      delay:
-                        index * 0.08,
-                    }}
-                  >
-
-                    {/* IMAGE */}
-
-                    {image ? (
-                      <div className="cause-card-image">
-                        <img
-                          src={image}
-                          alt={
-                            cause.title ||
-                            "Charity cause"
-                          }
-                          loading="lazy"
-                        />
-                      </div>
-                    ) : (
-                      <div className="cause-card-image cause-card-image-placeholder">
-                        <Heart
-                          size={42}
-                        />
-                      </div>
-                    )}
-
-                    {/* CONTENT */}
-
-                    <div className="cause-card-content">
-
-                      <span className="cause-number">
-                        {String(
-                          index + 1
-                        ).padStart(
-                          2,
-                          "0"
-                        )}
-                      </span>
-
-                      <h3>
-                        {cause.title}
-                      </h3>
-
-                      <p>
-                        {cause.description}
-                      </p>
-
-                      <Link
-                        to="/donate"
-                        className="cause-card-link"
-                      >
-                        Support This Cause
-
-                        <ArrowRight
-                          size={18}
-                        />
-                      </Link>
-
-                    </div>
-
-                  </motion.article>
-                );
-              })}
+                }
+              )}
 
           </div>
 
         </div>
+
       </section>
 
       {/* ======================================================
@@ -460,6 +569,7 @@ const OurCauses = ({ onDonateClick }) => {
           })`,
         }}
       >
+
         <div className="causes-approach-overlay">
 
           <div className="container">
@@ -503,6 +613,7 @@ const OurCauses = ({ onDonateClick }) => {
           </div>
 
         </div>
+
       </section>
 
       {/* ======================================================
@@ -510,6 +621,7 @@ const OurCauses = ({ onDonateClick }) => {
       ====================================================== */}
 
       <section className="causes-cta">
+
         <div className="container">
 
           <motion.div
@@ -552,7 +664,8 @@ const OurCauses = ({ onDonateClick }) => {
               className="causes-cta-button"
               onClick={onDonateClick}
             >
-              Donate Now
+              {causes.cta?.donateText ||
+                "Donate Now"}
 
               <ArrowRight
                 size={19}
@@ -562,6 +675,7 @@ const OurCauses = ({ onDonateClick }) => {
           </motion.div>
 
         </div>
+
       </section>
 
     </main>
