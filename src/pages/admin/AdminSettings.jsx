@@ -57,6 +57,26 @@ const AdminSettings = () => {
     []
   );
 
+  const isValidImageUrl = useCallback(
+    (image) => {
+      if (
+        typeof image !== "string" ||
+        !image.trim()
+      ) {
+        return false;
+      }
+
+      const cleanImage = image.trim();
+
+      return (
+        cleanImage.startsWith("https://") ||
+        cleanImage.startsWith("http://") ||
+        cleanImage.startsWith("blob:")
+      );
+    },
+    []
+  );
+
   const getImageUrl = useCallback((image) => {
     if (!image) {
       return "";
@@ -82,6 +102,12 @@ const AdminSettings = () => {
     ) {
       return image;
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | LEGACY LOCAL PATH SUPPORT
+    |--------------------------------------------------------------------------
+    */
 
     if (
       typeof image === "string" &&
@@ -166,11 +192,11 @@ const AdminSettings = () => {
       const heroImage =
         homepage.hero?.image || "";
 
-      if (heroImage) {
-        setHeroPreview(
-          getImageUrl(heroImage)
-        );
-      }
+      setHeroPreview(
+        heroImage
+          ? getImageUrl(heroImage)
+          : ""
+      );
 
       // ------------------------------------------------------------------------
       // ABOUT
@@ -179,11 +205,11 @@ const AdminSettings = () => {
       const aboutImage =
         homepage.about?.image || "";
 
-      if (aboutImage) {
-        setAboutPreview(
-          getImageUrl(aboutImage)
-        );
-      }
+      setAboutPreview(
+        aboutImage
+          ? getImageUrl(aboutImage)
+          : ""
+      );
 
       // ------------------------------------------------------------------------
       // FEATURED
@@ -192,11 +218,11 @@ const AdminSettings = () => {
       const featuredImage =
         homepage.featured?.image || "";
 
-      if (featuredImage) {
-        setFeaturedPreview(
-          getImageUrl(featuredImage)
-        );
-      }
+      setFeaturedPreview(
+        featuredImage
+          ? getImageUrl(featuredImage)
+          : ""
+      );
 
       // ------------------------------------------------------------------------
       // CTA
@@ -205,11 +231,11 @@ const AdminSettings = () => {
       const ctaImage =
         homepage.cta?.image || "";
 
-      if (ctaImage) {
-        setCtaPreview(
-          getImageUrl(ctaImage)
-        );
-      }
+      setCtaPreview(
+        ctaImage
+          ? getImageUrl(ctaImage)
+          : ""
+      );
 
       // ------------------------------------------------------------------------
       // CAUSES
@@ -293,7 +319,7 @@ const AdminSettings = () => {
       }
 
       // ------------------------------------------------------------------------
-      // HOMEPAGE
+      // HOMEPAGE CAUSES
       // ------------------------------------------------------------------------
 
       if (
@@ -326,6 +352,10 @@ const AdminSettings = () => {
         };
       }
 
+      // ------------------------------------------------------------------------
+      // HOMEPAGE NESTED SECTION
+      // ------------------------------------------------------------------------
+
       if (nestedSection) {
         return {
           ...previous,
@@ -340,6 +370,10 @@ const AdminSettings = () => {
           },
         };
       }
+
+      // ------------------------------------------------------------------------
+      // HOMEPAGE ROOT
+      // ------------------------------------------------------------------------
 
       return {
         ...previous,
@@ -551,7 +585,7 @@ const AdminSettings = () => {
         }
 
         // ----------------------------------------------------------------------
-        // NORMAL HOMEPAGE IMAGE
+        // STANDARD HOMEPAGE IMAGE
         // ----------------------------------------------------------------------
 
         return {
@@ -935,15 +969,17 @@ const AdminSettings = () => {
   // ============================================================================
   //
   // IMPORTANT:
-  // Images are intentionally NOT included here.
   //
-  // Image uploads are handled independently by Cloudinary upload endpoints.
-  // This prevents Save Settings from accidentally sending:
+  // Existing image URLs MUST be preserved.
+  //
+  // Save Settings must never replace a Cloudinary URL with:
   //
   //     ""
+  //     undefined
+  //     null
   //     "/uploads/..."
   //
-  // over an existing Cloudinary URL.
+  // Image uploads are still handled through their dedicated upload endpoints.
   //
   // ============================================================================
 
@@ -1043,6 +1079,10 @@ const AdminSettings = () => {
         },
 
         homepage: {
+          // --------------------------------------------------------------------
+          // HERO
+          // --------------------------------------------------------------------
+
           hero: {
             eyebrow:
               hero.eyebrow || "",
@@ -1060,7 +1100,16 @@ const AdminSettings = () => {
             secondaryButtonText:
               hero.secondaryButtonText ||
               "",
+
+            image:
+              isValidImageUrl(hero.image)
+                ? hero.image
+                : "",
           },
+
+          // --------------------------------------------------------------------
+          // ABOUT
+          // --------------------------------------------------------------------
 
           about: {
             eyebrow:
@@ -1074,7 +1123,16 @@ const AdminSettings = () => {
 
             buttonText:
               about.buttonText || "",
+
+            image:
+              isValidImageUrl(about.image)
+                ? about.image
+                : "",
           },
+
+          // --------------------------------------------------------------------
+          // CAUSES
+          // --------------------------------------------------------------------
 
           causes: {
             eyebrow:
@@ -1094,8 +1152,28 @@ const AdminSettings = () => {
 
               text:
                 item?.text || "",
+
+              /*
+              |--------------------------------------------------------------------------
+              | CRITICAL FIX
+              |--------------------------------------------------------------------------
+              |
+              | Preserve the existing Cloudinary image URL.
+              |
+              */
+
+              image:
+                isValidImageUrl(
+                  item?.image
+                )
+                  ? item.image
+                  : "",
             })),
           },
+
+          // --------------------------------------------------------------------
+          // FEATURED
+          // --------------------------------------------------------------------
 
           featured: {
             eyebrow:
@@ -1109,7 +1187,18 @@ const AdminSettings = () => {
 
             buttonText:
               featured.buttonText || "",
+
+            image:
+              isValidImageUrl(
+                featured.image
+              )
+                ? featured.image
+                : "",
           },
+
+          // --------------------------------------------------------------------
+          // CTA
+          // --------------------------------------------------------------------
 
           cta: {
             eyebrow:
@@ -1123,6 +1212,11 @@ const AdminSettings = () => {
 
             buttonText:
               cta.buttonText || "",
+
+            image:
+              isValidImageUrl(cta.image)
+                ? cta.image
+                : "",
           },
         },
 
@@ -1183,7 +1277,7 @@ const AdminSettings = () => {
           ),
       };
     },
-    []
+    [isValidImageUrl]
   );
 
   // ============================================================================
@@ -1196,11 +1290,9 @@ const AdminSettings = () => {
         return returnedSettings;
       }
 
-      const cleaned = {
+      return {
         ...returnedSettings,
       };
-
-      return cleaned;
     },
     []
   );
@@ -1209,25 +1301,10 @@ const AdminSettings = () => {
   // MERGE SAVED SETTINGS WITH CURRENT IMAGES
   // ============================================================================
   //
-  // CRITICAL PROTECTION:
+  // SECOND LAYER OF PROTECTION.
   //
-  // If the current React state contains:
-  //
-  //     https://res.cloudinary.com/...
-  //
-  // that URL always wins over:
-  //
-  //     ""
-  //     "/uploads/..."
-  //     undefined
-  //
-  // This applies to:
-  //
-  //     Hero
-  //     About
-  //     Featured
-  //     CTA
-  //     Causes 1–4
+  // If the backend returns an empty image while React currently has a valid
+  // Cloudinary URL, preserve the Cloudinary URL.
   //
   // ============================================================================
 
@@ -1259,23 +1336,39 @@ const AdminSettings = () => {
           previousImage,
           returnedImage
         ) => {
+          /*
+          |--------------------------------------------------------------------------
+          | Prefer a newly returned valid image.
+          |--------------------------------------------------------------------------
+          */
+
           if (
-            isCloudinaryImageUrl(
+            isValidImageUrl(
+              returnedImage
+            )
+          ) {
+            return returnedImage;
+          }
+
+          /*
+          |--------------------------------------------------------------------------
+          | Otherwise preserve the current valid image.
+          |--------------------------------------------------------------------------
+          */
+
+          if (
+            isValidImageUrl(
               previousImage
             )
           ) {
             return previousImage;
           }
 
-          return (
-            returnedImage ||
-            previousImage ||
-            ""
-          );
+          return "";
         };
 
         // ----------------------------------------------------------------------
-        // MERGE STANDARD HOMEPAGE IMAGE SECTION
+        // MERGE STANDARD HOMEPAGE SECTION
         // ----------------------------------------------------------------------
 
         const mergeSection = (
@@ -1379,7 +1472,7 @@ const AdminSettings = () => {
           },
         };
       },
-      [isCloudinaryImageUrl]
+      [isValidImageUrl]
     );
 
   // ============================================================================
@@ -1399,11 +1492,16 @@ const AdminSettings = () => {
       setMessage("");
 
       // ------------------------------------------------------------------------
-      // CREATE PAYLOAD WITHOUT IMAGE FIELDS
+      // CREATE PAYLOAD
       // ------------------------------------------------------------------------
 
       const payload =
         createSavePayload(settings);
+
+      console.log(
+        "SAVE SETTINGS PAYLOAD:",
+        payload
+      );
 
       const response = await API.put(
         "/settings",
@@ -1505,7 +1603,10 @@ const AdminSettings = () => {
         await loadSettings();
       }
 
-      // Clear selected files
+      // ------------------------------------------------------------------------
+      // CLEAR SELECTED FILES
+      // ------------------------------------------------------------------------
+
       setHeroImageFile(null);
       setAboutImageFile(null);
       setFeaturedImageFile(null);
@@ -1681,7 +1782,15 @@ const AdminSettings = () => {
                   ""
                 }
                 onChange={(event) =>
-                  handleChange(event)
+                  handleChange(
+                    {
+                      ...event,
+                      target: {
+                        ...event.target,
+                        name: "foundationName",
+                      },
+                    }
+                  )
                 }
               />
             </div>
@@ -1697,7 +1806,15 @@ const AdminSettings = () => {
                   settings.email || ""
                 }
                 onChange={(event) =>
-                  handleChange(event)
+                  handleChange(
+                    {
+                      ...event,
+                      target: {
+                        ...event.target,
+                        name: "email",
+                      },
+                    }
+                  )
                 }
               />
             </div>
@@ -1713,7 +1830,15 @@ const AdminSettings = () => {
                   settings.phone || ""
                 }
                 onChange={(event) =>
-                  handleChange(event)
+                  handleChange(
+                    {
+                      ...event,
+                      target: {
+                        ...event.target,
+                        name: "phone",
+                      },
+                    }
+                  )
                 }
               />
             </div>
@@ -1729,7 +1854,15 @@ const AdminSettings = () => {
                   settings.website || ""
                 }
                 onChange={(event) =>
-                  handleChange(event)
+                  handleChange(
+                    {
+                      ...event,
+                      target: {
+                        ...event.target,
+                        name: "website",
+                      },
+                    }
+                  )
                 }
               />
             </div>
@@ -1745,7 +1878,15 @@ const AdminSettings = () => {
                   settings.address || ""
                 }
                 onChange={(event) =>
-                  handleChange(event)
+                  handleChange(
+                    {
+                      ...event,
+                      target: {
+                        ...event.target,
+                        name: "address",
+                      },
+                    }
+                  )
                 }
               />
             </div>
@@ -1762,7 +1903,15 @@ const AdminSettings = () => {
                   ""
                 }
                 onChange={(event) =>
-                  handleChange(event)
+                  handleChange(
+                    {
+                      ...event,
+                      target: {
+                        ...event.target,
+                        name: "description",
+                      },
+                    }
+                  )
                 }
               />
             </div>
@@ -1790,61 +1939,39 @@ const AdminSettings = () => {
 
           <div className="settings-grid">
 
-            <div className="settings-field">
-              <label>Facebook</label>
+            {[
+              ["Facebook", "facebook"],
+              ["Instagram", "instagram"],
+              ["Twitter", "twitter"],
+              ["LinkedIn", "linkedin"],
+            ].map(
+              ([label, field]) => (
+                <div
+                  className="settings-field"
+                  key={field}
+                >
+                  <label>{label}</label>
 
-              <input
-                type="url"
-                value={
-                  settings.facebook || ""
-                }
-                onChange={(event) =>
-                  handleChange(event)
-                }
-              />
-            </div>
-
-            <div className="settings-field">
-              <label>Instagram</label>
-
-              <input
-                type="url"
-                value={
-                  settings.instagram || ""
-                }
-                onChange={(event) =>
-                  handleChange(event)
-                }
-              />
-            </div>
-
-            <div className="settings-field">
-              <label>Twitter</label>
-
-              <input
-                type="url"
-                value={
-                  settings.twitter || ""
-                }
-                onChange={(event) =>
-                  handleChange(event)
-                }
-              />
-            </div>
-
-            <div className="settings-field">
-              <label>LinkedIn</label>
-
-              <input
-                type="url"
-                value={
-                  settings.linkedin || ""
-                }
-                onChange={(event) =>
-                  handleChange(event)
-                }
-              />
-            </div>
+                  <input
+                    type="url"
+                    value={
+                      settings[field] || ""
+                    }
+                    onChange={(event) =>
+                      handleChange(
+                        {
+                          ...event,
+                          target: {
+                            ...event.target,
+                            name: field,
+                          },
+                        }
+                      )
+                    }
+                  />
+                </div>
+              )
+            )}
 
           </div>
 
@@ -1886,168 +2013,77 @@ const AdminSettings = () => {
                     "footer"
                   )
                 }
+                name="description"
               />
             </div>
 
-            <div className="settings-field">
-              <label>
-                Copyright Text
-              </label>
+            {[
+              [
+                "Copyright Text",
+                "copyrightText",
+                "text",
+              ],
+              [
+                "Footer Email",
+                "email",
+                "email",
+              ],
+              [
+                "Footer Phone",
+                "phone",
+                "text",
+              ],
+              [
+                "Footer Address",
+                "address",
+                "text",
+              ],
+              [
+                "Footer Facebook",
+                "facebook",
+                "url",
+              ],
+              [
+                "Footer Instagram",
+                "instagram",
+                "url",
+              ],
+              [
+                "Footer Twitter",
+                "twitter",
+                "url",
+              ],
+              [
+                "Footer LinkedIn",
+                "linkedin",
+                "url",
+              ],
+            ].map(
+              ([label, field, type]) => (
+                <div
+                  className="settings-field"
+                  key={field}
+                >
+                  <label>{label}</label>
 
-              <input
-                type="text"
-                value={
-                  settings.footer
-                    ?.copyrightText || ""
-                }
-                onChange={(event) =>
-                  handleChange(
-                    event,
-                    "footer"
-                  )
-                }
-              />
-            </div>
-
-            <div className="settings-field">
-              <label>
-                Footer Email
-              </label>
-
-              <input
-                type="email"
-                value={
-                  settings.footer?.email ||
-                  ""
-                }
-                onChange={(event) =>
-                  handleChange(
-                    event,
-                    "footer"
-                  )
-                }
-              />
-            </div>
-
-            <div className="settings-field">
-              <label>
-                Footer Phone
-              </label>
-
-              <input
-                type="text"
-                value={
-                  settings.footer?.phone ||
-                  ""
-                }
-                onChange={(event) =>
-                  handleChange(
-                    event,
-                    "footer"
-                  )
-                }
-              />
-            </div>
-
-            <div className="settings-field">
-              <label>
-                Footer Address
-              </label>
-
-              <input
-                type="text"
-                value={
-                  settings.footer?.address ||
-                  ""
-                }
-                onChange={(event) =>
-                  handleChange(
-                    event,
-                    "footer"
-                  )
-                }
-              />
-            </div>
-
-            <div className="settings-field">
-              <label>
-                Footer Facebook
-              </label>
-
-              <input
-                type="url"
-                value={
-                  settings.footer?.facebook ||
-                  ""
-                }
-                onChange={(event) =>
-                  handleChange(
-                    event,
-                    "footer"
-                  )
-                }
-              />
-            </div>
-
-            <div className="settings-field">
-              <label>
-                Footer Instagram
-              </label>
-
-              <input
-                type="url"
-                value={
-                  settings.footer?.instagram ||
-                  ""
-                }
-                onChange={(event) =>
-                  handleChange(
-                    event,
-                    "footer"
-                  )
-                }
-              />
-            </div>
-
-            <div className="settings-field">
-              <label>
-                Footer Twitter
-              </label>
-
-              <input
-                type="url"
-                value={
-                  settings.footer?.twitter ||
-                  ""
-                }
-                onChange={(event) =>
-                  handleChange(
-                    event,
-                    "footer"
-                  )
-                }
-              />
-            </div>
-
-            <div className="settings-field">
-              <label>
-                Footer LinkedIn
-              </label>
-
-              <input
-                type="url"
-                value={
-                  settings.footer?.linkedin ||
-                  ""
-                }
-                onChange={(event) =>
-                  handleChange(
-                    event,
-                    "footer"
-                  )
-                }
-              />
-            </div>
+                  <input
+                    type={type}
+                    value={
+                      settings.footer?.[
+                        field
+                      ] || ""
+                    }
+                    onChange={(event) =>
+                      handleChange(
+                        event,
+                        "footer"
+                      )
+                    }
+                    name={field}
+                  />
+                </div>
+              )
+            )}
 
           </div>
 
@@ -3032,155 +3068,67 @@ const AdminSettings = () => {
 
           <div className="settings-options">
 
-            <label className="settings-toggle">
+            {[
+              [
+                "emailNotifications",
+                "Email Notifications",
+                "Receive administrative email notifications.",
+              ],
+              [
+                "newDonationNotifications",
+                "New Donation Notifications",
+                "Get notified when a new donation is received.",
+              ],
+              [
+                "newContactNotifications",
+                "New Contact Notifications",
+                "Get notified when someone submits the contact form.",
+              ],
+              [
+                "newVolunteerNotifications",
+                "New Volunteer Notifications",
+                "Get notified when someone submits a volunteer request.",
+              ],
+              [
+                "adminNotifications",
+                "Admin Notifications",
+                "Enable general administrative notifications.",
+              ],
+            ].map(
+              ([field, title, description]) => (
+                <label
+                  className="settings-toggle"
+                  key={field}
+                >
 
-              <input
-                type="checkbox"
-                checked={
-                  Boolean(
-                    settings.emailNotifications
-                  )
-                }
-                onChange={(event) =>
-                  handleChange(event)
-                }
-                name="emailNotifications"
-              />
+                  <input
+                    type="checkbox"
+                    checked={
+                      Boolean(
+                        settings[field]
+                      )
+                    }
+                    onChange={(event) =>
+                      handleChange(event)
+                    }
+                    name={field}
+                  />
 
-              <span></span>
+                  <span></span>
 
-              <div>
-                <strong>
-                  Email Notifications
-                </strong>
+                  <div>
+                    <strong>
+                      {title}
+                    </strong>
 
-                <p>
-                  Receive administrative
-                  email notifications.
-                </p>
-              </div>
+                    <p>
+                      {description}
+                    </p>
+                  </div>
 
-            </label>
-
-            <label className="settings-toggle">
-
-              <input
-                type="checkbox"
-                checked={
-                  Boolean(
-                    settings.newDonationNotifications
-                  )
-                }
-                onChange={(event) =>
-                  handleChange(event)
-                }
-                name="newDonationNotifications"
-              />
-
-              <span></span>
-
-              <div>
-                <strong>
-                  New Donation Notifications
-                </strong>
-
-                <p>
-                  Get notified when a new
-                  donation is received.
-                </p>
-              </div>
-
-            </label>
-
-            <label className="settings-toggle">
-
-              <input
-                type="checkbox"
-                checked={
-                  Boolean(
-                    settings.newContactNotifications
-                  )
-                }
-                onChange={(event) =>
-                  handleChange(event)
-                }
-                name="newContactNotifications"
-              />
-
-              <span></span>
-
-              <div>
-                <strong>
-                  New Contact Notifications
-                </strong>
-
-                <p>
-                  Get notified when someone
-                  submits the contact form.
-                </p>
-              </div>
-
-            </label>
-
-            <label className="settings-toggle">
-
-              <input
-                type="checkbox"
-                checked={
-                  Boolean(
-                    settings.newVolunteerNotifications
-                  )
-                }
-                onChange={(event) =>
-                  handleChange(event)
-                }
-                name="newVolunteerNotifications"
-              />
-
-              <span></span>
-
-              <div>
-                <strong>
-                  New Volunteer Notifications
-                </strong>
-
-                <p>
-                  Get notified when someone
-                  submits a volunteer request.
-                </p>
-              </div>
-
-            </label>
-
-            <label className="settings-toggle">
-
-              <input
-                type="checkbox"
-                checked={
-                  Boolean(
-                    settings.adminNotifications
-                  )
-                }
-                onChange={(event) =>
-                  handleChange(event)
-                }
-                name="adminNotifications"
-              />
-
-              <span></span>
-
-              <div>
-                <strong>
-                  Admin Notifications
-                </strong>
-
-                <p>
-                  Enable general administrative
-                  notifications.
-                </p>
-              </div>
-
-            </label>
+                </label>
+              )
+            )}
 
           </div>
 
