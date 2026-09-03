@@ -128,6 +128,12 @@ app.use(
   require("./routes/donationRoutes")
 );
 
+// Donation Accounts
+app.use(
+  "/api/donation-accounts",
+  require("./routes/donationAccountRoutes")
+);
+
 // Contact
 app.use(
   "/api/contact",
