@@ -11,7 +11,8 @@ import Reveal from "./Reveal";
 const defaultCauses = {
   eyebrow: "Our Causes",
 
-  title: "Where Your Support Makes a Difference",
+  title:
+    "Where Your Support Makes a Difference",
 
   description:
     "Your support helps us provide meaningful assistance to communities and individuals who need it most.",
@@ -26,7 +27,10 @@ const defaultCauses = {
 |
 | Cloudinary URLs are already complete URLs and must be used directly.
 |
-| Legacy /uploads images are still supported.
+| Temporary blob URLs are supported for browser previews.
+|
+| Legacy local /uploads paths are intentionally ignored because the
+| foundation now uses Cloudinary for public images.
 |
 |--------------------------------------------------------------------------
 */
@@ -57,24 +61,11 @@ const getImageUrl = (image) => {
 
   /*
   |--------------------------------------------------------------------------
-  | LEGACY LOCAL UPLOAD
+  | IGNORE LEGACY LOCAL PATHS
   |--------------------------------------------------------------------------
   */
 
-  const apiUrl =
-    import.meta.env.VITE_API_URL ||
-    "http://localhost:5000/api";
-
-  const serverUrl = apiUrl.replace(
-    /\/api\/?$/,
-    ""
-  );
-
-  if (cleanImage.startsWith("/")) {
-    return `${serverUrl}${cleanImage}`;
-  }
-
-  return `${serverUrl}/${cleanImage}`;
+  return "";
 };
 
 /*
@@ -84,10 +75,22 @@ const getImageUrl = (image) => {
 */
 
 const Causes = ({ settings }) => {
+  /*
+  |--------------------------------------------------------------------------
+  | MERGE DEFAULT SETTINGS
+  |--------------------------------------------------------------------------
+  */
+
   const causesSettings = {
     ...defaultCauses,
     ...(settings || {}),
   };
+
+  /*
+  |--------------------------------------------------------------------------
+  | CAUSES ITEMS
+  |--------------------------------------------------------------------------
+  */
 
   const causes = Array.isArray(
     causesSettings.items
@@ -104,6 +107,11 @@ const Causes = ({ settings }) => {
   console.log(
     "PUBLIC CAUSES SETTINGS:",
     causesSettings
+  );
+
+  console.log(
+    "PUBLIC CAUSES ITEMS:",
+    causes
   );
 
   /*
@@ -147,15 +155,18 @@ const Causes = ({ settings }) => {
 
           {causes.map((cause, index) => {
             const imageUrl =
-              getImageUrl(cause.image);
+              getImageUrl(
+                cause.image
+              );
+
+            const causeKey =
+              cause._id ||
+              cause.id ||
+              `${cause.title || "cause"}-${index}`;
 
             return (
               <Reveal
-                key={
-                  cause._id ||
-                  cause.id ||
-                  `${cause.title}-${index}`
-                }
+                key={causeKey}
               >
                 <article
                   className="cause-card"

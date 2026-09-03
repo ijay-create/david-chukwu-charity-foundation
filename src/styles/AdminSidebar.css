@@ -4,6 +4,7 @@
 
 .admin-sidebar {
   position: fixed;
+
   top: 0;
   left: 0;
 
@@ -67,6 +68,7 @@
   flex-shrink: 0;
 
   background: #ffffff;
+
   color: #132b46;
 
   border-radius: 8px;
@@ -165,6 +167,7 @@
     rgba(255, 255, 255, 0.4);
 
   font-size: 10px;
+
   font-weight: 700;
 
   letter-spacing: 1.2px;
@@ -173,6 +176,7 @@
 
 .admin-sidebar-menu {
   display: flex;
+
   flex-direction: column;
 }
 
@@ -183,6 +187,7 @@
 
 .admin-sidebar-link {
   width: 100%;
+
   min-height: 50px;
 
   display: flex;
@@ -206,6 +211,7 @@
   text-decoration: none;
 
   font-size: 14px;
+
   font-weight: 500;
 
   transition:
@@ -260,7 +266,7 @@
 
 
 /* ========================================
-   FOOTER
+   SIDEBAR FOOTER
 ======================================== */
 
 .admin-sidebar-footer {
@@ -305,6 +311,7 @@
   color: #dca336;
 
   font-size: 14px;
+
   font-weight: 700;
 }
 
@@ -321,10 +328,13 @@
   color: #ffffff;
 
   font-size: 13px;
+
   font-weight: 600;
 
   white-space: nowrap;
+
   overflow: hidden;
+
   text-overflow: ellipsis;
 }
 
@@ -363,17 +373,18 @@
   font-family: inherit;
 
   font-size: 14px;
+
   font-weight: 500;
 
   text-align: left;
 
   cursor: pointer;
 
+  border-radius: 6px;
+
   transition:
     color 0.2s ease,
     background 0.2s ease;
-
-  border-radius: 6px;
 }
 
 
@@ -400,43 +411,438 @@
     rgba(0, 0, 0, 0.5);
 
   z-index: 999;
-}
 
-.admin-sidebar {
-  display: flex !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  transform: translateX(0) !important;
+  animation: sidebarOverlayIn 0.25s ease;
 }
 
 
 /* ========================================
-   MOBILE
+   ADMIN LAYOUT
+======================================== */
+
+.admin-layout {
+  width: 100%;
+
+  min-height: 100vh;
+
+  display: flex;
+
+  background: #f6f7f9;
+}
+
+
+/* ========================================
+   ADMIN MAIN
+======================================== */
+
+.admin-main {
+  width: calc(100% - 260px);
+
+  min-height: 100vh;
+
+  margin-left: 260px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  box-sizing: border-box;
+}
+
+
+/* ========================================
+   ADMIN HEADER
+======================================== */
+
+.admin-header {
+  width: 100%;
+
+  min-height: 88px;
+
+  padding: 0 32px;
+
+  box-sizing: border-box;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  background: #ffffff;
+
+  border-bottom:
+    1px solid #e5e7eb;
+}
+
+
+.admin-header-left {
+  display: flex;
+
+  align-items: center;
+
+  gap: 16px;
+}
+
+
+.admin-page-title {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 3px;
+}
+
+
+.admin-page-title h1 {
+  margin: 0;
+
+  color: #172033;
+
+  font-size: 22px;
+
+  font-weight: 650;
+}
+
+
+.admin-page-title span {
+  color: #8a919d;
+
+  font-size: 12px;
+}
+
+
+/* ========================================
+   HEADER RIGHT
+======================================== */
+
+.admin-header-right {
+  display: flex;
+
+  align-items: center;
+
+  gap: 18px;
+}
+
+
+.admin-header-foundation {
+  color: #667085;
+
+  font-size: 13px;
+
+  font-weight: 500;
+}
+
+
+/* ========================================
+   MOBILE MENU BUTTON
+======================================== */
+
+.admin-menu-button {
+  display: none;
+
+  width: 40px;
+  height: 40px;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border:
+    1px solid #e5e7eb;
+
+  border-radius: 7px;
+
+  background: #ffffff;
+
+  color: #172033;
+
+  cursor: pointer;
+}
+
+
+.admin-menu-button:hover {
+  background: #f6f7f9;
+}
+
+
+/* ========================================
+   ADMIN CONTENT
+======================================== */
+
+.admin-content {
+  flex: 1;
+
+  width: 100%;
+
+  padding: 32px;
+
+  box-sizing: border-box;
+}
+
+
+/* ========================================
+   TABLET / MOBILE
 ======================================== */
 
 @media (max-width: 991px) {
 
+  /* --------------------------------------
+     MAIN
+  -------------------------------------- */
+
+  .admin-main {
+    width: 100%;
+
+    margin-left: 0;
+  }
+
+
+  /* --------------------------------------
+     HEADER
+  -------------------------------------- */
+
+  .admin-header {
+    padding: 0 20px;
+  }
+
+
+  .admin-header-foundation {
+    display: none;
+  }
+
+
+  /* --------------------------------------
+     MENU BUTTON
+  -------------------------------------- */
+
+  .admin-menu-button {
+    display: flex;
+  }
+
+
+  /* --------------------------------------
+     CONTENT
+  -------------------------------------- */
+
+  .admin-content {
+    padding: 24px 20px;
+  }
+
+
+  /* --------------------------------------
+     SIDEBAR
+  -------------------------------------- */
+
   .admin-sidebar {
     width: 280px;
 
-    transform:
-      translateX(-100%);
+    max-width: 85vw;
+
+    transform: translateX(-100%);
+
+    pointer-events: none;
+
+    box-shadow:
+      4px 0 20px rgba(0, 0, 0, 0.18);
   }
 
+
+  /* --------------------------------------
+     OPEN SIDEBAR
+  -------------------------------------- */
 
   .admin-sidebar.open {
-    transform:
-      translateX(0);
+    transform: translateX(0);
+
+    pointer-events: auto;
   }
 
+
+  /* --------------------------------------
+     CLOSE BUTTON
+  -------------------------------------- */
 
   .admin-sidebar-close {
     display: flex;
   }
 
 
+  /* --------------------------------------
+     OVERLAY
+
+     IMPORTANT:
+     JSX only renders this element when
+     isOpen === true, so display:block
+     is all that is required here.
+  -------------------------------------- */
+
   .admin-sidebar-overlay {
     display: block;
+  }
+
+}
+
+
+/* ========================================
+   SMALL MOBILE
+======================================== */
+
+@media (max-width: 600px) {
+
+  .admin-header {
+    min-height: 72px;
+
+    padding:
+      0 15px;
+  }
+
+
+  .admin-page-title h1 {
+    font-size: 18px;
+  }
+
+
+  .admin-page-title span {
+    display: none;
+  }
+
+
+  .admin-content {
+    padding:
+      20px 15px;
+  }
+
+
+  /* --------------------------------------
+     SIDEBAR
+  -------------------------------------- */
+
+  .admin-sidebar {
+    width: 270px;
+
+    max-width: 88vw;
+  }
+
+
+  .admin-sidebar-header {
+    min-height: 72px;
+
+    padding:
+      14px 15px;
+  }
+
+
+  .admin-sidebar-navigation {
+    padding:
+      18px 0;
+  }
+
+
+  .admin-sidebar-label {
+    padding:
+      0 18px 10px;
+  }
+
+
+  .admin-sidebar-link {
+    min-height: 46px;
+
+    padding:
+      0 18px;
+
+    font-size: 13px;
+  }
+
+
+  .admin-sidebar-footer {
+    padding:
+      14px 15px;
+  }
+
+
+  .admin-menu-button {
+    width: 38px;
+    height: 38px;
+  }
+
+}
+
+
+/* ========================================
+   VERY SMALL MOBILE
+======================================== */
+
+@media (max-width: 380px) {
+
+  .admin-header {
+    min-height: 68px;
+
+    padding:
+      0 12px;
+  }
+
+
+  .admin-page-title h1 {
+    font-size: 17px;
+  }
+
+
+  .admin-content {
+    padding:
+      18px 12px;
+  }
+
+
+  .admin-sidebar {
+    width: 255px;
+
+    max-width: 90vw;
+  }
+
+
+  .admin-sidebar-brand {
+    gap: 9px;
+  }
+
+
+  .admin-sidebar-logo {
+    width: 40px;
+    height: 40px;
+  }
+
+
+  .admin-sidebar-brand-text strong {
+    font-size: 13px;
+  }
+
+
+  .admin-sidebar-brand-text span {
+    font-size: 10px;
+  }
+
+
+  .admin-sidebar-close {
+    width: 34px;
+    height: 34px;
+  }
+
+}
+
+
+/* ========================================
+   ANIMATIONS
+======================================== */
+
+@keyframes sidebarOverlayIn {
+
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
   }
 
 }

@@ -77,6 +77,11 @@ const defaultSettings = {
 |--------------------------------------------------------------------------
 | MERGE HOMEPAGE SETTINGS
 |--------------------------------------------------------------------------
+|
+| Server settings override the defaults while preserving any fields that
+| may not yet exist in MongoDB.
+|
+|--------------------------------------------------------------------------
 */
 
 const mergeHomepageSettings = (
@@ -105,10 +110,11 @@ const mergeHomepageSettings = (
       ...previousHomepage.causes,
       ...serverHomepage.causes,
 
-      items:
-        Array.isArray(serverHomepage.causes?.items)
-          ? serverHomepage.causes.items
-          : previousHomepage.causes.items,
+      items: Array.isArray(
+        serverHomepage.causes?.items
+      )
+        ? serverHomepage.causes.items
+        : previousHomepage.causes.items,
     },
 
     stats: {
@@ -135,18 +141,40 @@ const mergeHomepageSettings = (
 */
 
 const Home = () => {
-  const [isDonationOpen, setIsDonationOpen] =
-    useState(false);
+  /*
+  |--------------------------------------------------------------------------
+  | DONATION MODAL
+  |--------------------------------------------------------------------------
+  */
+
+  const [
+    isDonationOpen,
+    setIsDonationOpen,
+  ] = useState(false);
+
+  /*
+  |--------------------------------------------------------------------------
+  | HOMEPAGE SETTINGS
+  |--------------------------------------------------------------------------
+  */
 
   const [settings, setSettings] =
     useState(defaultSettings);
 
-  const [loadingSettings, setLoadingSettings] =
-    useState(true);
+  const [
+    loadingSettings,
+    setLoadingSettings,
+  ] = useState(true);
 
   /*
   |--------------------------------------------------------------------------
-  | LOAD PUBLIC SETTINGS
+  | LOAD PUBLIC HOMEPAGE SETTINGS
+  |--------------------------------------------------------------------------
+  |
+  | Public settings come from MongoDB through:
+  |
+  | GET /api/settings
+  |
   |--------------------------------------------------------------------------
   */
 
@@ -155,31 +183,60 @@ const Home = () => {
 
     const loadSettings = async () => {
       try {
-        const response = await API.get("/settings");
+        const response =
+          await API.get("/settings");
 
         console.log(
           "PUBLIC SETTINGS RESPONSE:",
           response.data
         );
 
+        /*
+        |--------------------------------------------------------------------------
+        | MAKE SURE COMPONENT IS STILL MOUNTED
+        |--------------------------------------------------------------------------
+        */
+
+        if (!mounted) {
+          return;
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | VALIDATE RESPONSE
+        |--------------------------------------------------------------------------
+        */
+
         if (
-          !mounted ||
           !response.data?.success ||
           !response.data?.settings
         ) {
           return;
         }
 
+        /*
+        |--------------------------------------------------------------------------
+        | SERVER SETTINGS
+        |--------------------------------------------------------------------------
+        */
+
         const serverSettings =
           response.data.settings;
+
+        /*
+        |--------------------------------------------------------------------------
+        | MERGE SERVER DATA WITH DEFAULTS
+        |--------------------------------------------------------------------------
+        */
 
         setSettings((previous) => ({
           ...previous,
 
-          homepage: mergeHomepageSettings(
-            previous.homepage,
-            serverSettings.homepage
-          ),
+          homepage:
+            mergeHomepageSettings(
+              previous.homepage,
+              serverSettings.homepage
+            ),
         }));
       } catch (error) {
         console.error(
@@ -202,7 +259,7 @@ const Home = () => {
 
   /*
   |--------------------------------------------------------------------------
-  | DONATION MODAL
+  | OPEN DONATION MODAL
   |--------------------------------------------------------------------------
   */
 
@@ -210,18 +267,25 @@ const Home = () => {
     setIsDonationOpen(true);
   };
 
+  /*
+  |--------------------------------------------------------------------------
+  | CLOSE DONATION MODAL
+  |--------------------------------------------------------------------------
+  */
+
   const closeDonation = () => {
     setIsDonationOpen(false);
   };
 
   /*
   |--------------------------------------------------------------------------
-  | HOMEPAGE
+  | HOMEPAGE DATA
   |--------------------------------------------------------------------------
   */
 
   const homepage =
-    settings?.homepage || defaultSettings.homepage;
+    settings?.homepage ||
+    defaultSettings.homepage;
 
   /*
   |--------------------------------------------------------------------------
@@ -239,7 +303,7 @@ const Home = () => {
 
   /*
   |--------------------------------------------------------------------------
-  | RENDER
+  | RENDER HOMEPAGE
   |--------------------------------------------------------------------------
   */
 

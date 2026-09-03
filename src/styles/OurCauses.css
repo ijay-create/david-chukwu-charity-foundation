@@ -311,11 +311,7 @@
   min-height: 42px;
 }
 
-.causes-cta-buttons .donate-btn svg {
-  width: 15px;
-  height: 15px;
-}
-
+.causes-cta-buttons .donate-btn svg,
 .causes-cta-buttons .outline-btn svg {
   width: 15px;
   height: 15px;
@@ -341,20 +337,31 @@
 
 /* ========================================
    MOBILE
+   MATCH ABOUT US MOBILE RHYTHM
 ======================================== */
 
 @media (max-width: 768px) {
+  /* ----------------------------------------
+     HERO
+  ---------------------------------------- */
+
   .causes-hero {
-    min-height: 380px;
-    background-position: center top;
-    background-size: 100% 200px;
+    min-height: 220px;
+    background-position: center;
+    background-size: cover;
     background-repeat: no-repeat;
     background-color: #ffffff;
-    align-items: flex-end;
+    align-items: center;
   }
 
   .causes-hero-overlay {
-    display: none;
+    display: block;
+    background: linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0.94) 0%,
+      rgba(255, 255, 255, 0.72) 55%,
+      transparent 100%
+    );
   }
 
   .causes-hero-container {
@@ -362,55 +369,115 @@
   }
 
   .causes-hero-content {
-    max-width: none;
-    padding: 28px 12px;
-    background: #ffffff;
+    max-width: 420px;
+    padding: 40px 0;
   }
 
   .causes-hero-content h1 {
-    font-size: 1.75rem;
+    font-size: 2rem;
   }
 
   .causes-hero-content p {
-    font-size: 0.85rem;
+    max-width: 300px;
+    font-size: 0.9rem;
+    font-weight: 500;
   }
 
+  .causes-underline {
+    width: 50px;
+    height: 3px;
+    margin-top: 10px;
+  }
+
+  /* ----------------------------------------
+     INTRO
+  ---------------------------------------- */
+
   .causes-intro {
-    padding: 35px 12px 25px;
+    padding: 40px 15px;
+  }
+
+  .causes-intro-container {
+    width: 100%;
   }
 
   .causes-intro h2 {
-    font-size: 1.5rem;
+    max-width: 100%;
+    font-size: 1.7rem;
   }
 
   .causes-intro p {
-    font-size: 0.88rem;
+    max-width: 100%;
+    font-size: 0.9rem;
+    line-height: 1.7;
   }
 
+  /* ----------------------------------------
+     CAUSES
+  ---------------------------------------- */
+
   .causes-list {
-    padding: 0 12px 40px;
+    padding: 0 15px 45px;
   }
 
   .causes-grid {
     grid-template-columns: 1fr;
-    gap: 20px;
+    gap: 30px;
+    width: 100%;
+  }
+
+  .cause-card {
+    width: 100%;
+    padding: 10px;
+    border-radius: 10px;
   }
 
   .cause-image {
-    height: 165px;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    border-radius: 8px;
   }
 
+  .cause-content {
+    gap: 15px;
+    padding: 14px 4px 8px;
+  }
+
+  .cause-number {
+    font-size: 1.2rem;
+  }
+
+  .cause-text h3 {
+    font-size: 0.95rem;
+  }
+
+  .cause-text p {
+    font-size: 0.82rem;
+    line-height: 1.6;
+  }
+
+  /* ----------------------------------------
+     APPROACH
+  ---------------------------------------- */
+
   .approach-section {
-    min-height: 420px;
-    background-position: center top;
-    background-size: 100% 210px;
+    min-height: 220px;
+    background-position: center;
+    background-size: cover;
     background-repeat: no-repeat;
     background-color: #ffffff;
-    align-items: flex-end;
+    align-items: center;
   }
 
   .approach-overlay {
-    display: none;
+    display: block;
+    background: linear-gradient(
+      to right,
+      transparent 0%,
+      rgba(255, 255, 255, 0.72) 45%,
+      rgba(255, 255, 255, 0.96) 100%
+    );
   }
 
   .approach-container {
@@ -418,36 +485,54 @@
   }
 
   .approach-content {
-    max-width: none;
-    padding: 28px 12px;
-    background: #ffffff;
+    max-width: 420px;
+    margin-left: auto;
+    padding: 40px 15px;
   }
 
   .approach-content h2 {
-    font-size: 1.5rem;
+    font-size: 1.7rem;
   }
 
   .approach-content p {
-    font-size: 0.88rem;
+    max-width: 100%;
+    font-size: 0.9rem;
+    line-height: 1.7;
   }
 
+  /* ----------------------------------------
+     CTA
+  ---------------------------------------- */
+
   .causes-cta {
-    padding: 40px 12px;
+    padding: 40px 15px 50px;
+  }
+
+  .causes-cta-content {
+    width: 100%;
   }
 
   .causes-cta h2 {
-    font-size: 1.5rem;
+    font-size: 1.7rem;
+  }
+
+  .causes-cta p {
+    font-size: 0.9rem;
+    line-height: 1.7;
   }
 
   .causes-cta-buttons {
     flex-direction: column;
     width: 100%;
+    gap: 12px;
+    margin-top: 24px;
   }
 
   .causes-cta-buttons .donate-btn,
   .causes-cta-buttons .outline-btn {
     width: 100%;
     justify-content: center;
+    min-height: 44px;
   }
 }
 
@@ -456,16 +541,54 @@
 ======================================== */
 
 @media (max-width: 480px) {
+  .causes-hero {
+    min-height: 220px;
+  }
+
+  .causes-hero-content {
+    padding: 40px 0;
+  }
+
+  .causes-hero-content h1 {
+    font-size: 2rem;
+  }
+
+  .causes-hero-content p {
+    max-width: 300px;
+    font-size: 0.88rem;
+  }
+
+  .causes-intro {
+    padding: 40px 15px;
+  }
+
+  .causes-intro h2 {
+    font-size: 1.6rem;
+  }
+
+  .causes-intro p {
+    font-size: 0.88rem;
+  }
+
+  .causes-list {
+    padding: 0 15px 40px;
+  }
+
+  .causes-grid {
+    gap: 25px;
+  }
+
   .cause-card {
     padding: 10px;
   }
 
   .cause-image {
-    height: 145px;
+    aspect-ratio: 16 / 10;
   }
 
   .cause-content {
-    gap: 10px;
+    gap: 12px;
+    padding: 14px 3px 7px;
   }
 
   .cause-number {
@@ -473,10 +596,39 @@
   }
 
   .cause-text h3 {
-    font-size: 0.9rem;
+    font-size: 0.92rem;
   }
 
   .cause-text p {
-    font-size: 0.78rem;
+    font-size: 0.8rem;
+    line-height: 1.6;
+  }
+
+  .approach-section {
+    min-height: 220px;
+  }
+
+  .approach-content {
+    padding: 40px 15px;
+  }
+
+  .approach-content h2 {
+    font-size: 1.6rem;
+  }
+
+  .approach-content p {
+    font-size: 0.88rem;
+  }
+
+  .causes-cta {
+    padding: 40px 15px 45px;
+  }
+
+  .causes-cta h2 {
+    font-size: 1.6rem;
+  }
+
+  .causes-cta p {
+    font-size: 0.88rem;
   }
 }

@@ -2,8 +2,6 @@ import { Link } from "react-router-dom";
 
 import Reveal from "./Reveal";
 
-import API from "../api/axios";
-
 import "../styles/About.css";
 
 /*
@@ -30,6 +28,15 @@ const defaultAbout = {
 |--------------------------------------------------------------------------
 | GET PUBLIC IMAGE URL
 |--------------------------------------------------------------------------
+|
+| Cloudinary URLs are already complete URLs and must be used directly.
+|
+| Temporary blob URLs are also supported for browser previews.
+|
+| Local /uploads paths are intentionally NOT converted because the
+| foundation now uses Cloudinary for public images.
+|
+|--------------------------------------------------------------------------
 */
 
 const getImageUrl = (image) => {
@@ -44,7 +51,7 @@ const getImageUrl = (image) => {
 
   /*
   |--------------------------------------------------------------------------
-  | CLOUDINARY / EXTERNAL IMAGE
+  | CLOUDINARY / EXTERNAL URL
   |--------------------------------------------------------------------------
   */
 
@@ -58,25 +65,16 @@ const getImageUrl = (image) => {
 
   /*
   |--------------------------------------------------------------------------
-  | LEGACY LOCAL IMAGE
+  | IGNORE LEGACY LOCAL PATHS
+  |--------------------------------------------------------------------------
+  |
+  | The public homepage should no longer construct image URLs from
+  | /uploads or local server paths.
+  |
   |--------------------------------------------------------------------------
   */
 
-  const apiUrl =
-    API.defaults?.baseURL ||
-    import.meta.env.VITE_API_URL ||
-    "http://localhost:5000/api";
-
-  const serverUrl = apiUrl.replace(
-    /\/api\/?$/,
-    ""
-  );
-
-  if (cleanImage.startsWith("/")) {
-    return `${serverUrl}${cleanImage}`;
-  }
-
-  return `${serverUrl}/${cleanImage}`;
+  return "";
 };
 
 /*
@@ -86,19 +84,37 @@ const getImageUrl = (image) => {
 */
 
 const About = ({ settings }) => {
+  /*
+  |--------------------------------------------------------------------------
+  | MERGE DEFAULT SETTINGS
+  |--------------------------------------------------------------------------
+  */
+
   const about = {
     ...defaultAbout,
     ...(settings || {}),
   };
 
-  const imageUrl =
-    getImageUrl(about.image);
+  /*
+  |--------------------------------------------------------------------------
+  | IMAGE URL
+  |--------------------------------------------------------------------------
+  */
+
+  const imageUrl = getImageUrl(
+    about.image
+  );
 
   /*
   |--------------------------------------------------------------------------
   | DEBUG
   |--------------------------------------------------------------------------
   */
+
+  console.log(
+    "PUBLIC ABOUT SETTINGS:",
+    about
+  );
 
   console.log(
     "PUBLIC ABOUT IMAGE:",

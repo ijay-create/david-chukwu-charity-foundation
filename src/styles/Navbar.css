@@ -1,221 +1,639 @@
+/* ==========================================================================
+   NAVBAR
+========================================================================== */
+
 .navbar {
   position: sticky;
   top: 0;
   z-index: 1000;
+
   background: #132b46;
+
   height: 78px;
-  box-shadow: 0 2px 12px rgba(0,0,0,.08);
+
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 }
+
+
+/* ==========================================================================
+   NAVBAR CONTAINER
+========================================================================== */
 
 .navbar-container {
   height: 100%;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
+
+
+/* ==========================================================================
+   LOGO
+========================================================================== */
 
 .navbar-logo {
   display: flex;
   align-items: center;
 }
 
+
 .navbar-logo img {
   width: 145px;
   max-height: 58px;
+
   object-fit: contain;
 }
+
+
+/* ==========================================================================
+   NAVIGATION
+========================================================================== */
 
 .nav-menu {
   display: flex;
   align-items: center;
+
   gap: 28px;
 }
 
+
 .nav-menu a {
   color: #fff;
+
   font-family: "Open Sans", sans-serif;
-  font-size: .82rem;
+
+  font-size: 0.82rem;
+
   font-weight: 600;
+
   text-decoration: none;
+
   padding: 29px 0 8px;
-  transition: color .3s ease;
+
+  transition: color 0.3s ease;
 }
+
 
 .nav-menu a:hover,
 .nav-menu a.active {
   color: #dca336;
 }
 
+
 .nav-menu a.active {
   border-bottom: 2px solid #dca336;
 }
 
+
+/* ==========================================================================
+   MOBILE DONATE
+========================================================================== */
+
 .mobile-donate {
   display: none;
 }
 
+
+/* ==========================================================================
+   DESKTOP DONATE BUTTON
+========================================================================== */
+
 .donate-btn {
   display: inline-flex;
+
   align-items: center;
   justify-content: center;
+
   gap: 8px;
+
   background: #dca336;
+
   color: #fff;
+
   border: 0;
+
   text-decoration: none;
+
   font-family: "Open Sans", sans-serif;
+
   font-weight: 700;
-  font-size: .78rem;
+
+  font-size: 0.78rem;
+
   padding: 11px 20px;
+
   border-radius: 4px;
-  transition: .3s ease;
+
+  transition: 0.3s ease;
 }
+
 
 .donate-btn:hover {
   background: #c58e25;
+
   transform: translateY(-2px);
 }
+
 
 .donate-btn svg {
   width: 15px;
   height: 15px;
+
   fill: none;
+
   stroke: currentColor;
+
   stroke-width: 2;
 }
 
+
+/* ==========================================================================
+   HAMBURGER
+========================================================================== */
+
 .hamburger {
   display: none;
+
   width: 38px;
   height: 38px;
+
   padding: 7px;
+
   background: transparent;
+
   border: 0;
+
   cursor: pointer;
 }
+
 
 .hamburger span {
   display: block;
+
   height: 2px;
+
   background: #fff;
+
   margin: 5px 0;
-  transition: .3s ease;
+
+  transition: 0.3s ease;
 }
+
+
+/* ==========================================================================
+   NAVBAR DONATE
+========================================================================== */
 
 .navbar-donate {
   cursor: pointer;
+
   font-family: "Open Sans", sans-serif;
 }
+
+
+/* ==========================================================================
+   MOBILE DONATE BASE
+========================================================================== */
 
 .mobile-donate {
   display: none;
-  width: 100%;
+
   color: #dca336;
+
   background: transparent;
+
   border: 0;
+
   font-family: "Open Sans", sans-serif;
-  font-size: .82rem;
+
+  font-size: 0.82rem;
+
   font-weight: 600;
+
   text-align: left;
+
   text-transform: uppercase;
+
   cursor: pointer;
 }
 
+
+/* ==========================================================================
+   HAMBURGER ICON
+========================================================================== */
+
 .hamburger {
   display: none;
+
   width: 38px;
   height: 38px;
+
   align-items: center;
   justify-content: center;
+
   padding: 0;
+
   color: #fff;
+
   background: transparent;
+
   border: 0;
+
   cursor: pointer;
 }
+
 
 .hamburger svg {
   width: 26px;
   height: 26px;
 }
 
-@media (max-width: 768px) {
-  .mobile-donate {
-    display: block;
-  }
 
-  .hamburger {
-    display: flex;
-  }
-}
+/* ==========================================================================
+   TABLET
+========================================================================== */
 
 @media (max-width: 992px) {
+
   .nav-menu {
     gap: 16px;
   }
 
+
   .nav-menu a {
-    font-size: .75rem;
+    font-size: 0.75rem;
   }
+
 
   .navbar-donate {
     display: none;
   }
 
+
   .mobile-donate {
     display: block;
   }
+
 }
 
+
+/* ==========================================================================
+   MOBILE
+========================================================================== */
+
 @media (max-width: 768px) {
+
   .navbar {
-    height: 70px;
+    height: 68px;
   }
+
+
+  .navbar-container {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+
+
+  /* ------------------------------------------------------------------------
+     LOGO
+  ------------------------------------------------------------------------ */
 
   .navbar-logo img {
-    width: 125px;
+    width: 115px;
   }
 
+
+  /* ------------------------------------------------------------------------
+     HAMBURGER
+  ------------------------------------------------------------------------ */
+
   .hamburger {
-    display: block;
+    display: flex;
+
+    flex: 0 0 auto;
+
+    width: 38px;
+    height: 38px;
+
+    padding: 0;
+
+    color: #fff;
+
+    background: transparent;
+
+    border: 1px solid rgba(255, 255, 255, 0.14);
+
+    border-radius: 5px;
+
     z-index: 1002;
   }
 
+
+  .hamburger svg {
+    width: 22px;
+    height: 22px;
+  }
+
+
+  /* ------------------------------------------------------------------------
+     MOBILE NAVIGATION
+  ------------------------------------------------------------------------ */
+
   .nav-menu {
     position: absolute;
-    top: 70px;
+
+    top: 68px;
     left: 0;
+
     width: 100%;
+
     background: #132b46;
+
     display: flex;
+
     flex-direction: column;
-    align-items: flex-start;
+
+    align-items: stretch;
+
     gap: 0;
-    padding: 15px 24px 25px;
-    transform: translateY(-120%);
+
+    padding: 7px 15px 16px;
+
+    transform: translateY(-8px);
+
     opacity: 0;
+
+    visibility: hidden;
+
     pointer-events: none;
-    transition: .3s ease;
+
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+
+    transition:
+      transform 0.3s ease,
+      opacity 0.3s ease,
+      visibility 0.3s ease;
   }
+
+
+  /* ------------------------------------------------------------------------
+     OPEN MENU
+  ------------------------------------------------------------------------ */
 
   .nav-menu.open {
     transform: translateY(0);
+
     opacity: 1;
+
+    visibility: visible;
+
     pointer-events: auto;
   }
 
+
+  /* ------------------------------------------------------------------------
+     NAVIGATION LINKS
+  ------------------------------------------------------------------------ */
+
   .nav-menu a {
+    display: block;
+
     width: 100%;
-    padding: 14px 0;
-    border-bottom: 1px solid rgba(255,255,255,.08);
+
+    padding: 11px 3px;
+
+    font-size: 0.76rem;
+
+    line-height: 1.4;
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
   }
+
 
   .nav-menu a.active {
     border-bottom: 1px solid #dca336;
   }
 
-  .mobile-donate {
+
+  /* ------------------------------------------------------------------------
+     MOBILE DONATE BUTTON
+     
+     IMPORTANT:
+     This is the actual fix.
+  ------------------------------------------------------------------------ */
+
+  .nav-menu .mobile-donate {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    align-self: center;
+
+    flex: 0 0 auto;
+
+    width: fit-content;
+
+    min-width: 0;
+
+    max-width: max-content;
+
+    margin: 12px auto 0;
+
+    padding: 7px 14px;
+
     color: #dca336 !important;
+
+    background: transparent;
+
+    border: 1px solid #dca336;
+
+    border-radius: 4px;
+
+    font-family: "Open Sans", sans-serif;
+
+    font-size: 0.69rem;
+
+    font-weight: 600;
+
+    line-height: 1.2;
+
+    text-align: center;
+
     text-transform: uppercase;
+
+    white-space: nowrap;
+
+    cursor: pointer;
+
+    box-sizing: border-box;
+
+    transition:
+      background-color 0.25s ease,
+      color 0.25s ease,
+      transform 0.25s ease;
   }
+
+
+  .nav-menu .mobile-donate:hover {
+    color: #fff !important;
+
+    background: #dca336;
+
+    transform: translateY(-1px);
+  }
+
+}
+
+
+/* ==========================================================================
+   SMALL PHONES
+========================================================================== */
+
+@media (max-width: 480px) {
+
+  .navbar {
+    height: 64px;
+  }
+
+
+  .navbar-container {
+    padding-left: 13px;
+    padding-right: 13px;
+  }
+
+
+  /* ------------------------------------------------------------------------
+     LOGO
+  ------------------------------------------------------------------------ */
+
+  .navbar-logo img {
+    width: 108px;
+  }
+
+
+  /* ------------------------------------------------------------------------
+     HAMBURGER
+  ------------------------------------------------------------------------ */
+
+  .hamburger {
+    width: 36px;
+    height: 36px;
+  }
+
+
+  .hamburger svg {
+    width: 21px;
+    height: 21px;
+  }
+
+
+  /* ------------------------------------------------------------------------
+     MOBILE MENU
+  ------------------------------------------------------------------------ */
+
+  .nav-menu {
+    top: 64px;
+
+    padding: 6px 13px 14px;
+  }
+
+
+  .nav-menu a {
+    padding: 10px 2px;
+
+    font-size: 0.74rem;
+  }
+
+
+  /* ------------------------------------------------------------------------
+     DONATE
+  ------------------------------------------------------------------------ */
+
+  .nav-menu .mobile-donate {
+    margin-top: 10px;
+
+    padding: 6px 12px;
+
+    font-size: 0.65rem;
+  }
+
+}
+
+
+/* ==========================================================================
+   VERY SMALL PHONES
+========================================================================== */
+
+@media (max-width: 380px) {
+
+  .navbar {
+    height: 62px;
+  }
+
+
+  .navbar-container {
+    padding-left: 11px;
+    padding-right: 11px;
+  }
+
+
+  /* ------------------------------------------------------------------------
+     LOGO
+  ------------------------------------------------------------------------ */
+
+  .navbar-logo img {
+    width: 102px;
+  }
+
+
+  /* ------------------------------------------------------------------------
+     HAMBURGER
+  ------------------------------------------------------------------------ */
+
+  .hamburger {
+    width: 34px;
+    height: 34px;
+  }
+
+
+  .hamburger svg {
+    width: 20px;
+    height: 20px;
+  }
+
+
+  /* ------------------------------------------------------------------------
+     MOBILE MENU
+  ------------------------------------------------------------------------ */
+
+  .nav-menu {
+    top: 62px;
+
+    padding: 5px 11px 12px;
+  }
+
+
+  .nav-menu a {
+    padding: 9px 2px;
+
+    font-size: 0.71rem;
+  }
+
+
+  /* ------------------------------------------------------------------------
+     DONATE
+  ------------------------------------------------------------------------ */
+
+  .nav-menu .mobile-donate {
+    margin-top: 9px;
+
+    padding: 6px 11px;
+
+    font-size: 0.62rem;
+  }
+
 }
