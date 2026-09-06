@@ -1,4 +1,8 @@
-import { useEffect, useState } from "react";
+import {
+  useEffect,
+  useState
+} from "react";
+
 import { useLocation } from "react-router-dom";
 
 import "../styles/scroll.top.css";
@@ -11,14 +15,20 @@ import "../styles/scroll.top.css";
    - Near top       → Down arrow
    - Scrolled down  → Up arrow
    - Route changes  → Automatically scroll to top
+   - Lightbox open  → Scroll button hidden
 ============================================================ */
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
 
-  const [isScrolled, setIsScrolled] = useState(false);
+  const [isScrolled, setIsScrolled] =
+    useState(false);
 
-  const [hasScrollableContent, setHasScrollableContent] = useState(false);
+  const [hasScrollableContent, setHasScrollableContent] =
+    useState(false);
+
+  const [isLightboxOpen, setIsLightboxOpen] =
+    useState(false);
 
   /* ==========================================================
      RESET SCROLL WHEN ROUTE CHANGES
@@ -35,25 +45,83 @@ const ScrollToTop = () => {
   }, [pathname]);
 
   /* ==========================================================
+     DETECT LIGHTBOX / MODAL STATE
+     
+     Your Gallery component uses:
+     
+     document.body.style.overflow = "hidden";
+     
+     when the lightbox opens.
+     
+     We watch the body style so this component
+     automatically hides while the lightbox is open.
+  ========================================================== */
+
+  useEffect(() => {
+    const checkLightbox = () => {
+      const bodyOverflow =
+        document.body.style.overflow;
+
+      const lightboxIsOpen =
+        bodyOverflow === "hidden";
+
+      setIsLightboxOpen(
+        lightboxIsOpen
+      );
+    };
+
+    /* Initial check */
+    checkLightbox();
+
+    /* Watch changes to body attributes */
+    const observer =
+      new MutationObserver(() => {
+        checkLightbox();
+      });
+
+    observer.observe(
+      document.body,
+      {
+        attributes: true,
+        attributeFilter: [
+          "style",
+          "class",
+        ],
+      }
+    );
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
+  /* ==========================================================
      DETECT SCROLL POSITION
   ========================================================== */
 
   useEffect(() => {
     const checkScroll = () => {
-      const scrollTop = window.scrollY;
+      const scrollTop =
+        window.scrollY;
 
       const documentHeight =
-        document.documentElement.scrollHeight;
+        document.documentElement
+          .scrollHeight;
 
       const viewportHeight =
         window.innerHeight;
 
       const canScroll =
-        documentHeight > viewportHeight + 20;
+        documentHeight >
+        viewportHeight + 20;
 
-      setHasScrollableContent(canScroll);
+      setHasScrollableContent(
+        canScroll
+      );
 
-      setIsScrolled(scrollTop > 150);
+      setIsScrolled(
+        scrollTop > 150
+      );
     };
 
     checkScroll();
@@ -61,7 +129,9 @@ const ScrollToTop = () => {
     window.addEventListener(
       "scroll",
       checkScroll,
-      { passive: true }
+      {
+        passive: true,
+      }
     );
 
     window.addEventListener(
@@ -104,12 +174,24 @@ const ScrollToTop = () => {
       ================================================ */
 
       window.scrollTo({
-        top: document.documentElement.scrollHeight,
+        top:
+          document.documentElement
+            .scrollHeight,
+
         left: 0,
+
         behavior: "smooth",
       });
     }
   };
+
+  /* ==========================================================
+     DON'T SHOW DURING LIGHTBOX
+  ========================================================== */
+
+  if (isLightboxOpen) {
+    return null;
+  }
 
   /* ==========================================================
      DON'T SHOW IF PAGE DOESN'T NEED SCROLLING
@@ -139,7 +221,9 @@ const ScrollToTop = () => {
           : "Scroll to bottom"
       }
     >
+
       {isScrolled ? (
+
         /* ==================================================
            UP ARROW
         ================================================== */
@@ -155,10 +239,12 @@ const ScrollToTop = () => {
           aria-hidden="true"
         >
           <path d="M12 19V5" />
+
           <path d="m6 11 6-6 6 6" />
         </svg>
 
       ) : (
+
         /* ==================================================
            DOWN ARROW
         ================================================== */
@@ -174,9 +260,12 @@ const ScrollToTop = () => {
           aria-hidden="true"
         >
           <path d="M12 5v14" />
+
           <path d="m18 13-6 6-6-6" />
         </svg>
+
       )}
+
     </button>
   );
 };

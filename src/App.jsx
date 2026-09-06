@@ -13,6 +13,7 @@ GLOBAL COMPONENTS
 */
 
 import Navbar from "./components/Navbar";
+import Newsletter from "./components/Newsletter";
 import DonationModal from "./components/DonationModal";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminLayout from "./components/AdminLayout";
@@ -53,30 +54,24 @@ import AdminContacts from "./pages/admin/AdminContacts";
 import AdminVolunteers from "./pages/admin/AdminVolunteers";
 import AdminSettings from "./pages/admin/AdminSettings";
 
-/*
-==================================================
-FIXED IMPORT
-==================================================
-
-App.jsx is inside:
-
-src/App.jsx
-
-Therefore the correct path is:
-
-./pages/admin/DonationAccounts
-
-NOT:
-
-../pages/admin/DonationAccounts
-==================================================
-*/
-
 import DonationAccounts from "./pages/admin/DonationAccounts";
 
 /*
 ==================================================
 PUBLIC LAYOUT
+==================================================
+
+Every PUBLIC page will automatically have:
+
+Navbar
+   ↓
+Page Content
+   ↓
+Newsletter
+   ↓
+Footer
+
+The admin area does NOT use this layout.
 ==================================================
 */
 
@@ -86,11 +81,32 @@ const PublicLayout = ({
 }) => {
   return (
     <>
+      {/* ==========================================
+          PUBLIC NAVBAR
+      ========================================== */}
+
       <Navbar
         onDonateClick={onDonateClick}
       />
 
+      {/* ==========================================
+          PAGE CONTENT
+      ========================================== */}
+
       {children}
+
+      {/* ==========================================
+          NEWSLETTER
+          
+          Appears on every public page immediately
+          before the footer.
+      ========================================== */}
+
+      <Newsletter />
+
+      {/* ==========================================
+          PUBLIC FOOTER
+      ========================================== */}
 
       <Footer />
     </>
@@ -151,10 +167,14 @@ const AppContent = () => {
           path="/"
           element={
             <PublicLayout
-              onDonateClick={openDonationModal}
+              onDonateClick={
+                openDonationModal
+              }
             >
               <Home
-                onDonateClick={openDonationModal}
+                onDonateClick={
+                  openDonationModal
+                }
               />
             </PublicLayout>
           }
@@ -168,10 +188,14 @@ const AppContent = () => {
           path="/about"
           element={
             <PublicLayout
-              onDonateClick={openDonationModal}
+              onDonateClick={
+                openDonationModal
+              }
             >
               <AboutUs
-                onDonateClick={openDonationModal}
+                onDonateClick={
+                  openDonationModal
+                }
               />
             </PublicLayout>
           }
@@ -185,10 +209,14 @@ const AppContent = () => {
           path="/causes"
           element={
             <PublicLayout
-              onDonateClick={openDonationModal}
+              onDonateClick={
+                openDonationModal
+              }
             >
               <OurCauses
-                onDonateClick={openDonationModal}
+                onDonateClick={
+                  openDonationModal
+                }
               />
             </PublicLayout>
           }
@@ -202,10 +230,14 @@ const AppContent = () => {
           path="/impact"
           element={
             <PublicLayout
-              onDonateClick={openDonationModal}
+              onDonateClick={
+                openDonationModal
+              }
             >
               <OurImpact
-                onDonateClick={openDonationModal}
+                onDonateClick={
+                  openDonationModal
+                }
               />
             </PublicLayout>
           }
@@ -219,10 +251,14 @@ const AppContent = () => {
           path="/gallery"
           element={
             <PublicLayout
-              onDonateClick={openDonationModal}
+              onDonateClick={
+                openDonationModal
+              }
             >
               <Gallery
-                onDonateClick={openDonationModal}
+                onDonateClick={
+                  openDonationModal
+                }
               />
             </PublicLayout>
           }
@@ -236,10 +272,14 @@ const AppContent = () => {
           path="/get-involved"
           element={
             <PublicLayout
-              onDonateClick={openDonationModal}
+              onDonateClick={
+                openDonationModal
+              }
             >
               <GetInvolved
-                onDonateClick={openDonationModal}
+                onDonateClick={
+                  openDonationModal
+                }
               />
             </PublicLayout>
           }
@@ -421,10 +461,14 @@ const AppContent = () => {
           path="*"
           element={
             <PublicLayout
-              onDonateClick={openDonationModal}
+              onDonateClick={
+                openDonationModal
+              }
             >
               <Home
-                onDonateClick={openDonationModal}
+                onDonateClick={
+                  openDonationModal
+                }
               />
             </PublicLayout>
           }
@@ -438,7 +482,9 @@ const AppContent = () => {
 
       {isDonationModalOpen && (
         <DonationModal
-          onClose={closeDonationModal}
+          onClose={
+            closeDonationModal
+          }
         />
       )}
     </>

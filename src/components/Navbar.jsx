@@ -124,14 +124,6 @@ const Navbar = ({ onDonateClick }) => {
 
           {/* MOBILE DONATE */}
 
-          <button
-            className="mobile-donate"
-            onClick={handleDonate}
-            type="button"
-          >
-            DONATE NOW
-          </button>
-
         </nav>
 
         {/* ========================================

@@ -27,8 +27,6 @@ const filters = [
   "Success Stories"
 ];
 
-const API_BASE_URL = "http://localhost:5000";
-
 const Gallery = ({
   onDonateClick
 }) => {
@@ -50,6 +48,13 @@ const Gallery = ({
   const [error, setError] =
     useState("");
 
+  /*
+   * Stores the exact page scroll position
+   * before opening the lightbox.
+   */
+  const [savedScrollPosition, setSavedScrollPosition] =
+    useState(0);
+
   /* ========================================
      GET MEDIA URL
   ======================================== */
@@ -59,6 +64,10 @@ const Gallery = ({
       return "";
     }
 
+    /*
+     * Cloudinary / external URLs are already
+     * complete and must be returned unchanged.
+     */
     if (
       url.startsWith("http://") ||
       url.startsWith("https://") ||
@@ -67,7 +76,28 @@ const Gallery = ({
       return url;
     }
 
-    return `${API_BASE_URL}${url}`;
+    /*
+     * Support old relative URLs without
+     * hard-coding localhost.
+     */
+    const apiUrl =
+      import.meta.env.VITE_API_URL;
+
+    if (!apiUrl) {
+      console.warn(
+        "VITE_API_URL is not configured."
+      );
+
+      return url;
+    }
+
+    const apiOrigin =
+      apiUrl.replace(
+        /\/api\/?$/,
+        ""
+      );
+
+    return `${apiOrigin}${url}`;
   };
 
   /* ========================================
@@ -81,25 +111,6 @@ const Gallery = ({
 
       const response =
         await API.get("/gallery");
-
-      /*
-       * Your backend currently returns:
-       *
-       * [
-       *   {
-       *     _id,
-       *     title,
-       *     category,
-       *     type,
-       *     fileUrl,
-       *     description,
-       *     order
-       *   }
-       * ]
-       *
-       * This also supports wrapped responses
-       * in case you change the controller later.
-       */
 
       const items =
         Array.isArray(response.data)
@@ -210,9 +221,28 @@ const Gallery = ({
       return;
     }
 
+    /*
+     * IMPORTANT:
+     * Save the exact position where the user
+     * clicked the image/video.
+     */
+    const currentScrollPosition =
+      window.scrollY ||
+      window.pageYOffset ||
+      document.documentElement.scrollTop ||
+      0;
+
+    setSavedScrollPosition(
+      currentScrollPosition
+    );
+
     setCurrentIndex(index);
     setLightboxOpen(true);
 
+    /*
+     * Prevent the background page from
+     * scrolling while the lightbox is open.
+     */
     document.body.style.overflow =
       "hidden";
   };
@@ -226,6 +256,18 @@ const Gallery = ({
 
     document.body.style.overflow =
       "";
+
+    /*
+     * Restore the exact position where
+     * the user opened the media.
+     */
+    requestAnimationFrame(() => {
+      window.scrollTo({
+        top: savedScrollPosition,
+        left: 0,
+        behavior: "auto"
+      });
+    });
   };
 
   /* ========================================
@@ -271,9 +313,7 @@ const Gallery = ({
       return;
     }
 
-    const handleKeyboard = (
-      event
-    ) => {
+    const handleKeyboard = (event) => {
       if (event.key === "Escape") {
         closeLightbox();
       }
@@ -300,7 +340,8 @@ const Gallery = ({
     };
   }, [
     lightboxOpen,
-    galleryItems.length
+    galleryItems.length,
+    savedScrollPosition
   ]);
 
   /* ========================================
@@ -405,11 +446,9 @@ const Gallery = ({
 
         {loading && (
           <div className="gallery-empty">
-
             <p>
               Loading gallery...
             </p>
-
           </div>
         )}
 
@@ -445,24 +484,27 @@ const Gallery = ({
                   <article
                     className="gallery-item"
                     key={item.id}
-                    onClick={() =>
-                      openLightbox(
-                        item
-                      )
-                    }
+                    onClick={(event) => {
+                      /*
+                       * Prevent the click from bubbling
+                       * to any parent/global click handlers.
+                       */
+                      event.stopPropagation();
+
+                      openLightbox(item);
+                    }}
                   >
 
-                    {/* IMAGE */}
+                    {/* IMAGE / VIDEO */}
 
                     {item.type ===
                     "video" ? (
                       <>
                         <video
-                          src={
-                            item.src
-                          }
+                          src={item.src}
                           muted
                           preload="metadata"
+                          playsInline
                           aria-label={
                             item.title
                           }
@@ -478,13 +520,10 @@ const Gallery = ({
                       </>
                     ) : (
                       <img
-                        src={
-                          item.src
-                        }
-                        alt={
-                          item.title
-                        }
+                        src={item.src}
+                        alt={item.title}
                         loading="lazy"
+                        draggable="false"
                       />
                     )}
 
@@ -597,9 +636,13 @@ const Gallery = ({
             <button
               className="lightbox-close"
               type="button"
-              onClick={
-                closeLightbox
-              }
+              onClick={(
+                event
+              ) => {
+                event.stopPropagation();
+
+                closeLightbox();
+              }}
               aria-label="Close gallery"
             >
               <X />
@@ -638,8 +681,14 @@ const Gallery = ({
                 <video
                   controls
                   autoPlay
+                  playsInline
                   src={
                     currentItem.src
+                  }
+                  onClick={(
+                    event
+                  ) =>
+                    event.stopPropagation()
                   }
                 />
               ) : (
@@ -649,6 +698,12 @@ const Gallery = ({
                   }
                   alt={
                     currentItem.title
+                  }
+                  draggable="false"
+                  onClick={(
+                    event
+                  ) =>
+                    event.stopPropagation()
                   }
                 />
               )}

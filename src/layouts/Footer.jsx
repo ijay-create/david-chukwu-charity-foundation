@@ -270,13 +270,6 @@ const Footer = () => {
               About Us
             </Link>
 
-            <Link
-              to="/"
-              onClick={handleContactNavigation}
-            >
-              Contact Us
-            </Link>
-
           </nav>
 
           {/* =================================================

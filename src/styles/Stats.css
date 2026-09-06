@@ -1,399 +1,752 @@
-/* =========================================================
+/* ============================================================
    STATS SECTION
-========================================================= */
+   ============================================================ */
 
 .stats {
   width: 100%;
+  padding: 34px 0;
   background: #132b46;
-  padding: 45px 0;
+  color: #ffffff;
   overflow: hidden;
 }
 
-.stats-container {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 30px;
+.stats .container {
+  width: min(1200px, calc(100% - 40px));
+  margin: 0 auto;
 }
 
-/* =========================================================
-   STATS INTRO
-========================================================= */
+
+/* ============================================================
+   MAIN CONTAINER — DESKTOP
+   ============================================================ */
+
+.stats-container {
+  width: 100%;
+
+  display: flex;
+  flex-direction: row;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 40px;
+}
+
+
+/* ============================================================
+   INTRO — DESKTOP
+   ============================================================ */
 
 .stats-intro {
   flex: 0 0 auto;
 
   display: flex;
   align-items: center;
+
   gap: 14px;
 
-  padding-right: 30px;
+  padding-right: 35px;
 
-  border-right: 1px solid
-    rgba(255, 255, 255, 0.18);
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .stats-intro > svg {
-  width: 38px;
-  height: 38px;
+  width: 42px;
+  height: 42px;
 
-  flex-shrink: 0;
+  flex: 0 0 42px;
 
   fill: none;
   stroke: #dca336;
-  stroke-width: 1.5;
+
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .stats-intro > div {
   display: flex;
   flex-direction: column;
+
+  gap: 3px;
 }
 
 .stats-intro span {
   display: block;
 
-  margin-bottom: 3px;
+  font-size: 0.75rem;
+  font-weight: 500;
+
+  line-height: 1.2;
 
   color: rgba(255, 255, 255, 0.72);
-
-  font-family: "Open Sans", sans-serif;
-  font-size: 0.75rem;
-  font-weight: 400;
-
-  line-height: 1.4;
 }
 
 .stats-intro strong {
   display: block;
 
+  font-size: 1.05rem;
+  font-weight: 700;
+
+  line-height: 1.2;
+
   color: #ffffff;
-
-  font-family: "Poppins", sans-serif;
-  font-size: 1rem;
-  font-weight: 600;
-
-  line-height: 1.3;
 }
 
-/* =========================================================
-   STATS GRID
-========================================================= */
+
+/* ============================================================
+   STATS GRID — DESKTOP
+   ============================================================ */
 
 .stats-grid {
-  flex: 1;
+  flex: 1 1 auto;
+
+  width: 100%;
+  min-width: 0;
 
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
 
-  gap: 12px;
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
 
-  min-width: 0;
+  align-items: center;
+
+  gap: 20px;
 }
 
-/* =========================================================
-   INDIVIDUAL STAT
-========================================================= */
+
+/* ============================================================
+   STAT ITEM
+   ============================================================ */
 
 .stat-item {
+  width: 100%;
   min-width: 0;
 
   display: flex;
   flex-direction: column;
+
   align-items: center;
+  justify-content: center;
 
   text-align: center;
 }
 
 .stat-item > svg {
-  width: 20px;
-  height: 20px;
+  width: 28px;
+  height: 28px;
 
-  margin-bottom: 8px;
+  margin-bottom: 6px;
+
+  flex-shrink: 0;
 
   fill: none;
   stroke: #dca336;
-  stroke-width: 1.6;
 
-  transition:
-    transform 0.3s ease,
-    opacity 0.3s ease;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
-.stat-item:hover > svg {
-  transform: translateY(-2px);
-  opacity: 0.9;
-}
 
-/* =========================================================
-   COUNT NUMBER
-========================================================= */
+/* ============================================================
+   NUMBER
+   ============================================================ */
 
 .stat-item strong {
   display: block;
 
-  min-width: 60px;
-
-  margin: 0 auto 4px;
-
-  color: #dca336;
-
-  font-family: "Poppins", sans-serif;
-  font-size: 1.4rem;
-  font-weight: 600;
+  font-size: 1.65rem;
+  font-weight: 700;
 
   line-height: 1;
 
-  font-variant-numeric: tabular-nums;
+  color: #ffffff;
 
   white-space: nowrap;
 }
 
-/* =========================================================
-   STAT LABEL
-========================================================= */
+
+/* ============================================================
+   LABEL
+   ============================================================ */
 
 .stat-item > span {
   display: block;
 
-  max-width: 110px;
+  margin-top: 6px;
 
-  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.72rem;
+  font-weight: 500;
 
-  font-family: "Open Sans", sans-serif;
-  font-size: 0.68rem;
-  font-weight: 400;
+  line-height: 1.2;
 
-  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.7);
 
-  text-align: center;
+  white-space: nowrap;
 }
 
-/* =========================================================
-   TABLET
-========================================================= */
 
-@media (max-width: 1100px) {
+/* ============================================================
+   TABLET
+   ============================================================ */
+
+@media (max-width: 1000px) {
   .stats {
-    padding: 40px 0;
+    padding: 30px 0;
+  }
+
+  .stats .container {
+    width: calc(100% - 32px);
   }
 
   .stats-container {
-    gap: 24px;
+    gap: 22px;
   }
 
   .stats-intro {
-    padding-right: 20px;
     gap: 10px;
+    padding-right: 20px;
   }
 
   .stats-intro > svg {
     width: 34px;
     height: 34px;
+
+    flex-basis: 34px;
   }
 
   .stats-intro span {
-    font-size: 0.7rem;
+    font-size: 0.66rem;
   }
 
   .stats-intro strong {
-    font-size: 0.92rem;
+    font-size: 0.9rem;
   }
 
   .stats-grid {
+    grid-template-columns:
+      repeat(4, minmax(0, 1fr));
+
     gap: 10px;
   }
 
-  .stat-item strong {
-    font-size: 1.25rem;
-  }
+  .stat-item > svg {
+    width: 24px;
+    height: 24px;
 
-  .stat-item > span {
-    font-size: 0.64rem;
-  }
-}
-
-/* =========================================================
-   SMALL TABLET
-========================================================= */
-
-@media (max-width: 900px) {
-  .stats-container {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 24px;
-  }
-
-  .stats-intro {
-    width: 100%;
-
-    padding-right: 0;
-    padding-bottom: 18px;
-
-    border-right: none;
-
-    border-bottom: 1px solid
-      rgba(255, 255, 255, 0.18);
-  }
-
-  .stats-grid {
-    width: 100%;
-
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-
-    gap: 8px;
-  }
-}
-
-/* =========================================================
-   MOBILE TABLET
-========================================================= */
-
-@media (max-width: 680px) {
-  .stats {
-    padding: 35px 0;
-  }
-
-  .stats-container {
-    gap: 18px;
-  }
-
-  .stats-intro {
-    justify-content: center;
-    text-align: center;
-  }
-
-  .stats-intro > div {
-    align-items: flex-start;
-    text-align: left;
-  }
-
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-
-    column-gap: 14px;
-    row-gap: 20px;
-  }
-
-  .stat-item {
-    padding: 4px;
+    margin-bottom: 5px;
   }
 
   .stat-item strong {
-    font-size: 1.2rem;
+    font-size: 1.35rem;
   }
 
   .stat-item > span {
     font-size: 0.62rem;
+    margin-top: 5px;
   }
 }
 
-/* =========================================================
-   MOBILE
-========================================================= */
 
-@media (max-width: 480px) {
+/* ============================================================
+   MOBILE
+   ============================================================ */
+
+@media (max-width: 768px) {
   .stats {
-    padding: 30px 0;
+    padding: 24px 0;
   }
+
+  .stats .container {
+    width: calc(100% - 24px);
+  }
+
+
+  /* ----------------------------------------------------------
+     CONTAINER
+     ---------------------------------------------------------- */
 
   .stats-container {
-    gap: 16px;
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: stretch;
+    justify-content: center;
+
+    gap: 18px;
   }
 
-  .stats-intro {
-    gap: 10px;
 
-    padding-bottom: 14px;
+  /* ----------------------------------------------------------
+     INTRO — ON TOP
+     ---------------------------------------------------------- */
+
+  .stats-intro {
+    width: 100%;
+
+    flex: 0 0 auto;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+
+    gap: 5px;
+
+    padding: 0 0 14px;
+
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.18);
   }
 
   .stats-intro > svg {
-    width: 30px;
-    height: 30px;
+    width: 28px;
+    height: 28px;
+
+    flex: 0 0 28px;
+  }
+
+  .stats-intro > div {
+    align-items: center;
+
+    gap: 2px;
   }
 
   .stats-intro span {
-    font-size: 0.68rem;
+    font-size: 0.62rem;
   }
 
   .stats-intro strong {
     font-size: 0.85rem;
   }
 
+
+  /* ----------------------------------------------------------
+     FOUR STATS — ONE SINGLE HORIZONTAL LINE
+     ---------------------------------------------------------- */
+
   .stats-grid {
-    column-gap: 10px;
-    row-gap: 16px;
+    width: 100%;
+
+    flex: 0 0 auto;
+
+    display: grid;
+
+    /*
+      THIS IS THE IMPORTANT PART.
+
+      EXACTLY FOUR COLUMNS.
+      NEVER 2 COLUMNS.
+      NEVER 1 COLUMN.
+    */
+
+    grid-template-columns:
+      repeat(4, 1fr);
+
+    grid-template-rows: 1fr;
+
+    gap: 0;
+
+    align-items: center;
+
+    overflow: hidden;
+  }
+
+
+  /* ----------------------------------------------------------
+     STAT ITEM
+     ---------------------------------------------------------- */
+
+  .stat-item {
+    width: 100%;
+    min-width: 0;
+
+    flex: none;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+
+    padding: 0 2px;
   }
 
   .stat-item > svg {
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
 
-    margin-bottom: 6px;
+    flex: 0 0 20px;
+
+    margin-bottom: 4px;
   }
 
   .stat-item strong {
-    min-width: 50px;
+    font-size: 1rem;
 
-    font-size: 1.1rem;
+    line-height: 1;
 
-    margin-bottom: 3px;
+    white-space: nowrap;
   }
 
   .stat-item > span {
-    max-width: 95px;
+    width: 100%;
 
-    font-size: 0.6rem;
-    line-height: 1.35;
+    margin-top: 4px;
+
+    font-size: 0.5rem;
+
+    line-height: 1.15;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+    text-overflow: clip;
   }
 }
 
-/* =========================================================
-   VERY SMALL MOBILE
-========================================================= */
 
-@media (max-width: 360px) {
+/* ============================================================
+   SMALL MOBILE
+   ============================================================ */
+
+@media (max-width: 600px) {
   .stats {
-    padding: 25px 0;
+    padding: 21px 0;
   }
 
+  .stats .container {
+    width: calc(100% - 16px);
+  }
+
+  .stats-container {
+    gap: 15px;
+  }
+
+
+  /* INTRO */
+
   .stats-intro {
-    gap: 8px;
+    padding-bottom: 12px;
   }
 
   .stats-intro > svg {
-    width: 26px;
-    height: 26px;
+    width: 25px;
+    height: 25px;
+
+    flex-basis: 25px;
   }
 
   .stats-intro span {
-    font-size: 0.64rem;
+    font-size: 0.57rem;
   }
 
   .stats-intro strong {
     font-size: 0.78rem;
   }
 
+
+  /* FOUR STATS */
+
   .stats-grid {
-    column-gap: 6px;
-    row-gap: 14px;
+    width: 100%;
+
+    grid-template-columns:
+      repeat(4, 1fr);
+
+    grid-template-rows: 1fr;
+
+    gap: 0;
+
+    overflow: hidden;
+  }
+
+  .stat-item {
+    padding: 0 1px;
+  }
+
+  .stat-item > svg {
+    width: 18px;
+    height: 18px;
+
+    flex-basis: 18px;
+
+    margin-bottom: 3px;
   }
 
   .stat-item strong {
-    font-size: 1rem;
+    font-size: 0.9rem;
   }
 
   .stat-item > span {
-    font-size: 0.58rem;
+    font-size: 0.45rem;
+
+    margin-top: 3px;
+
+    white-space: nowrap;
   }
 }
 
-/* =========================================================
+
+/* ============================================================
+   VERY SMALL PHONES
+   ============================================================ */
+
+@media (max-width: 480px) {
+  .stats {
+    padding: 19px 0;
+  }
+
+  .stats .container {
+    width: calc(100% - 10px);
+  }
+
+  .stats-container {
+    gap: 13px;
+  }
+
+
+  /* INTRO */
+
+  .stats-intro {
+    padding-bottom: 10px;
+  }
+
+  .stats-intro > svg {
+    width: 22px;
+    height: 22px;
+
+    flex-basis: 22px;
+  }
+
+  .stats-intro span {
+    font-size: 0.52rem;
+  }
+
+  .stats-intro strong {
+    font-size: 0.7rem;
+  }
+
+
+  /* ----------------------------------------------------------
+     FOUR STATS — STILL ONE SINGLE LINE
+     ---------------------------------------------------------- */
+
+  .stats-grid {
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns:
+      repeat(4, 1fr);
+
+    grid-template-rows: 1fr;
+
+    gap: 0;
+
+    overflow: hidden;
+  }
+
+  .stat-item {
+    width: 100%;
+
+    padding: 0;
+  }
+
+  .stat-item > svg {
+    width: 16px;
+    height: 16px;
+
+    flex-basis: 16px;
+
+    margin-bottom: 3px;
+  }
+
+  .stat-item strong {
+    font-size: 0.78rem;
+  }
+
+  .stat-item > span {
+    font-size: 0.4rem;
+
+    margin-top: 3px;
+
+    white-space: nowrap;
+  }
+}
+
+
+/* ============================================================
+   EXTRA SMALL PHONES
+   ============================================================ */
+
+@media (max-width: 380px) {
+  .stats {
+    padding: 17px 0;
+  }
+
+  .stats .container {
+    width: calc(100% - 6px);
+  }
+
+  .stats-container {
+    gap: 11px;
+  }
+
+
+  /* INTRO */
+
+  .stats-intro {
+    padding-bottom: 9px;
+  }
+
+  .stats-intro > svg {
+    width: 20px;
+    height: 20px;
+
+    flex-basis: 20px;
+  }
+
+  .stats-intro span {
+    font-size: 0.48rem;
+  }
+
+  .stats-intro strong {
+    font-size: 0.64rem;
+  }
+
+
+  /* FOUR STATS */
+
+  .stats-grid {
+    width: 100%;
+
+    grid-template-columns:
+      repeat(4, 1fr);
+
+    grid-template-rows: 1fr;
+
+    gap: 0;
+
+    overflow: hidden;
+  }
+
+  .stat-item {
+    padding: 0;
+  }
+
+  .stat-item > svg {
+    width: 14px;
+    height: 14px;
+
+    flex-basis: 14px;
+
+    margin-bottom: 2px;
+  }
+
+  .stat-item strong {
+    font-size: 0.68rem;
+  }
+
+  .stat-item > span {
+    font-size: 0.35rem;
+
+    margin-top: 2px;
+
+    white-space: nowrap;
+  }
+}
+
+
+/* ============================================================
+   EXTRA SMALL DEVICES
+   ============================================================ */
+
+@media (max-width: 340px) {
+  .stats {
+    padding: 15px 0;
+  }
+
+  .stats .container {
+    width: calc(100% - 4px);
+  }
+
+  .stats-container {
+    gap: 9px;
+  }
+
+
+  /* INTRO */
+
+  .stats-intro {
+    padding-bottom: 8px;
+  }
+
+  .stats-intro > svg {
+    width: 18px;
+    height: 18px;
+
+    flex-basis: 18px;
+  }
+
+  .stats-intro span {
+    font-size: 0.42rem;
+  }
+
+  .stats-intro strong {
+    font-size: 0.58rem;
+  }
+
+
+  /* FOUR STATS — FLAT */
+
+  .stats-grid {
+    grid-template-columns:
+      repeat(4, 1fr);
+
+    grid-template-rows: 1fr;
+
+    gap: 0;
+
+    overflow: hidden;
+  }
+
+  .stat-item > svg {
+    width: 13px;
+    height: 13px;
+
+    flex-basis: 13px;
+  }
+
+  .stat-item strong {
+    font-size: 0.62rem;
+  }
+
+  .stat-item > span {
+    font-size: 0.32rem;
+  }
+}
+
+
+/* ============================================================
    ACCESSIBILITY
-========================================================= */
+   ============================================================ */
 
 @media (prefers-reduced-motion: reduce) {
-  .stat-item > svg {
-    transition: none;
+  .stats *,
+  .stats *::before,
+  .stats *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
   }
 }
