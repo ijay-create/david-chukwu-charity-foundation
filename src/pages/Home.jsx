@@ -7,7 +7,6 @@ import Stats from "../components/Stats";
 import Featured from "../components/Featured";
 import CTA from "../components/CTA";
 import DonationModal from "../components/DonationModal";
-import Newsletter from "../components/Newsletter";
 
 import API from "../api/axios";
 
@@ -360,12 +359,6 @@ const Home = () => {
           settings={homepage.cta}
           onDonateClick={openDonation}
         />
-
-        {/* =========================================================
-            NEWSLETTER
-        ========================================================= */}
-
-        <Newsletter />
 
       </main>
 
