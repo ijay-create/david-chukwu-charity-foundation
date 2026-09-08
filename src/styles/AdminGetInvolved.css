@@ -1,19 +1,13 @@
 /* ==========================================================================
    ADMIN GET INVOLVED
-   David Chukwu Charity Foundation
    ========================================================================== */
 
-
-/* ==========================================================================
-   PAGE CONTAINER
-   ========================================================================== */
-
-.admin-get-involved {
+.admin-get-involved-page {
   width: 100%;
   min-height: 100%;
-  padding: 30px;
+  padding: 28px;
   background: #f4f1ea;
-  color: #4b5563;
+  color: #132b46;
   box-sizing: border-box;
 }
 
@@ -23,80 +17,27 @@
    ========================================================================== */
 
 .admin-get-involved-header {
-  width: 100%;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 30px;
+  gap: 24px;
   margin-bottom: 28px;
 }
 
-
-/* ==========================================================================
-   TITLE
-   ========================================================================== */
-
-.admin-get-involved-title {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-
-.admin-get-involved-icon {
-  width: 48px;
-  height: 48px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  flex-shrink: 0;
-
-  background: #132b46;
-  color: #dca336;
-
-  border-radius: 10px;
-
-  box-shadow:
-    0 4px 12px rgba(19, 43, 70, 0.12);
-}
-
-
-.admin-get-involved-title span {
-  display: block;
-
-  margin-bottom: 3px;
-
-  color: #dca336;
-
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 1.4px;
-  text-transform: uppercase;
-}
-
-
-.admin-get-involved-title h2 {
-  margin: 0;
-
-  color: #132b46;
-
-  font-size: 28px;
+.admin-get-involved-header h1 {
+  margin: 0 0 7px;
+  font-size: 30px;
   line-height: 1.2;
   font-weight: 700;
+  color: #132b46;
 }
 
-
-.admin-get-involved-header > div > p {
-  max-width: 720px;
-
-  margin: 12px 0 0;
-
-  color: #6b7280;
-
+.admin-get-involved-header p {
+  margin: 0;
+  max-width: 650px;
   font-size: 14px;
-  line-height: 1.7;
+  line-height: 1.6;
+  color: #64748b;
 }
 
 
@@ -104,726 +45,63 @@
    REFRESH BUTTON
    ========================================================================== */
 
-.admin-refresh-button {
-  min-height: 42px;
-
+.refresh-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
 
-  padding: 0 18px;
+  min-height: 42px;
+  padding: 0 17px;
 
-  border: 1px solid #d8d3c8;
-  border-radius: 8px;
+  border: 1px solid #d9d4c9;
+  border-radius: 7px;
 
   background: #ffffff;
   color: #132b46;
 
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 600;
-
-  cursor: pointer;
-
-  transition:
-    background-color 0.2s ease,
-    border-color 0.2s ease,
-    color 0.2s ease,
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-}
-
-
-.admin-refresh-button svg {
-  transition: transform 0.25s ease;
-}
-
-
-.admin-refresh-button:hover {
-  border-color: #dca336;
-  background: #fffdf8;
-  color: #132b46;
-
-  box-shadow:
-    0 4px 12px rgba(19, 43, 70, 0.08);
-
-  transform: translateY(-1px);
-}
-
-
-.admin-refresh-button:hover svg {
-  transform: rotate(45deg);
-}
-
-
-.admin-refresh-button:active {
-  transform: translateY(0);
-}
-
-
-.admin-refresh-button:focus-visible {
-  outline: 3px solid rgba(220, 163, 54, 0.25);
-  outline-offset: 2px;
-}
-
-
-.admin-refresh-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-}
-
-
-/* ==========================================================================
-   ERROR MESSAGE
-   ========================================================================== */
-
-.admin-get-involved-error {
-  width: 100%;
-
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-
-  margin-bottom: 25px;
-  padding: 15px 18px;
-
-  border: 1px solid #e8b4b4;
-  border-left: 4px solid #b42318;
-  border-radius: 8px;
-
-  background: #fff5f5;
-  color: #8a1c1c;
-
-  box-sizing: border-box;
-}
-
-
-.admin-get-involved-error span {
   font-size: 14px;
-  line-height: 1.5;
-}
-
-
-.admin-get-involved-error button {
-  flex-shrink: 0;
-
-  padding: 8px 14px;
-
-  border: 1px solid #b42318;
-  border-radius: 6px;
-
-  background: #ffffff;
-  color: #b42318;
-
-  font-family: inherit;
-  font-size: 12px;
   font-weight: 600;
 
   cursor: pointer;
 
   transition:
-    background-color 0.2s ease,
-    color 0.2s ease;
-}
-
-
-.admin-get-involved-error button:hover {
-  background: #b42318;
-  color: #ffffff;
-}
-
-
-/* ==========================================================================
-   SUMMARY SECTION
-   ========================================================================== */
-
-.admin-get-involved-summary {
-  width: 100%;
-
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-
-  gap: 18px;
-
-  margin-bottom: 28px;
-}
-
-
-/* ==========================================================================
-   SUMMARY CARD
-   ========================================================================== */
-
-.summary-card {
-  min-height: 92px;
-
-  display: flex;
-  align-items: center;
-  gap: 15px;
-
-  padding: 18px 20px;
-
-  border: 1px solid #e4dfd5;
-  border-radius: 10px;
-
-  background: #ffffff;
-
-  box-sizing: border-box;
-
-  box-shadow:
-    0 3px 12px rgba(19, 43, 70, 0.05);
-
-  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
     transform 0.2s ease,
-    box-shadow 0.2s ease,
-    border-color 0.2s ease;
-}
-
-
-.summary-card:hover {
-  border-color: #d9c9a7;
-
-  box-shadow:
-    0 8px 20px rgba(19, 43, 70, 0.08);
-
-  transform: translateY(-2px);
-}
-
-
-/* ==========================================================================
-   SUMMARY ICON
-   ========================================================================== */
-
-.summary-card-icon {
-  width: 42px;
-  height: 42px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  flex-shrink: 0;
-
-  border-radius: 9px;
-
-  background: #f9f2df;
-  color: #c38c22;
-}
-
-
-.summary-card:nth-child(2) .summary-card-icon {
-  background: #fff4d8;
-  color: #b57a0d;
-}
-
-
-.summary-card:nth-child(3) .summary-card-icon {
-  background: #eaf0f5;
-  color: #132b46;
-}
-
-
-/* ==========================================================================
-   SUMMARY TEXT
-   ========================================================================== */
-
-.summary-card div:last-child {
-  min-width: 0;
-}
-
-
-.summary-card span {
-  display: block;
-
-  margin-bottom: 4px;
-
-  color: #7a8088;
-
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 1.1px;
-  text-transform: uppercase;
-}
-
-
-.summary-card strong {
-  display: block;
-
-  color: #132b46;
-
-  font-size: 25px;
-  line-height: 1.1;
-  font-weight: 700;
-}
-
-
-/* ==========================================================================
-   APPLICATIONS CONTAINER
-   ========================================================================== */
-
-.applications-container {
-  width: 100%;
-
-  display: flex;
-  flex-direction: column;
-
-  gap: 18px;
-}
-
-
-/* ==========================================================================
-   APPLICATION CARD
-   ========================================================================== */
-
-.application-card {
-  width: 100%;
-
-  padding: 22px;
-
-  border: 1px solid #e3ded4;
-  border-radius: 11px;
-
-  background: #ffffff;
-
-  box-sizing: border-box;
-
-  box-shadow:
-    0 3px 14px rgba(19, 43, 70, 0.05);
-
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease,
-    transform 0.2s ease;
-}
-
-
-.application-card:hover {
-  border-color: #d8c9a8;
-
-  box-shadow:
-    0 8px 24px rgba(19, 43, 70, 0.08);
-
-  transform: translateY(-1px);
-}
-
-
-/* ==========================================================================
-   APPLICATION CARD HEADER
-   ========================================================================== */
-
-.application-card-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-
-  gap: 20px;
-
-  padding-bottom: 18px;
-
-  border-bottom: 1px solid #eeeae3;
-}
-
-
-/* ==========================================================================
-   APPLICANT INFO
-   ========================================================================== */
-
-.applicant-info {
-  min-width: 0;
-
-  display: flex;
-  align-items: center;
-
-  gap: 13px;
-}
-
-
-.applicant-avatar {
-  width: 46px;
-  height: 46px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  flex-shrink: 0;
-
-  border-radius: 50%;
-
-  background: #132b46;
-  color: #dca336;
-}
-
-
-.applicant-info h3 {
-  margin: 0 0 4px;
-
-  color: #132b46;
-
-  font-size: 16px;
-  line-height: 1.3;
-  font-weight: 700;
-}
-
-
-.applicant-info span {
-  display: block;
-
-  color: #9a7125;
-
-  font-size: 12px;
-  font-weight: 600;
-}
-
-
-/* ==========================================================================
-   APPLICATION STATUS
-   ========================================================================== */
-
-.application-status {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-
-  min-height: 30px;
-
-  padding: 0 11px;
-
-  border-radius: 20px;
-
-  font-size: 11px;
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-
-.status-unread {
-  background: #fff4d8;
-  color: #9a6800;
-}
-
-
-.status-read {
-  background: #edf4ef;
-  color: #27734a;
-}
-
-
-.status-replied {
-  background: #eaf0f5;
-  color: #24506f;
-}
-
-
-.status-archived {
-  background: #eeeeee;
-  color: #666666;
-}
-
-
-/* ==========================================================================
-   CONTACT DETAILS
-   ========================================================================== */
-
-.application-details {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-
-  gap: 10px 22px;
-
-  padding: 17px 0;
-}
-
-
-.application-detail {
-  min-width: 0;
-
-  display: inline-flex;
-  align-items: center;
-
-  gap: 7px;
-
-  color: #69717a;
-
-  font-size: 12px;
-  line-height: 1.5;
-
-  text-decoration: none;
-
-  transition:
-    color 0.2s ease;
-}
-
-
-.application-detail svg {
-  flex-shrink: 0;
-
-  color: #b88a2b;
-}
-
-
-a.application-detail:hover {
-  color: #132b46;
-}
-
-
-/* ==========================================================================
-   APPLICATION MESSAGE
-   ========================================================================== */
-
-.application-message {
-  margin-bottom: 18px;
-
-  padding: 18px;
-
-  border-radius: 8px;
-
-  background: #faf9f6;
-
-  border: 1px solid #eeeae3;
-}
-
-
-.message-heading {
-  display: flex;
-  align-items: center;
-
-  gap: 7px;
-
-  margin-bottom: 10px;
-
-  color: #132b46;
-
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 1.1px;
-}
-
-
-.message-heading svg {
-  color: #dca336;
-}
-
-
-.application-message p {
-  margin: 0;
-
-  color: #555e68;
-
-  font-size: 13px;
-  line-height: 1.75;
-
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-}
-
-
-/* ==========================================================================
-   APPLICATION ACTIONS
-   ========================================================================== */
-
-.application-actions {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  gap: 20px;
-
-  padding-top: 17px;
-
-  border-top: 1px solid #eeeae3;
-}
-
-
-/* ==========================================================================
-   STATUS ACTIONS
-   ========================================================================== */
-
-.status-actions {
-  display: flex;
-  align-items: center;
-
-  gap: 10px;
-}
-
-
-.status-actions > span {
-  color: #777e86;
-
-  font-size: 12px;
-  font-weight: 500;
-}
-
-
-/* ==========================================================================
-   STATUS SELECT
-   ========================================================================== */
-
-.status-actions select {
-  min-width: 125px;
-  height: 36px;
-
-  padding: 0 30px 0 11px;
-
-  border: 1px solid #d9d5cc;
-  border-radius: 6px;
-
-  background: #ffffff;
-  color: #39424c;
-
-  font-family: inherit;
-  font-size: 12px;
-  font-weight: 600;
-
-  cursor: pointer;
-
-  outline: none;
-
-  transition:
-    border-color 0.2s ease,
     box-shadow 0.2s ease;
 }
 
-
-.status-actions select:hover {
-  border-color: #c7a252;
-}
-
-
-.status-actions select:focus {
-  border-color: #dca336;
-
-  box-shadow:
-    0 0 0 3px rgba(220, 163, 54, 0.14);
-}
-
-
-.status-actions select:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-
-/* ==========================================================================
-   DELETE BUTTON
-   ========================================================================== */
-
-.delete-application-button {
-  min-height: 36px;
-
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  gap: 7px;
-
-  padding: 0 13px;
-
-  border: 1px solid #e2caca;
-  border-radius: 6px;
-
-  background: #ffffff;
-  color: #a33a3a;
-
-  font-family: inherit;
-  font-size: 12px;
-  font-weight: 600;
-
-  cursor: pointer;
-
-  transition:
-    background-color 0.2s ease,
-    border-color 0.2s ease,
-    color 0.2s ease,
-    transform 0.2s ease;
-}
-
-
-.delete-application-button:hover {
-  border-color: #b42318;
-
-  background: #b42318;
+.refresh-button:hover:not(:disabled) {
+  background: #132b46;
+  border-color: #132b46;
   color: #ffffff;
-
   transform: translateY(-1px);
+  box-shadow: 0 5px 14px rgba(19, 43, 70, 0.12);
 }
 
-
-.delete-application-button:active {
-  transform: translateY(0);
-}
-
-
-.delete-application-button:focus-visible {
-  outline: 3px solid rgba(180, 35, 24, 0.18);
-  outline-offset: 2px;
-}
-
-
-.delete-application-button:disabled {
-  opacity: 0.6;
+.refresh-button:disabled {
+  opacity: 0.65;
   cursor: not-allowed;
-  transform: none;
 }
 
 
 /* ==========================================================================
-   EMPTY STATE
+   LOADING SPINNER
    ========================================================================== */
 
-.admin-get-involved-empty {
-  width: 100%;
-
-  min-height: 320px;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-
-  padding: 40px 25px;
-
-  border: 1px dashed #d6d0c4;
-  border-radius: 11px;
-
-  background: #ffffff;
-
-  text-align: center;
-
-  box-sizing: border-box;
+.loading-spinner {
+  animation: adminGetInvolvedSpin 0.9s linear infinite;
 }
 
+@keyframes adminGetInvolvedSpin {
+  from {
+    transform: rotate(0deg);
+  }
 
-.admin-get-involved-empty > svg {
-  margin-bottom: 16px;
-
-  color: #dca336;
-}
-
-
-.admin-get-involved-empty h3 {
-  margin: 0 0 8px;
-
-  color: #132b46;
-
-  font-size: 18px;
-  font-weight: 700;
-}
-
-
-.admin-get-involved-empty p {
-  max-width: 430px;
-
-  margin: 0;
-
-  color: #777e86;
-
-  font-size: 13px;
-  line-height: 1.7;
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 
@@ -832,46 +110,526 @@ a.application-detail:hover {
    ========================================================================== */
 
 .admin-get-involved-loading {
-  min-height: 400px;
+  min-height: 420px;
 
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
 
-  gap: 12px;
+  gap: 14px;
 
+  color: #64748b;
+}
+
+.admin-get-involved-loading p {
+  margin: 0;
+  font-size: 14px;
+}
+
+
+/* ==========================================================================
+   SUMMARY CARDS
+   ========================================================================== */
+
+.get-involved-summary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+
+  margin-bottom: 26px;
+}
+
+.summary-card {
+  min-height: 92px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 14px;
+
+  padding: 18px;
+
+  background: #ffffff;
+
+  border: 1px solid #e5e0d7;
+  border-radius: 9px;
+
+  box-sizing: border-box;
+
+  box-shadow:
+    0 2px 8px rgba(19, 43, 70, 0.04);
+}
+
+.summary-icon {
+  width: 44px;
+  height: 44px;
+
+  flex: 0 0 44px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 8px;
+
+  background: #f4f1ea;
+  color: #dca336;
+}
+
+.summary-card > div:last-child {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.summary-card span {
+  font-size: 12px;
+  font-weight: 500;
+  color: #64748b;
+}
+
+.summary-card strong {
+  font-size: 25px;
+  line-height: 1;
+  font-weight: 700;
   color: #132b46;
 }
 
 
-.admin-get-involved-loading p {
+/* ==========================================================================
+   CONTENT
+   ========================================================================== */
+
+.get-involved-content {
+  width: 100%;
+}
+
+.get-involved-list {
+  display: flex;
+  flex-direction: column;
+  gap: 17px;
+}
+
+
+/* ==========================================================================
+   SUBMISSION CARD
+   ========================================================================== */
+
+.get-involved-card {
+  width: 100%;
+
+  padding: 22px;
+
+  background: #ffffff;
+
+  border: 1px solid #e5e0d7;
+  border-radius: 9px;
+
+  box-sizing: border-box;
+
+  box-shadow:
+    0 2px 8px rgba(19, 43, 70, 0.04);
+
+  transition:
+    box-shadow 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.get-involved-card:hover {
+  border-color: #d8d0c2;
+
+  box-shadow:
+    0 7px 20px rgba(19, 43, 70, 0.07);
+
+  transform: translateY(-1px);
+}
+
+
+/* ==========================================================================
+   SUBMISSION HEADER
+   ========================================================================== */
+
+.submission-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  padding-bottom: 18px;
+
+  border-bottom: 1px solid #eeeae2;
+}
+
+.submission-person {
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+
+  gap: 13px;
+}
+
+.person-icon {
+  width: 43px;
+  height: 43px;
+
+  flex: 0 0 43px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #132b46;
+  color: #ffffff;
+}
+
+.submission-person h2 {
+  margin: 0 0 4px;
+
+  font-size: 17px;
+  line-height: 1.3;
+
+  font-weight: 650;
+
+  color: #132b46;
+
+  word-break: break-word;
+}
+
+.submission-person p {
   margin: 0;
 
-  color: #6d747c;
+  font-size: 13px;
+  line-height: 1.4;
+
+  color: #dca336;
+  font-weight: 600;
+}
+
+
+/* ==========================================================================
+   STATUS BADGE
+   ========================================================================== */
+
+.submission-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 6px;
+
+  min-height: 31px;
+
+  padding: 0 11px;
+
+  border-radius: 20px;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  white-space: nowrap;
+}
+
+.status-new {
+  background: #fff6df;
+  color: #a66a00;
+}
+
+.status-contacted {
+  background: #eaf2f8;
+  color: #275b7a;
+}
+
+.status-resolved {
+  background: #e8f5ee;
+  color: #28734b;
+}
+
+
+/* ==========================================================================
+   CONTACT DETAILS
+   ========================================================================== */
+
+.submission-details {
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 10px 24px;
+
+  padding: 17px 0;
+}
+
+.submission-detail {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 8px;
+
+  min-width: 0;
+
+  color: #526274;
 
   font-size: 13px;
+
+  text-decoration: none;
+
+  transition:
+    color 0.2s ease;
 }
 
-
-.loading-spinner {
+.submission-detail svg {
+  flex: 0 0 auto;
   color: #dca336;
+}
 
-  animation:
-    adminGetInvolvedSpin 1s linear infinite;
+.submission-detail span {
+  overflow-wrap: anywhere;
+}
+
+.submission-detail:hover {
+  color: #132b46;
 }
 
 
-@keyframes adminGetInvolvedSpin {
+/* ==========================================================================
+   MESSAGE
+   ========================================================================== */
 
-  from {
-    transform: rotate(0deg);
-  }
+.submission-message {
+  padding: 17px;
 
-  to {
-    transform: rotate(360deg);
-  }
+  background: #faf9f6;
 
+  border: 1px solid #eeeae2;
+  border-radius: 7px;
+}
+
+.message-heading {
+  display: flex;
+  align-items: center;
+
+  gap: 7px;
+
+  margin-bottom: 9px;
+
+  color: #132b46;
+
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.message-heading svg {
+  color: #dca336;
+}
+
+.submission-message p {
+  margin: 0;
+
+  color: #596979;
+
+  font-size: 14px;
+  line-height: 1.7;
+
+  white-space: pre-line;
+
+  overflow-wrap: anywhere;
+}
+
+
+/* ==========================================================================
+   DATE
+   ========================================================================== */
+
+.submission-date {
+  margin-top: 15px;
+
+  color: #8993a0;
+
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+
+/* ==========================================================================
+   ACTIONS
+   ========================================================================== */
+
+.submission-actions {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+
+  gap: 18px;
+
+  margin-top: 19px;
+  padding-top: 18px;
+
+  border-top: 1px solid #eeeae2;
+}
+
+.status-control {
+  display: flex;
+  flex-direction: column;
+
+  gap: 7px;
+}
+
+.status-control label {
+  font-size: 12px;
+  font-weight: 600;
+
+  color: #526274;
+}
+
+.status-control select {
+  min-width: 170px;
+  height: 40px;
+
+  padding: 0 34px 0 11px;
+
+  border: 1px solid #d8d4cb;
+  border-radius: 6px;
+
+  background: #ffffff;
+
+  color: #132b46;
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+
+  outline: none;
+
+  cursor: pointer;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.status-control select:focus {
+  border-color: #dca336;
+
+  box-shadow:
+    0 0 0 3px rgba(220, 163, 54, 0.12);
+}
+
+.status-control select:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.action-loading {
+  font-size: 11px;
+  color: #8993a0;
+}
+
+
+/* ==========================================================================
+   DELETE BUTTON
+   ========================================================================== */
+
+.delete-submission-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  height: 40px;
+
+  padding: 0 15px;
+
+  border: 1px solid #e0c8c8;
+  border-radius: 6px;
+
+  background: #ffffff;
+  color: #a64646;
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.delete-submission-button:hover:not(:disabled) {
+  background: #a64646;
+  border-color: #a64646;
+  color: #ffffff;
+
+  transform: translateY(-1px);
+}
+
+.delete-submission-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+
+/* ==========================================================================
+   EMPTY STATE
+   ========================================================================== */
+
+.empty-state {
+  min-height: 360px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  padding: 40px;
+
+  background: #ffffff;
+
+  border: 1px solid #e5e0d7;
+  border-radius: 9px;
+
+  text-align: center;
+
+  color: #8993a0;
+
+  box-sizing: border-box;
+}
+
+.empty-state svg {
+  margin-bottom: 15px;
+
+  color: #dca336;
+}
+
+.empty-state h2 {
+  margin: 0 0 7px;
+
+  color: #132b46;
+
+  font-size: 20px;
+  font-weight: 650;
+}
+
+.empty-state p {
+  max-width: 450px;
+
+  margin: 0;
+
+  color: #64748b;
+
+  font-size: 14px;
+  line-height: 1.6;
 }
 
 
@@ -879,272 +637,221 @@ a.application-detail:hover {
    TABLET
    ========================================================================== */
 
-@media (max-width: 900px) {
+@media (max-width: 1100px) {
 
-  .admin-get-involved {
+  .admin-get-involved-page {
     padding: 24px;
   }
 
-
-  .admin-get-involved-summary {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-
-  .summary-card:last-child {
-    grid-column: 1 / -1;
+  .get-involved-summary {
+    grid-template-columns: repeat(2, 1fr);
   }
 
 }
 
 
 /* ==========================================================================
-   MOBILE — 768PX
+   MOBILE
    ========================================================================== */
 
 @media (max-width: 768px) {
 
-  .admin-get-involved {
+  .admin-get-involved-page {
     padding: 20px 16px;
   }
 
-
-  /* HEADER */
-
   .admin-get-involved-header {
     flex-direction: column;
-    gap: 18px;
-  }
-
-
-  .admin-get-involved-header > div {
-    width: 100%;
-  }
-
-
-  .admin-get-involved-header > div > p {
-    max-width: none;
-  }
-
-
-  .admin-refresh-button {
-    width: 100%;
-  }
-
-
-  /* SUMMARY */
-
-  .admin-get-involved-summary {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-
-
-  .summary-card:last-child {
-    grid-column: auto;
-  }
-
-
-  /* APPLICATION */
-
-  .application-card {
-    padding: 18px;
-  }
-
-
-  .application-card-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 13px;
-  }
-
-
-  .application-status {
-    align-self: flex-start;
-  }
-
-
-  /* DETAILS */
-
-  .application-details {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 9px;
-  }
-
-
-  .application-detail {
-    max-width: 100%;
-  }
-
-
-  /* ACTIONS */
-
-  .application-actions {
-    flex-direction: column;
     align-items: stretch;
-    gap: 14px;
+
+    gap: 16px;
+
+    margin-bottom: 22px;
   }
 
-
-  .status-actions {
-    width: 100%;
-
-    flex-direction: column;
-    align-items: flex-start;
+  .admin-get-involved-header h1 {
+    font-size: 26px;
   }
 
-
-  .status-actions select {
-    width: 100%;
-  }
-
-
-  .delete-application-button {
-    width: 100%;
-  }
-
-}
-
-
-/* ==========================================================================
-   SMALL MOBILE — 480PX
-   ========================================================================== */
-
-@media (max-width: 480px) {
-
-  .admin-get-involved {
-    padding: 16px 12px;
-  }
-
-
-  .admin-get-involved-icon {
-    width: 42px;
-    height: 42px;
-  }
-
-
-  .admin-get-involved-title {
-    gap: 11px;
-  }
-
-
-  .admin-get-involved-title h2 {
-    font-size: 23px;
-  }
-
-
-  .admin-get-involved-header > div > p {
+  .admin-get-involved-header p {
     font-size: 13px;
   }
 
+  .refresh-button {
+    width: 100%;
+  }
+
+  .get-involved-summary {
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: 10px;
+
+    margin-bottom: 20px;
+  }
 
   .summary-card {
     min-height: 82px;
 
-    padding: 15px;
+    padding: 14px;
+
+    gap: 10px;
   }
 
-
-  .summary-card-icon {
+  .summary-icon {
     width: 38px;
     height: 38px;
-  }
 
+    flex-basis: 38px;
+  }
 
   .summary-card strong {
     font-size: 22px;
   }
 
-
-  .application-card {
-    padding: 15px;
-    border-radius: 9px;
+  .get-involved-card {
+    padding: 17px;
   }
 
+  .submission-header {
+    flex-direction: column;
+    align-items: flex-start;
 
-  .applicant-avatar {
-    width: 40px;
-    height: 40px;
+    gap: 13px;
   }
 
-
-  .applicant-info h3 {
-    font-size: 15px;
+  .submission-status {
+    align-self: flex-start;
   }
 
+  .submission-details {
+    flex-direction: column;
 
-  .application-message {
-    padding: 14px;
+    gap: 10px;
   }
 
+  .submission-actions {
+    flex-direction: column;
+    align-items: stretch;
 
-  .application-message p {
-    font-size: 12px;
-    line-height: 1.7;
+    gap: 13px;
   }
 
+  .status-control select {
+    width: 100%;
+  }
 
-  .admin-get-involved-empty {
-    min-height: 280px;
-    padding: 30px 18px;
+  .delete-submission-button {
+    width: 100%;
   }
 
 }
 
 
 /* ==========================================================================
-   VERY SMALL SCREENS — 360PX
+   SMALL MOBILE
+   ========================================================================== */
+
+@media (max-width: 480px) {
+
+  .admin-get-involved-page {
+    padding: 17px 12px;
+  }
+
+  .admin-get-involved-header h1 {
+    font-size: 23px;
+  }
+
+  .admin-get-involved-header p {
+    font-size: 12px;
+  }
+
+  .get-involved-summary {
+    gap: 8px;
+  }
+
+  .summary-card {
+    min-height: 75px;
+
+    padding: 11px;
+  }
+
+  .summary-icon {
+    width: 34px;
+    height: 34px;
+
+    flex-basis: 34px;
+  }
+
+  .summary-icon svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  .summary-card span {
+    font-size: 11px;
+  }
+
+  .summary-card strong {
+    font-size: 20px;
+  }
+
+  .get-involved-card {
+    padding: 14px;
+  }
+
+  .submission-person {
+    gap: 10px;
+  }
+
+  .person-icon {
+    width: 38px;
+    height: 38px;
+
+    flex-basis: 38px;
+  }
+
+  .submission-person h2 {
+    font-size: 15px;
+  }
+
+  .submission-person p {
+    font-size: 12px;
+  }
+
+  .submission-message {
+    padding: 13px;
+  }
+
+  .submission-message p {
+    font-size: 13px;
+    line-height: 1.65;
+  }
+
+  .empty-state {
+    min-height: 300px;
+
+    padding: 25px 16px;
+  }
+
+}
+
+
+/* ==========================================================================
+   EXTRA SMALL
    ========================================================================== */
 
 @media (max-width: 360px) {
 
-  .admin-get-involved {
-    padding: 14px 10px;
+  .get-involved-summary {
+    grid-template-columns: 1fr;
   }
 
+  .summary-card {
+    min-height: 70px;
+  }
 
-  .admin-get-involved-title h2 {
+  .admin-get-involved-header h1 {
     font-size: 21px;
-  }
-
-
-  .admin-get-involved-title span {
-    font-size: 9px;
-  }
-
-
-  .application-card {
-    padding: 13px;
-  }
-
-
-  .application-status {
-    font-size: 10px;
-  }
-
-
-  .summary-card span {
-    font-size: 9px;
-  }
-
-}
-
-
-/* ==========================================================================
-   REDUCED MOTION
-   ========================================================================== */
-
-@media (prefers-reduced-motion: reduce) {
-
-  .admin-get-involved *,
-  .admin-get-involved *::before,
-  .admin-get-involved *::after {
-    scroll-behavior: auto !important;
-
-    transition-duration: 0.01ms !important;
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
   }
 
 }

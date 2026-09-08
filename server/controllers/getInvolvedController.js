@@ -38,7 +38,7 @@ const createGetInvolved = async (req, res) => {
 
     /*
     |--------------------------------------------------------------------------
-    | SAVE SUBMISSION TO MONGODB
+    | SAVE SUBMISSION
     |--------------------------------------------------------------------------
     */
 
@@ -54,14 +54,6 @@ const createGetInvolved = async (req, res) => {
     /*
     |--------------------------------------------------------------------------
     | SEND EMAIL NOTIFICATION
-    |--------------------------------------------------------------------------
-    |
-    | The MongoDB submission is already saved before
-    | attempting to send the email.
-    |
-    | Therefore, if email sending fails, the user's
-    | submission is NOT lost.
-    |
     |--------------------------------------------------------------------------
     */
 
@@ -113,8 +105,6 @@ const createGetInvolved = async (req, res) => {
                   "
                 >
 
-                  <!-- HEADER -->
-
                   <div
                     style="
                       background-color: #132b46;
@@ -144,9 +134,6 @@ const createGetInvolved = async (req, res) => {
 
                   </div>
 
-
-                  <!-- CONTENT -->
-
                   <div
                     style="
                       padding: 30px;
@@ -165,9 +152,6 @@ const createGetInvolved = async (req, res) => {
                       website.
                     </p>
 
-
-                    <!-- SUBMISSION DETAILS -->
-
                     <div
                       style="
                         margin-top: 25px;
@@ -177,71 +161,29 @@ const createGetInvolved = async (req, res) => {
                       "
                     >
 
-                      <p
-                        style="
-                          margin: 0 0 12px;
-                        "
-                      >
-                        <strong>
-                          Name:
-                        </strong>
-
+                      <p style="margin: 0 0 12px;">
+                        <strong>Name:</strong>
                         ${name}
                       </p>
 
-
-                      <p
-                        style="
-                          margin: 0 0 12px;
-                        "
-                      >
-                        <strong>
-                          Email:
-                        </strong>
-
+                      <p style="margin: 0 0 12px;">
+                        <strong>Email:</strong>
                         ${email}
                       </p>
 
-
-                      <p
-                        style="
-                          margin: 0 0 12px;
-                        "
-                      >
-                        <strong>
-                          Phone:
-                        </strong>
-
-                        ${
-                          phone ||
-                          "Not provided"
-                        }
+                      <p style="margin: 0 0 12px;">
+                        <strong>Phone:</strong>
+                        ${phone || "Not provided"}
                       </p>
 
-
-                      <p
-                        style="
-                          margin: 0 0 12px;
-                        "
-                      >
-                        <strong>
-                          Involvement:
-                        </strong>
-
+                      <p style="margin: 0 0 12px;">
+                        <strong>Involvement:</strong>
                         ${involvement}
                       </p>
 
-
-                      <p
-                        style="
-                          margin: 0 0 8px;
-                        "
-                      >
-                        <strong>
-                          Message:
-                        </strong>
+                      <p style="margin: 0 0 8px;">
+                        <strong>Message:</strong>
                       </p>
-
 
                       <p
                         style="
@@ -254,9 +196,6 @@ const createGetInvolved = async (req, res) => {
                       </p>
 
                     </div>
-
-
-                    <!-- FOOTER MESSAGE -->
 
                     <p
                       style="
@@ -272,9 +211,6 @@ const createGetInvolved = async (req, res) => {
                     </p>
 
                   </div>
-
-
-                  <!-- FOOTER -->
 
                   <div
                     style="
@@ -313,28 +249,10 @@ const createGetInvolved = async (req, res) => {
           `,
         });
 
-      /*
-      |--------------------------------------------------------------------------
-      | CONFIRM EMAIL WAS SENT
-      |--------------------------------------------------------------------------
-      */
-
       emailSent =
         emailResult?.success === true;
 
     } catch (emailError) {
-      /*
-      |--------------------------------------------------------------------------
-      | EMAIL ERROR
-      |--------------------------------------------------------------------------
-      |
-      | Do NOT return a 500 error here because the
-      | MongoDB submission was already successfully
-      | created.
-      |
-      |--------------------------------------------------------------------------
-      */
-
       console.error(
         "GET INVOLVED EMAIL ERROR:",
         emailError
@@ -359,12 +277,6 @@ const createGetInvolved = async (req, res) => {
     });
 
   } catch (error) {
-    /*
-    |--------------------------------------------------------------------------
-    | DATABASE / SERVER ERROR
-    |--------------------------------------------------------------------------
-    */
-
     console.error(
       "CREATE GET INVOLVED ERROR:",
       error
@@ -372,7 +284,6 @@ const createGetInvolved = async (req, res) => {
 
     return res.status(500).json({
       success: false,
-
       message:
         "Unable to submit your request. Please try again.",
     });
@@ -412,9 +323,204 @@ const getAllGetInvolved = async (req, res) => {
 
     return res.status(500).json({
       success: false,
-
       message:
         "Unable to retrieve submissions.",
+    });
+  }
+};
+
+
+/*
+|--------------------------------------------------------------------------
+| UPDATE GET INVOLVED STATUS
+|--------------------------------------------------------------------------
+*/
+
+const updateGetInvolvedStatus = async (
+  req,
+  res
+) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    /*
+    |--------------------------------------------------------------------------
+    | VALIDATE STATUS
+    |--------------------------------------------------------------------------
+    */
+
+    const allowedStatuses = [
+      "New",
+      "Contacted",
+      "Resolved",
+    ];
+
+    if (
+      !allowedStatuses.includes(status)
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Invalid status. Allowed values are New, Contacted and Resolved.",
+      });
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | UPDATE SUBMISSION
+    |--------------------------------------------------------------------------
+    */
+
+    const submission =
+      await GetInvolved.findByIdAndUpdate(
+        id,
+        {
+          status,
+        },
+        {
+          new: true,
+          runValidators: true,
+        }
+      );
+
+    /*
+    |--------------------------------------------------------------------------
+    | NOT FOUND
+    |--------------------------------------------------------------------------
+    */
+
+    if (!submission) {
+      return res.status(404).json({
+        success: false,
+        message:
+          "Get Involved submission not found.",
+      });
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | SUCCESS
+    |--------------------------------------------------------------------------
+    */
+
+    return res.status(200).json({
+      success: true,
+      message:
+        "Get Involved submission status updated successfully.",
+      data: submission,
+    });
+
+  } catch (error) {
+    console.error(
+      "UPDATE GET INVOLVED STATUS ERROR:",
+      error
+    );
+
+    /*
+    |--------------------------------------------------------------------------
+    | INVALID MONGODB ID
+    |--------------------------------------------------------------------------
+    */
+
+    if (
+      error.name ===
+      "CastError"
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Invalid Get Involved submission ID.",
+      });
+    }
+
+    return res.status(500).json({
+      success: false,
+      message:
+        "Unable to update submission status.",
+    });
+  }
+};
+
+
+/*
+|--------------------------------------------------------------------------
+| DELETE GET INVOLVED SUBMISSION
+|--------------------------------------------------------------------------
+*/
+
+const deleteGetInvolved = async (
+  req,
+  res
+) => {
+  try {
+    const { id } = req.params;
+
+    /*
+    |--------------------------------------------------------------------------
+    | DELETE SUBMISSION
+    |--------------------------------------------------------------------------
+    */
+
+    const submission =
+      await GetInvolved.findByIdAndDelete(
+        id
+      );
+
+    /*
+    |--------------------------------------------------------------------------
+    | NOT FOUND
+    |--------------------------------------------------------------------------
+    */
+
+    if (!submission) {
+      return res.status(404).json({
+        success: false,
+        message:
+          "Get Involved submission not found.",
+      });
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | SUCCESS
+    |--------------------------------------------------------------------------
+    */
+
+    return res.status(200).json({
+      success: true,
+      message:
+        "Get Involved submission deleted successfully.",
+      data: submission,
+    });
+
+  } catch (error) {
+    console.error(
+      "DELETE GET INVOLVED ERROR:",
+      error
+    );
+
+    /*
+    |--------------------------------------------------------------------------
+    | INVALID MONGODB ID
+    |--------------------------------------------------------------------------
+    */
+
+    if (
+      error.name ===
+      "CastError"
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Invalid Get Involved submission ID.",
+      });
+    }
+
+    return res.status(500).json({
+      success: false,
+      message:
+        "Unable to delete submission.",
     });
   }
 };
@@ -429,4 +535,6 @@ const getAllGetInvolved = async (req, res) => {
 module.exports = {
   createGetInvolved,
   getAllGetInvolved,
+  updateGetInvolvedStatus,
+  deleteGetInvolved,
 };

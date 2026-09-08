@@ -3,32 +3,52 @@ const express = require("express");
 const {
   createGetInvolved,
   getAllGetInvolved,
+  updateGetInvolvedStatus,
+  deleteGetInvolved,
 } = require("../controllers/getInvolvedController");
+
+const authMiddleware = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
-// ============================================================
-// CREATE GET INVOLVED SUBMISSION
-// POST /api/get-involved
-// ============================================================
 
+// ============================================================================
+// PUBLIC
+// ============================================================================
+
+// POST /api/get-involved
 router.post(
   "/",
   createGetInvolved
 );
 
-// ============================================================
-// GET ALL GET INVOLVED SUBMISSIONS
-// GET /api/get-involved
-// ============================================================
 
+// ============================================================================
+// ADMIN
+// ============================================================================
+
+// GET /api/get-involved
 router.get(
   "/",
+  authMiddleware,
   getAllGetInvolved
 );
 
-// ============================================================
-// EXPORT ROUTER
-// ============================================================
+
+// PUT /api/get-involved/:id/status
+router.put(
+  "/:id/status",
+  authMiddleware,
+  updateGetInvolvedStatus
+);
+
+
+// DELETE /api/get-involved/:id
+router.delete(
+  "/:id",
+  authMiddleware,
+  deleteGetInvolved
+);
+
 
 module.exports = router;

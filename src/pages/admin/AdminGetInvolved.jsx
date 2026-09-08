@@ -1,17 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 
 import {
-  Mail,
-  Phone,
-  User,
-  Calendar,
-  MessageSquare,
-  Trash2,
   CheckCircle,
   Clock,
-  Archive,
+  Mail,
+  MessageSquare,
+  Phone,
   RefreshCw,
-  Handshake
+  Trash2,
+  User,
+  Users,
 } from "lucide-react";
 
 import API from "../../api/axios";
@@ -19,476 +21,300 @@ import API from "../../api/axios";
 import "../../styles/AdminGetInvolved.css";
 
 
-/*
-|--------------------------------------------------------------------------
-| ADMIN GET INVOLVED
-|--------------------------------------------------------------------------
-*/
-
 const AdminGetInvolved = () => {
+  // ==========================================================================
+  // STATE
+  // ==========================================================================
 
-  const [applications, setApplications] = useState([]);
+  const [submissions, setSubmissions] =
+    useState([]);
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] =
+    useState(true);
 
-  const [error, setError] = useState("");
+  const [refreshing, setRefreshing] =
+    useState(false);
 
-  const [updatingId, setUpdatingId] = useState(null);
+  const [updatingId, setUpdatingId] =
+    useState(null);
 
-  const [deletingId, setDeletingId] = useState(null);
-
-
-  /*
-  |--------------------------------------------------------------------------
-  | FETCH APPLICATIONS
-  |--------------------------------------------------------------------------
-  */
-
-  const fetchApplications = async () => {
-
-    try {
-
-      setLoading(true);
-
-      setError("");
-
-      const response = await API.get(
-        "/contact/volunteers"
-      );
+  const [deletingId, setDeletingId] =
+    useState(null);
 
 
-      /*
-      |--------------------------------------------------------------------------
-      | IMPORTANT
-      |--------------------------------------------------------------------------
-      |
-      | Backend returns:
-      |
-      | {
-      |   success: true,
-      |   count: 5,
-      |   volunteers: [...]
-      | }
-      |
-      | Therefore we must read:
-      |
-      | response.data.volunteers
-      |
-      |--------------------------------------------------------------------------
-      */
+  // ==========================================================================
+  // FETCH SUBMISSIONS
+  // ==========================================================================
 
-      const volunteers =
-        response.data?.volunteers;
+  const fetchSubmissions = useCallback(
+    async (showRefresh = false) => {
+      try {
+        if (showRefresh) {
+          setRefreshing(true);
+        } else {
+          setLoading(true);
+        }
 
-      setApplications(
-        Array.isArray(volunteers)
-          ? volunteers
-          : []
-      );
+        const response =
+          await API.get(
+            "/get-involved"
+          );
 
+        if (
+          response.data?.success
+        ) {
+          setSubmissions(
+            response.data.data || []
+          );
+        } else {
+          setSubmissions([]);
+        }
 
-    } catch (error) {
-
-      console.error(
-        "FETCH GET INVOLVED APPLICATIONS ERROR:",
-        error
-      );
-
-
-      /*
-      |--------------------------------------------------------------------------
-      | AUTH ERROR
-      |--------------------------------------------------------------------------
-      */
-
-      if (error.response?.status === 401) {
-
-        setError(
-          "Your admin session has expired. Please log in again."
+      } catch (error) {
+        console.error(
+          "FETCH GET INVOLVED ERROR:",
+          error
         );
 
-      } else {
-
-        setError(
+        alert(
           error.response?.data?.message ||
-          "Failed to load get involved applications."
+            "Unable to load Get Involved submissions."
         );
 
+      } finally {
+        setLoading(false);
+        setRefreshing(false);
       }
-
-    } finally {
-
-      setLoading(false);
-
-    }
-
-  };
+    },
+    []
+  );
 
 
-  /*
-  |--------------------------------------------------------------------------
-  | INITIAL LOAD
-  |--------------------------------------------------------------------------
-  */
+  // ==========================================================================
+  // INITIAL LOAD
+  // ==========================================================================
 
   useEffect(() => {
-
-    fetchApplications();
-
-  }, []);
+    fetchSubmissions();
+  }, [fetchSubmissions]);
 
 
-  /*
-  |--------------------------------------------------------------------------
-  | UPDATE STATUS
-  |--------------------------------------------------------------------------
-  */
+  // ==========================================================================
+  // UPDATE STATUS
+  // ==========================================================================
 
   const handleStatusChange = async (
     id,
     status
   ) => {
-
     try {
-
       setUpdatingId(id);
 
-
-      const response = await API.put(
-        `/contact/${id}/status`,
-        {
-          status
-        }
-      );
-
-
-      const updatedContact =
-        response.data?.contact;
-
-
-      if (!updatedContact) {
-
-        throw new Error(
-          "Updated application was not returned by the server."
+      const response =
+        await API.put(
+          `/get-involved/${id}/status`,
+          {
+            status,
+          }
         );
 
+      if (
+        response.data?.success
+      ) {
+        const updatedSubmission =
+          response.data.data;
+
+        setSubmissions(
+          (currentSubmissions) =>
+            currentSubmissions.map(
+              (submission) =>
+                submission._id === id
+                  ? updatedSubmission
+                  : submission
+            )
+        );
       }
 
-
-      setApplications(
-        (previousApplications) =>
-          previousApplications.map(
-            (application) =>
-              application._id === id
-                ? updatedContact
-                : application
-          )
-      );
-
-
     } catch (error) {
-
       console.error(
-        "UPDATE APPLICATION STATUS ERROR:",
+        "UPDATE GET INVOLVED STATUS ERROR:",
         error
       );
 
-
       alert(
         error.response?.data?.message ||
-        "Failed to update application status."
+          "Unable to update submission status."
       );
 
-
     } finally {
-
       setUpdatingId(null);
-
     }
-
   };
 
 
-  /*
-  |--------------------------------------------------------------------------
-  | DELETE APPLICATION
-  |--------------------------------------------------------------------------
-  */
+  // ==========================================================================
+  // DELETE SUBMISSION
+  // ==========================================================================
 
-  const handleDelete = async (id) => {
-
+  const handleDelete = async (
+    id
+  ) => {
     const confirmed =
       window.confirm(
-        "Are you sure you want to delete this application? This action cannot be undone."
+        "Are you sure you want to delete this Get Involved submission? This action cannot be undone."
       );
-
 
     if (!confirmed) {
-
       return;
-
     }
 
-
     try {
-
       setDeletingId(id);
 
+      const response =
+        await API.delete(
+          `/get-involved/${id}`
+        );
 
-      await API.delete(
-        `/contact/${id}`
-      );
-
-
-      setApplications(
-        (previousApplications) =>
-          previousApplications.filter(
-            (application) =>
-              application._id !== id
-          )
-      );
-
+      if (
+        response.data?.success
+      ) {
+        setSubmissions(
+          (currentSubmissions) =>
+            currentSubmissions.filter(
+              (submission) =>
+                submission._id !== id
+            )
+        );
+      }
 
     } catch (error) {
-
       console.error(
-        "DELETE GET INVOLVED APPLICATION ERROR:",
+        "DELETE GET INVOLVED ERROR:",
         error
       );
 
-
       alert(
         error.response?.data?.message ||
-        "Failed to delete application."
+          "Unable to delete submission."
       );
 
-
     } finally {
-
       setDeletingId(null);
-
     }
-
   };
 
 
-  /*
-  |--------------------------------------------------------------------------
-  | FORMAT DATE
-  |--------------------------------------------------------------------------
-  */
+  // ==========================================================================
+  // STATUS HELPERS
+  // ==========================================================================
 
-  const formatDate = (date) => {
-
-    if (!date) {
-
-      return "—";
-
+  const getStatusIcon = (
+    status
+  ) => {
+    if (status === "Resolved") {
+      return <CheckCircle size={16} />;
     }
 
-
-    const formattedDate =
-      new Date(date);
-
-
-    if (
-      Number.isNaN(
-        formattedDate.getTime()
-      )
-    ) {
-
-      return "—";
-
+    if (status === "Contacted") {
+      return <MessageSquare size={16} />;
     }
 
-
-    return formattedDate.toLocaleDateString(
-      "en-US",
-      {
-        year: "numeric",
-        month: "short",
-        day: "numeric"
-      }
-    );
-
+    return <Clock size={16} />;
   };
 
 
-  /*
-  |--------------------------------------------------------------------------
-  | STATUS CLASS
-  |--------------------------------------------------------------------------
-  */
-
-  const getStatusClass = (status) => {
-
+  const getStatusClass = (
+    status
+  ) => {
     switch (status) {
+      case "Resolved":
+        return "status-resolved";
 
-      case "Read":
-        return "status-read";
+      case "Contacted":
+        return "status-contacted";
 
-      case "Replied":
-        return "status-replied";
-
-      case "Archived":
-        return "status-archived";
-
-      case "Unread":
+      case "New":
       default:
-        return "status-unread";
-
+        return "status-new";
     }
-
   };
 
 
-  /*
-  |--------------------------------------------------------------------------
-  | STATUS ICON
-  |--------------------------------------------------------------------------
-  */
+  // ==========================================================================
+  // COUNTS
+  // ==========================================================================
 
-  const getStatusIcon = (status) => {
+  const totalCount =
+    submissions.length;
 
-    switch (status) {
+  const newCount =
+    submissions.filter(
+      (item) =>
+        item.status === "New"
+    ).length;
 
-      case "Read":
+  const contactedCount =
+    submissions.filter(
+      (item) =>
+        item.status === "Contacted"
+    ).length;
 
-        return (
-          <CheckCircle size={14} />
-        );
-
-
-      case "Replied":
-
-        return (
-          <MessageSquare size={14} />
-        );
-
-
-      case "Archived":
-
-        return (
-          <Archive size={14} />
-        );
+  const resolvedCount =
+    submissions.filter(
+      (item) =>
+        item.status === "Resolved"
+    ).length;
 
 
-      case "Unread":
-
-      default:
-
-        return (
-          <Clock size={14} />
-        );
-
-    }
-
-  };
-
-
-  /*
-  |--------------------------------------------------------------------------
-  | LOADING STATE
-  |--------------------------------------------------------------------------
-  */
+  // ==========================================================================
+  // LOADING STATE
+  // ==========================================================================
 
   if (loading) {
-
     return (
-
-      <div className="admin-get-involved">
+      <div className="admin-get-involved-page">
 
         <div className="admin-get-involved-loading">
 
           <RefreshCw
-            size={24}
+            size={30}
             className="loading-spinner"
           />
 
           <p>
-            Loading applications...
+            Loading Get Involved submissions...
           </p>
 
         </div>
 
       </div>
-
     );
-
   }
 
 
-  /*
-  |--------------------------------------------------------------------------
-  | COUNTS
-  |--------------------------------------------------------------------------
-  */
-
-  const totalApplications =
-    applications.length;
-
-
-  const unreadApplications =
-    applications.filter(
-      (application) =>
-        application.status === "Unread"
-    ).length;
-
-
-  const repliedApplications =
-    applications.filter(
-      (application) =>
-        application.status === "Replied"
-    ).length;
-
-
-  /*
-  |--------------------------------------------------------------------------
-  | RENDER
-  |--------------------------------------------------------------------------
-  */
+  // ==========================================================================
+  // RENDER
+  // ==========================================================================
 
   return (
+    <div className="admin-get-involved-page">
 
-    <div className="admin-get-involved">
-
-
-      {/* ================================================================
-          HEADER
-      ================================================================= */}
+      {/* ================================================================== */}
+      {/* HEADER */}
+      {/* ================================================================== */}
 
       <div className="admin-get-involved-header">
 
         <div>
 
-          <div className="admin-get-involved-title">
-
-            <div className="admin-get-involved-icon">
-
-              <Handshake size={22} />
-
-            </div>
-
-
-            <div>
-
-              <span>
-                FOUNDATION
-              </span>
-
-              <h2>
-                Get Involved
-              </h2>
-
-            </div>
-
-          </div>
-
+          <h1>
+            Get Involved
+          </h1>
 
           <p>
-            Manage volunteer, partnership, sponsorship
-            and other participation requests submitted
-            through the foundation website.
+            Manage people who have expressed
+            interest in supporting the foundation.
           </p>
 
         </div>
@@ -496,226 +322,180 @@ const AdminGetInvolved = () => {
 
         <button
           type="button"
-          className="admin-refresh-button"
-          onClick={fetchApplications}
-          disabled={loading}
+          className="refresh-button"
+          onClick={() =>
+            fetchSubmissions(true)
+          }
+          disabled={refreshing}
         >
 
-          <RefreshCw size={16} />
+          <RefreshCw
+            size={17}
+            className={
+              refreshing
+                ? "loading-spinner"
+                : ""
+            }
+          />
 
-          Refresh
+          {refreshing
+            ? "Refreshing..."
+            : "Refresh"}
 
         </button>
 
       </div>
 
 
-      {/* ================================================================
-          ERROR
-      ================================================================= */}
+      {/* ================================================================== */}
+      {/* SUMMARY */}
+      {/* ================================================================== */}
 
-      {error && (
+      <div className="get-involved-summary">
 
-        <div className="admin-get-involved-error">
+        <div className="summary-card">
 
-          <span>
-            {error}
-          </span>
-
-
-          <button
-            type="button"
-            onClick={fetchApplications}
-          >
-
-            Try Again
-
-          </button>
-
-        </div>
-
-      )}
-
-
-      {/* ================================================================
-          SUMMARY
-      ================================================================= */}
-
-      {!error && (
-
-        <div className="admin-get-involved-summary">
-
-
-          {/* TOTAL */}
-
-          <div className="summary-card">
-
-            <div className="summary-card-icon">
-
-              <User size={18} />
-
-            </div>
-
-
-            <div>
-
-              <span>
-                TOTAL APPLICATIONS
-              </span>
-
-              <strong>
-                {totalApplications}
-              </strong>
-
-            </div>
-
+          <div className="summary-icon">
+            <Users size={21} />
           </div>
 
+          <div>
 
-          {/* UNREAD */}
+            <span>
+              Total
+            </span>
 
-          <div className="summary-card">
-
-            <div className="summary-card-icon">
-
-              <Clock size={18} />
-
-            </div>
-
-
-            <div>
-
-              <span>
-                UNREAD
-              </span>
-
-              <strong>
-                {unreadApplications}
-              </strong>
-
-            </div>
-
-          </div>
-
-
-          {/* REPLIED */}
-
-          <div className="summary-card">
-
-            <div className="summary-card-icon">
-
-              <MessageSquare size={18} />
-
-            </div>
-
-
-            <div>
-
-              <span>
-                REPLIED
-              </span>
-
-              <strong>
-                {repliedApplications}
-              </strong>
-
-            </div>
+            <strong>
+              {totalCount}
+            </strong>
 
           </div>
 
         </div>
 
-      )}
+
+        <div className="summary-card">
+
+          <div className="summary-icon">
+            <Clock size={21} />
+          </div>
+
+          <div>
+
+            <span>
+              New
+            </span>
+
+            <strong>
+              {newCount}
+            </strong>
+
+          </div>
+
+        </div>
 
 
-      {/* ================================================================
-          EMPTY STATE
-      ================================================================= */}
+        <div className="summary-card">
 
-      {!error &&
-        applications.length === 0 && (
+          <div className="summary-icon">
+            <MessageSquare size={21} />
+          </div>
 
-          <div className="admin-get-involved-empty">
+          <div>
 
-            <div className="empty-icon">
+            <span>
+              Contacted
+            </span>
 
-              <Handshake size={42} />
+            <strong>
+              {contactedCount}
+            </strong>
 
-            </div>
+          </div>
+
+        </div>
 
 
-            <h3>
-              No Applications Yet
-            </h3>
+        <div className="summary-card">
 
+          <div className="summary-icon">
+            <CheckCircle size={21} />
+          </div>
+
+          <div>
+
+            <span>
+              Resolved
+            </span>
+
+            <strong>
+              {resolvedCount}
+            </strong>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      {/* ================================================================== */}
+      {/* SUBMISSIONS */}
+      {/* ================================================================== */}
+
+      <div className="get-involved-content">
+
+        {submissions.length === 0 ? (
+
+          <div className="empty-state">
+
+            <Users size={42} />
+
+            <h2>
+              No submissions yet
+            </h2>
 
             <p>
-              Get involved applications submitted
-              from the website will appear here.
+              Get Involved submissions will
+              appear here when people submit
+              the form.
             </p>
-
-
-            <button
-              type="button"
-              onClick={fetchApplications}
-            >
-
-              <RefreshCw size={16} />
-
-              Refresh Applications
-
-            </button>
 
           </div>
 
-        )}
+        ) : (
 
+          <div className="get-involved-list">
 
-      {/* ================================================================
-          APPLICATIONS
-      ================================================================= */}
+            {submissions.map(
+              (submission) => (
 
-      {!error &&
-        applications.length > 0 && (
-
-          <div className="applications-container">
-
-            {applications.map(
-              (application) => (
-
-                <article
-                  className="application-card"
-                  key={application._id}
+                <div
+                  className="get-involved-card"
+                  key={submission._id}
                 >
 
+                  {/* ====================================================== */}
+                  {/* CARD HEADER */}
+                  {/* ====================================================== */}
 
-                  {/* ==================================================
-                      CARD HEADER
-                  ================================================== */}
+                  <div className="submission-header">
 
-                  <div className="application-card-header">
+                    <div className="submission-person">
 
-
-                    <div className="applicant-info">
-
-                      <div className="applicant-avatar">
-
+                      <div className="person-icon">
                         <User size={20} />
-
                       </div>
-
 
                       <div>
 
-                        <h3>
-                          {application.name}
-                        </h3>
+                        <h2>
+                          {submission.name}
+                        </h2>
 
-
-                        <span>
-                          {application.interestArea ||
-                            "General Interest"}
-                        </span>
+                        <p>
+                          {submission.involvement}
+                        </p>
 
                       </div>
 
@@ -723,18 +503,17 @@ const AdminGetInvolved = () => {
 
 
                     <div
-                      className={`application-status ${getStatusClass(
-                        application.status
+                      className={`submission-status ${getStatusClass(
+                        submission.status
                       )}`}
                     >
 
                       {getStatusIcon(
-                        application.status
+                        submission.status
                       )}
 
                       <span>
-                        {application.status ||
-                          "Unread"}
+                        {submission.status}
                       </span>
 
                     </div>
@@ -742,147 +521,137 @@ const AdminGetInvolved = () => {
                   </div>
 
 
-                  {/* ==================================================
-                      CONTACT DETAILS
-                  ================================================== */}
+                  {/* ====================================================== */}
+                  {/* CONTACT DETAILS */}
+                  {/* ====================================================== */}
 
-                  <div className="application-details">
-
-
-                    {/* EMAIL */}
+                  <div className="submission-details">
 
                     <a
-                      href={`mailto:${application.email}`}
-                      className="application-detail"
+                      href={`mailto:${submission.email}`}
+                      className="submission-detail"
                     >
 
                       <Mail size={16} />
 
                       <span>
-                        {application.email}
+                        {submission.email}
                       </span>
 
                     </a>
 
 
-                    {/* PHONE */}
-
-                    {application.phone && (
-
+                    {submission.phone && (
                       <a
-                        href={`tel:${application.phone}`}
-                        className="application-detail"
+                        href={`tel:${submission.phone}`}
+                        className="submission-detail"
                       >
 
                         <Phone size={16} />
 
                         <span>
-                          {application.phone}
+                          {submission.phone}
                         </span>
 
                       </a>
-
                     )}
-
-
-                    {/* DATE */}
-
-                    <div className="application-detail">
-
-                      <Calendar size={16} />
-
-                      <span>
-                        {formatDate(
-                          application.createdAt
-                        )}
-                      </span>
-
-                    </div>
 
                   </div>
 
 
-                  {/* ==================================================
-                      MESSAGE
-                  ================================================== */}
+                  {/* ====================================================== */}
+                  {/* MESSAGE */}
+                  {/* ====================================================== */}
 
-                  <div className="application-message">
+                  <div className="submission-message">
 
                     <div className="message-heading">
 
-                      <MessageSquare size={16} />
+                      <MessageSquare
+                        size={16}
+                      />
 
                       <span>
-                        MESSAGE
+                        Message
                       </span>
 
                     </div>
 
-
                     <p>
-                      {application.message}
+                      {submission.message}
                     </p>
 
                   </div>
 
 
-                  {/* ==================================================
-                      ACTIONS
-                  ================================================== */}
+                  {/* ====================================================== */}
+                  {/* DATE */}
+                  {/* ====================================================== */}
 
-                  <div className="application-actions">
+                  <div className="submission-date">
+
+                    Submitted{" "}
+
+                    {submission.createdAt
+                      ? new Date(
+                          submission.createdAt
+                        ).toLocaleString()
+                      : "—"}
+
+                  </div>
 
 
-                    <div className="status-actions">
+                  {/* ====================================================== */}
+                  {/* ACTIONS */}
+                  {/* ====================================================== */}
 
-                      <span>
-                        Update status:
-                      </span>
+                  <div className="submission-actions">
 
+                    <div className="status-control">
+
+                      <label
+                        htmlFor={`status-${submission._id}`}
+                      >
+                        Status
+                      </label>
 
                       <select
+                        id={`status-${submission._id}`}
                         value={
-                          application.status ||
-                          "Unread"
+                          submission.status ||
+                          "New"
                         }
                         onChange={(event) =>
                           handleStatusChange(
-                            application._id,
+                            submission._id,
                             event.target.value
                           )
                         }
                         disabled={
                           updatingId ===
-                          application._id
+                          submission._id
                         }
                       >
 
-                        <option value="Unread">
-                          Unread
+                        <option value="New">
+                          New
                         </option>
 
-                        <option value="Read">
-                          Read
+                        <option value="Contacted">
+                          Contacted
                         </option>
 
-                        <option value="Replied">
-                          Replied
-                        </option>
-
-                        <option value="Archived">
-                          Archived
+                        <option value="Resolved">
+                          Resolved
                         </option>
 
                       </select>
 
-
                       {updatingId ===
-                        application._id && (
-
-                        <span className="updating-text">
+                        submission._id && (
+                        <span className="action-loading">
                           Updating...
                         </span>
-
                       )}
 
                     </div>
@@ -890,22 +659,22 @@ const AdminGetInvolved = () => {
 
                     <button
                       type="button"
-                      className="delete-application-button"
+                      className="delete-submission-button"
                       onClick={() =>
                         handleDelete(
-                          application._id
+                          submission._id
                         )
                       }
                       disabled={
                         deletingId ===
-                        application._id
+                        submission._id
                       }
                     >
 
                       <Trash2 size={16} />
 
                       {deletingId ===
-                      application._id
+                      submission._id
                         ? "Deleting..."
                         : "Delete"}
 
@@ -913,19 +682,17 @@ const AdminGetInvolved = () => {
 
                   </div>
 
-                </article>
-
+                </div>
               )
             )}
 
           </div>
-
         )}
 
+      </div>
+
     </div>
-
   );
-
 };
 
 
