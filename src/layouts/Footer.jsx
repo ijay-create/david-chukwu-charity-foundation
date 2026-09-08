@@ -361,7 +361,7 @@ const Footer = () => {
               <EmailIcon />
 
               <a href="mailto:info@davidchukwu.org.com">
-                info@davidchukwu.org.com
+                info@davidchukwu.org
               </a>
 
             </div>

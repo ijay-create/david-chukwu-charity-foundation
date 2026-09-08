@@ -30,6 +30,10 @@ const allowedOrigins = [
   // Production frontend - Vercel
   "https://david-chukwu-charity-foundation.vercel.app",
 
+  // Custom production domain
+  "https://davidchukwu.org",
+  "https://www.davidchukwu.org",
+
   // Existing production frontend, if configured
   process.env.CLIENT_URL,
 ].filter(Boolean);
