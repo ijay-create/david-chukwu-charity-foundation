@@ -3,83 +3,102 @@ import {
   Handshake,
   Mail,
   Lock,
-  ArrowRight
+  ArrowRight,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import axios from "axios";
+
+import API from "../api/axios";
+
 import "../styles/GetInvolved.css";
 
-const API_URL = "http://localhost:5000/api/contact";
-
 const GetInvolved = ({ onDonateClick }) => {
+  // ============================================================
+  // GET INVOLVED FORM
+  // ============================================================
+
   const [involvedForm, setInvolvedForm] = useState({
     name: "",
     email: "",
     phone: "",
     involvement: "",
-    message: ""
+    message: "",
   });
+
+  // ============================================================
+  // CONTACT FORM
+  // ============================================================
 
   const [contactForm, setContactForm] = useState({
     name: "",
     email: "",
     phone: "",
     subject: "",
-    message: ""
+    message: "",
   });
 
-  const [involvedLoading, setInvolvedLoading] = useState(false);
-  const [contactLoading, setContactLoading] = useState(false);
+  // ============================================================
+  // LOADING STATES
+  // ============================================================
+
+  const [involvedLoading, setInvolvedLoading] =
+    useState(false);
+
+  const [contactLoading, setContactLoading] =
+    useState(false);
+
+  // ============================================================
+  // FEEDBACK STATES
+  // ============================================================
 
   const [involvedMessage, setInvolvedMessage] = useState({
     type: "",
-    text: ""
+    text: "",
   });
 
   const [contactMessage, setContactMessage] = useState({
     type: "",
-    text: ""
+    text: "",
   });
 
-  /* ========================================
-     GET INVOLVED FORM CHANGE
-  ======================================== */
+  // ============================================================
+  // GET INVOLVED FORM CHANGE
+  // ============================================================
 
   const handleInvolvedChange = (event) => {
     const { name, value } = event.target;
 
     setInvolvedForm((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
 
     setInvolvedMessage({
       type: "",
-      text: ""
+      text: "",
     });
   };
 
-  /* ========================================
-     CONTACT FORM CHANGE
-  ======================================== */
+  // ============================================================
+  // CONTACT FORM CHANGE
+  // ============================================================
 
   const handleContactChange = (event) => {
     const { name, value } = event.target;
 
     setContactForm((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
 
     setContactMessage({
       type: "",
-      text: ""
+      text: "",
     });
   };
 
-  /* ========================================
-     GET INVOLVED SUBMIT
-  ======================================== */
+  // ============================================================
+  // GET INVOLVED SUBMIT
+  // ============================================================
 
   const handleInvolvedSubmit = async (event) => {
     event.preventDefault();
@@ -88,18 +107,18 @@ const GetInvolved = ({ onDonateClick }) => {
 
     setInvolvedMessage({
       type: "",
-      text: ""
+      text: "",
     });
 
     try {
-      const response = await axios.post(
-        `${API_URL}/involved`,
+      const response = await API.post(
+        "/get-involved",
         {
           name: involvedForm.name,
           email: involvedForm.email,
           phone: involvedForm.phone,
-          interestArea: involvedForm.involvement,
-          message: involvedForm.message
+          involvement: involvedForm.involvement,
+          message: involvedForm.message,
         }
       );
 
@@ -107,7 +126,7 @@ const GetInvolved = ({ onDonateClick }) => {
         type: "success",
         text:
           response.data?.message ||
-          "Your application has been submitted successfully."
+          "Your application has been submitted successfully.",
       });
 
       setInvolvedForm({
@@ -115,7 +134,7 @@ const GetInvolved = ({ onDonateClick }) => {
         email: "",
         phone: "",
         involvement: "",
-        message: ""
+        message: "",
       });
     } catch (error) {
       console.error(
@@ -127,16 +146,16 @@ const GetInvolved = ({ onDonateClick }) => {
         type: "error",
         text:
           error.response?.data?.message ||
-          "Failed to submit your application. Please try again."
+          "Failed to submit your application. Please try again.",
       });
     } finally {
       setInvolvedLoading(false);
     }
   };
 
-  /* ========================================
-     CONTACT SUBMIT
-  ======================================== */
+  // ============================================================
+  // CONTACT SUBMIT
+  // ============================================================
 
   const handleContactSubmit = async (event) => {
     event.preventDefault();
@@ -145,18 +164,18 @@ const GetInvolved = ({ onDonateClick }) => {
 
     setContactMessage({
       type: "",
-      text: ""
+      text: "",
     });
 
     try {
-      const response = await axios.post(
-        `${API_URL}/`,
+      const response = await API.post(
+        "/contact",
         {
           name: contactForm.name,
           email: contactForm.email,
           phone: contactForm.phone,
           subject: contactForm.subject,
-          message: contactForm.message
+          message: contactForm.message,
         }
       );
 
@@ -164,7 +183,7 @@ const GetInvolved = ({ onDonateClick }) => {
         type: "success",
         text:
           response.data?.message ||
-          "Your message has been sent successfully."
+          "Your message has been sent successfully.",
       });
 
       setContactForm({
@@ -172,7 +191,7 @@ const GetInvolved = ({ onDonateClick }) => {
         email: "",
         phone: "",
         subject: "",
-        message: ""
+        message: "",
       });
     } catch (error) {
       console.error(
@@ -184,7 +203,7 @@ const GetInvolved = ({ onDonateClick }) => {
         type: "error",
         text:
           error.response?.data?.message ||
-          "Failed to send your message. Please try again."
+          "Failed to send your message. Please try again.",
       });
     } finally {
       setContactLoading(false);
