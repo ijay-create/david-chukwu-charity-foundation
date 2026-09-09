@@ -16,9 +16,23 @@ const FacebookIcon = () => (
 
 const InstagramIcon = () => (
   <svg viewBox="0 0 24 24" aria-hidden="true">
-    <rect x="3" y="3" width="18" height="18" rx="5" />
-    <circle cx="12" cy="12" r="4" />
-    <circle cx="17.5" cy="6.5" r="1" />
+    <rect
+      x="3"
+      y="3"
+      width="18"
+      height="18"
+      rx="5"
+    />
+    <circle
+      cx="12"
+      cy="12"
+      r="4"
+    />
+    <circle
+      cx="17.5"
+      cy="6.5"
+      r="1"
+    />
   </svg>
 );
 
@@ -40,7 +54,13 @@ const PhoneIcon = () => (
 
 const EmailIcon = () => (
   <svg viewBox="0 0 24 24" aria-hidden="true">
-    <rect x="3" y="5" width="18" height="14" rx="2" />
+    <rect
+      x="3"
+      y="5"
+      width="18"
+      height="14"
+      rx="2"
+    />
     <path d="m4 7 8 6 8-6" />
   </svg>
 );
@@ -48,7 +68,11 @@ const EmailIcon = () => (
 const LocationIcon = () => (
   <svg viewBox="0 0 24 24" aria-hidden="true">
     <path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z" />
-    <circle cx="12" cy="10" r="2.5" />
+    <circle
+      cx="12"
+      cy="10"
+      r="2.5"
+    />
   </svg>
 );
 
@@ -76,28 +100,49 @@ const AdminIcon = () => (
 
 const getSavedLogo = () => {
   try {
-    const footerLogo = localStorage.getItem("footerLogo");
+    /* -------------------------------------------------------
+       FOOTER LOGO
+    ------------------------------------------------------- */
+
+    const footerLogo =
+      localStorage.getItem("footerLogo");
 
     if (footerLogo) {
       return footerLogo;
     }
 
-    const siteLogo = localStorage.getItem("siteLogo");
+    /* -------------------------------------------------------
+       SITE LOGO
+    ------------------------------------------------------- */
+
+    const siteLogo =
+      localStorage.getItem("siteLogo");
 
     if (siteLogo) {
       return siteLogo;
     }
 
-    const logo = localStorage.getItem("logo");
+    /* -------------------------------------------------------
+       GENERIC LOGO
+    ------------------------------------------------------- */
+
+    const logo =
+      localStorage.getItem("logo");
 
     if (logo) {
       return logo;
     }
 
-    const adminSettings = localStorage.getItem("adminSettings");
+    /* -------------------------------------------------------
+       ADMIN SETTINGS
+    ------------------------------------------------------- */
+
+    const adminSettings =
+      localStorage.getItem("adminSettings");
 
     if (adminSettings) {
-      const parsedSettings = JSON.parse(adminSettings);
+      const parsedSettings =
+        JSON.parse(adminSettings);
 
       if (parsedSettings?.logo) {
         return parsedSettings.logo;
@@ -126,7 +171,8 @@ const getSavedLogo = () => {
 ========================================================= */
 
 const Footer = () => {
-  const currentYear = new Date().getFullYear();
+  const currentYear =
+    new Date().getFullYear();
 
   const location = useLocation();
 
@@ -134,16 +180,19 @@ const Footer = () => {
 
   /* =======================================================
      CONTACT NAVIGATION
-     
-     If already on the homepage, scroll to contact.
-     Otherwise navigate to homepage and pass the section
-     information through router state.
+
+     If already on homepage:
+     Scroll to contact section.
+
+     Otherwise:
+     Navigate normally through the footer link.
   ======================================================= */
 
   const handleContactNavigation = () => {
     if (location.pathname === "/") {
       setTimeout(() => {
-        const contactSection = document.getElementById("contact");
+        const contactSection =
+          document.getElementById("contact");
 
         if (contactSection) {
           contactSection.scrollIntoView({
@@ -160,7 +209,6 @@ const Footer = () => {
       className="footer"
       id="contact"
     >
-
       <div className="container footer-container">
 
         {/* =================================================
@@ -184,15 +232,17 @@ const Footer = () => {
                 src={logo}
                 alt="David Chukwu Charity Foundation"
                 onError={(event) => {
-                  event.currentTarget.src = defaultLogo;
+                  event.currentTarget.src =
+                    defaultLogo;
                 }}
               />
             </Link>
 
             <p className="footer-description">
-              Bringing hope, support and positive change to
-              vulnerable individuals and communities through
-              compassion, dignity and meaningful action.
+              Bringing hope, support and positive
+              change to vulnerable individuals and
+              communities through compassion, dignity
+              and meaningful action.
             </p>
 
             {/* =================================================
@@ -236,7 +286,6 @@ const Footer = () => {
               </a>
 
             </div>
-
           </div>
 
           {/* =================================================
@@ -247,7 +296,6 @@ const Footer = () => {
             className="footer-column"
             aria-label="Quick Links"
           >
-
             <h3>Quick Links</h3>
 
             <Link to="/">
@@ -269,7 +317,6 @@ const Footer = () => {
             <Link to="/about">
               About Us
             </Link>
-
           </nav>
 
           {/* =================================================
@@ -280,7 +327,6 @@ const Footer = () => {
             className="footer-column"
             aria-label="Our Causes"
           >
-
             <h3>Our Causes</h3>
 
             <Link to="/causes">
@@ -302,7 +348,6 @@ const Footer = () => {
             <Link to="/causes">
               Community Outreach
             </Link>
-
           </nav>
 
           {/* =================================================
@@ -313,7 +358,6 @@ const Footer = () => {
             className="footer-column"
             aria-label="Get Involved"
           >
-
             <h3>Get Involved</h3>
 
             <Link to="/get-involved">
@@ -331,7 +375,6 @@ const Footer = () => {
             <Link to="/get-involved">
               Donate
             </Link>
-
           </nav>
 
           {/* =================================================
@@ -360,8 +403,10 @@ const Footer = () => {
 
               <EmailIcon />
 
-              <a href="mailto:info@davidchukwu.org.com">
-                info@davidchukwu.org
+              <a
+                href="mailto:info@davidchukwucharityfoundation.org"
+              >
+                info@davidchukwucharityfoundation.org
               </a>
 
             </div>
@@ -432,7 +477,6 @@ const Footer = () => {
         </div>
 
       </div>
-
     </footer>
   );
 };
