@@ -11,7 +11,6 @@ const authMiddleware = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
-
 // ============================================================================
 // PUBLIC
 // ============================================================================
@@ -21,7 +20,6 @@ router.post(
   "/",
   createGetInvolved
 );
-
 
 // ============================================================================
 // ADMIN
@@ -34,7 +32,6 @@ router.get(
   getAllGetInvolved
 );
 
-
 // PUT /api/get-involved/:id/status
 router.put(
   "/:id/status",
@@ -42,13 +39,11 @@ router.put(
   updateGetInvolvedStatus
 );
 
-
 // DELETE /api/get-involved/:id
 router.delete(
   "/:id",
   authMiddleware,
   deleteGetInvolved
 );
-
 
 module.exports = router;

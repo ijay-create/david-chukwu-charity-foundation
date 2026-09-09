@@ -3,11 +3,29 @@ const sendEmail = require("../utils/sendEmail");
 
 /*
 |--------------------------------------------------------------------------
+| ESCAPE HTML
+|--------------------------------------------------------------------------
+*/
+
+const escapeHtml = (value = "") => {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+};
+
+/*
+|--------------------------------------------------------------------------
 | CREATE GET INVOLVED SUBMISSION
 |--------------------------------------------------------------------------
 */
 
-const createGetInvolved = async (req, res) => {
+const createGetInvolved = async (
+  req,
+  res
+) => {
   try {
     const {
       name,
@@ -38,17 +56,50 @@ const createGetInvolved = async (req, res) => {
 
     /*
     |--------------------------------------------------------------------------
-    | SAVE SUBMISSION
+    | CLEAN INPUT
+    |--------------------------------------------------------------------------
+    */
+
+    const cleanName = name.trim();
+
+    const cleanEmail =
+      email.trim().toLowerCase();
+
+    const cleanPhone =
+      phone?.trim() || "";
+
+    const cleanInvolvement =
+      involvement.trim();
+
+    const cleanMessage =
+      message.trim();
+
+    if (
+      !cleanName ||
+      !cleanEmail ||
+      !cleanInvolvement ||
+      !cleanMessage
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Name, email, involvement type and message are required.",
+      });
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | SAVE SUBMISSION TO MONGODB
     |--------------------------------------------------------------------------
     */
 
     const submission =
       await GetInvolved.create({
-        name,
-        email,
-        phone,
-        involvement,
-        message,
+        name: cleanName,
+        email: cleanEmail,
+        phone: cleanPhone,
+        involvement: cleanInvolvement,
+        message: cleanMessage,
       });
 
     /*
@@ -64,14 +115,17 @@ const createGetInvolved = async (req, res) => {
         await sendEmail({
           to: process.env.MAIL_TO,
 
+          replyTo: cleanEmail,
+
           subject:
-            `New Get Involved Submission - ${involvement}`,
+            `New Get Involved Submission - ${cleanInvolvement}`,
 
           html: `
             <!DOCTYPE html>
 
             <html>
               <head>
+
                 <meta charset="UTF-8" />
 
                 <meta
@@ -82,6 +136,7 @@ const createGetInvolved = async (req, res) => {
                 <title>
                   New Get Involved Submission
                 </title>
+
               </head>
 
               <body
@@ -101,9 +156,13 @@ const createGetInvolved = async (req, res) => {
                     background-color: #ffffff;
                     border-radius: 8px;
                     overflow: hidden;
-                    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+                    box-shadow:
+                      0 2px 10px
+                      rgba(0,0,0,0.08);
                   "
                 >
+
+                  <!-- HEADER -->
 
                   <div
                     style="
@@ -134,6 +193,8 @@ const createGetInvolved = async (req, res) => {
 
                   </div>
 
+                  <!-- CONTENT -->
+
                   <div
                     style="
                       padding: 30px;
@@ -161,27 +222,54 @@ const createGetInvolved = async (req, res) => {
                       "
                     >
 
-                      <p style="margin: 0 0 12px;">
+                      <p
+                        style="
+                          margin: 0 0 12px;
+                        "
+                      >
                         <strong>Name:</strong>
-                        ${name}
+                        ${escapeHtml(cleanName)}
                       </p>
 
-                      <p style="margin: 0 0 12px;">
+                      <p
+                        style="
+                          margin: 0 0 12px;
+                        "
+                      >
                         <strong>Email:</strong>
-                        ${email}
+                        ${escapeHtml(cleanEmail)}
                       </p>
 
-                      <p style="margin: 0 0 12px;">
+                      <p
+                        style="
+                          margin: 0 0 12px;
+                        "
+                      >
                         <strong>Phone:</strong>
-                        ${phone || "Not provided"}
+                        ${
+                          escapeHtml(
+                            cleanPhone ||
+                            "Not provided"
+                          )
+                        }
                       </p>
 
-                      <p style="margin: 0 0 12px;">
+                      <p
+                        style="
+                          margin: 0 0 12px;
+                        "
+                      >
                         <strong>Involvement:</strong>
-                        ${involvement}
+                        ${escapeHtml(
+                          cleanInvolvement
+                        )}
                       </p>
 
-                      <p style="margin: 0 0 8px;">
+                      <p
+                        style="
+                          margin: 0 0 8px;
+                        "
+                      >
                         <strong>Message:</strong>
                       </p>
 
@@ -192,7 +280,9 @@ const createGetInvolved = async (req, res) => {
                           white-space: pre-line;
                         "
                       >
-                        ${message}
+                        ${escapeHtml(
+                          cleanMessage
+                        )}
                       </p>
 
                     </div>
@@ -206,11 +296,13 @@ const createGetInvolved = async (req, res) => {
                       "
                     >
                       This submission has also been
-                      successfully saved to the
-                      foundation database.
+                      successfully saved to the foundation
+                      database.
                     </p>
 
                   </div>
+
+                  <!-- FOOTER -->
 
                   <div
                     style="
@@ -237,7 +329,7 @@ const createGetInvolved = async (req, res) => {
                         font-size: 12px;
                       "
                     >
-                      https://davidchukwu.org
+                      davidchukwucharityfoundation.org
                     </p>
 
                   </div>
@@ -252,10 +344,14 @@ const createGetInvolved = async (req, res) => {
       emailSent =
         emailResult?.success === true;
 
+      console.log(
+        "GET INVOLVED EMAIL SENT:",
+        emailSent
+      );
     } catch (emailError) {
       console.error(
         "GET INVOLVED EMAIL ERROR:",
-        emailError
+        emailError.message
       );
     }
 
@@ -275,7 +371,6 @@ const createGetInvolved = async (req, res) => {
 
       data: submission,
     });
-
   } catch (error) {
     console.error(
       "CREATE GET INVOLVED ERROR:",
@@ -290,14 +385,16 @@ const createGetInvolved = async (req, res) => {
   }
 };
 
-
 /*
 |--------------------------------------------------------------------------
 | GET ALL GET INVOLVED SUBMISSIONS
 |--------------------------------------------------------------------------
 */
 
-const getAllGetInvolved = async (req, res) => {
+const getAllGetInvolved = async (
+  req,
+  res
+) => {
   try {
     const submissions =
       await GetInvolved.find()
@@ -307,14 +404,9 @@ const getAllGetInvolved = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-
-      count:
-        submissions.length,
-
-      data:
-        submissions,
+      count: submissions.length,
+      data: submissions,
     });
-
   } catch (error) {
     console.error(
       "GET GET INVOLVED ERROR:",
@@ -328,7 +420,6 @@ const getAllGetInvolved = async (req, res) => {
     });
   }
 };
-
 
 /*
 |--------------------------------------------------------------------------
@@ -344,33 +435,19 @@ const updateGetInvolvedStatus = async (
     const { id } = req.params;
     const { status } = req.body;
 
-    /*
-    |--------------------------------------------------------------------------
-    | VALIDATE STATUS
-    |--------------------------------------------------------------------------
-    */
-
     const allowedStatuses = [
       "New",
       "Contacted",
       "Resolved",
     ];
 
-    if (
-      !allowedStatuses.includes(status)
-    ) {
+    if (!allowedStatuses.includes(status)) {
       return res.status(400).json({
         success: false,
         message:
           "Invalid status. Allowed values are New, Contacted and Resolved.",
       });
     }
-
-    /*
-    |--------------------------------------------------------------------------
-    | UPDATE SUBMISSION
-    |--------------------------------------------------------------------------
-    */
 
     const submission =
       await GetInvolved.findByIdAndUpdate(
@@ -384,12 +461,6 @@ const updateGetInvolvedStatus = async (
         }
       );
 
-    /*
-    |--------------------------------------------------------------------------
-    | NOT FOUND
-    |--------------------------------------------------------------------------
-    */
-
     if (!submission) {
       return res.status(404).json({
         success: false,
@@ -398,35 +469,21 @@ const updateGetInvolvedStatus = async (
       });
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | SUCCESS
-    |--------------------------------------------------------------------------
-    */
-
     return res.status(200).json({
       success: true,
+
       message:
         "Get Involved submission status updated successfully.",
+
       data: submission,
     });
-
   } catch (error) {
     console.error(
       "UPDATE GET INVOLVED STATUS ERROR:",
       error
     );
 
-    /*
-    |--------------------------------------------------------------------------
-    | INVALID MONGODB ID
-    |--------------------------------------------------------------------------
-    */
-
-    if (
-      error.name ===
-      "CastError"
-    ) {
+    if (error.name === "CastError") {
       return res.status(400).json({
         success: false,
         message:
@@ -442,7 +499,6 @@ const updateGetInvolvedStatus = async (
   }
 };
 
-
 /*
 |--------------------------------------------------------------------------
 | DELETE GET INVOLVED SUBMISSION
@@ -456,22 +512,10 @@ const deleteGetInvolved = async (
   try {
     const { id } = req.params;
 
-    /*
-    |--------------------------------------------------------------------------
-    | DELETE SUBMISSION
-    |--------------------------------------------------------------------------
-    */
-
     const submission =
       await GetInvolved.findByIdAndDelete(
         id
       );
-
-    /*
-    |--------------------------------------------------------------------------
-    | NOT FOUND
-    |--------------------------------------------------------------------------
-    */
 
     if (!submission) {
       return res.status(404).json({
@@ -481,35 +525,21 @@ const deleteGetInvolved = async (
       });
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | SUCCESS
-    |--------------------------------------------------------------------------
-    */
-
     return res.status(200).json({
       success: true,
+
       message:
         "Get Involved submission deleted successfully.",
+
       data: submission,
     });
-
   } catch (error) {
     console.error(
       "DELETE GET INVOLVED ERROR:",
       error
     );
 
-    /*
-    |--------------------------------------------------------------------------
-    | INVALID MONGODB ID
-    |--------------------------------------------------------------------------
-    */
-
-    if (
-      error.name ===
-      "CastError"
-    ) {
+    if (error.name === "CastError") {
       return res.status(400).json({
         success: false,
         message:
@@ -524,7 +554,6 @@ const deleteGetInvolved = async (
     });
   }
 };
-
 
 /*
 |--------------------------------------------------------------------------

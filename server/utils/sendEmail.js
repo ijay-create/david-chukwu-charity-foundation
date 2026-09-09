@@ -20,6 +20,23 @@ const transporter = nodemailer.createTransport({
 });
 
 // ============================================================
+// SMTP CONNECTION CHECK
+// ============================================================
+
+transporter.verify((error) => {
+  if (error) {
+    console.error(
+      "SMTP VERIFICATION ERROR:",
+      error.message
+    );
+  } else {
+    console.log(
+      "SMTP SERVER READY"
+    );
+  }
+});
+
+// ============================================================
 // SEND EMAIL
 // ============================================================
 
@@ -27,8 +44,13 @@ const sendEmail = async ({
   to,
   subject,
   html,
+  replyTo,
 }) => {
   try {
+    // ----------------------------------------------------------
+    // VALIDATION
+    // ----------------------------------------------------------
+
     if (!process.env.SMTP_HOST) {
       throw new Error(
         "SMTP_HOST is not configured."
@@ -53,17 +75,33 @@ const sendEmail = async ({
       );
     }
 
+    if (!process.env.MAIL_TO) {
+      throw new Error(
+        "MAIL_TO is not configured."
+      );
+    }
+
     if (!to) {
       throw new Error(
         "Email recipient is required."
       );
     }
 
+    // ----------------------------------------------------------
+    // SEND
+    // ----------------------------------------------------------
+
     const info =
       await transporter.sendMail({
         from: process.env.MAIL_FROM,
+
         to,
+
+        replyTo:
+          replyTo || undefined,
+
         subject,
+
         html,
       });
 
