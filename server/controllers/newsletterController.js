@@ -53,17 +53,21 @@ const subscribeNewsletter = async (req, res) => {
 
     /*
     |--------------------------------------------------------------------------
-    | MAILERLITE SUBSCRIPTION
+    | NEWSLETTER SUBSCRIPTION
     |--------------------------------------------------------------------------
     */
 
-    const result =
-      await subscribeToNewsletter(
-        normalizedEmail
-      );
+    const result = await subscribeToNewsletter(
+      normalizedEmail
+    );
+
+    /*
+    |--------------------------------------------------------------------------
+    | SUCCESS RESPONSE
+    |--------------------------------------------------------------------------
+    */
 
     return res.status(200).json(result);
-
   } catch (error) {
     console.error(
       "Newsletter subscription error:",

@@ -2,22 +2,28 @@ const axios = require("axios");
 
 /*
 |--------------------------------------------------------------------------
-| MAILERLITE CONFIGURATION
+| BREVO CONTACTS API CONFIGURATION
 |--------------------------------------------------------------------------
 */
 
-const MAILERLITE_API_URL =
-  "https://connect.mailerlite.com/api";
+const BREVO_API_URL =
+  "https://api.brevo.com/v3/contacts";
+
+/*
+|--------------------------------------------------------------------------
+| BREVO HEADERS
+|--------------------------------------------------------------------------
+*/
 
 const getHeaders = () => {
-  if (!process.env.MAILERLITE_API_TOKEN) {
+  if (!process.env.BREVO_API_KEY) {
     throw new Error(
-      "MAILERLITE_API_TOKEN is not configured."
+      "BREVO_API_KEY is not configured."
     );
   }
 
   return {
-    Authorization: `Bearer ${process.env.MAILERLITE_API_TOKEN}`,
+    "api-key": process.env.BREVO_API_KEY,
     "Content-Type": "application/json",
     Accept: "application/json",
   };
@@ -30,26 +36,31 @@ const getHeaders = () => {
 */
 
 const subscribeToNewsletter = async (email) => {
-  const groupId = process.env.MAILERLITE_GROUP_ID;
+  const listId = process.env.BREVO_NEWSLETTER_LIST_ID;
 
-  if (!groupId) {
+  if (!listId) {
     throw new Error(
-      "MAILERLITE_GROUP_ID is not configured."
+      "BREVO_NEWSLETTER_LIST_ID is not configured."
     );
   }
 
   try {
     /*
     |--------------------------------------------------------------------------
-    | CREATE SUBSCRIBER
+    | CREATE / UPDATE BREVO CONTACT
     |--------------------------------------------------------------------------
     */
 
     const response = await axios.post(
-      `${MAILERLITE_API_URL}/subscribers`,
+      BREVO_API_URL,
       {
         email,
-        groups: [String(groupId)],
+
+        listIds: [
+          Number(listId),
+        ],
+
+        updateEnabled: true,
       },
       {
         headers: getHeaders(),
@@ -63,13 +74,14 @@ const subscribeToNewsletter = async (email) => {
       data: response.data,
     };
   } catch (error) {
-    const status = error.response?.status;
+    const status =
+      error.response?.status;
 
     const errorData =
       error.response?.data;
 
     console.error(
-      "MAILERLITE SUBSCRIPTION ERROR:",
+      "BREVO NEWSLETTER SUBSCRIPTION ERROR:",
       errorData || error.message
     );
 
@@ -77,14 +89,14 @@ const subscribeToNewsletter = async (email) => {
     |--------------------------------------------------------------------------
     | ALREADY SUBSCRIBED
     |--------------------------------------------------------------------------
+    |
+    | Brevo may return a conflict when the contact already exists.
+    | Because updateEnabled is true, existing contacts can be updated
+    | and associated with the newsletter list.
+    |--------------------------------------------------------------------------
     */
 
-    if (
-      status === 422 ||
-      errorData?.message
-        ?.toLowerCase()
-        ?.includes("already")
-    ) {
+    if (status === 409) {
       return {
         success: true,
         message:
