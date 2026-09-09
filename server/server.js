@@ -23,33 +23,67 @@ const PORT = process.env.PORT || 5000;
 // ============================================================
 
 const allowedOrigins = [
-  // Local development
+  // ============================================================
+  // LOCAL DEVELOPMENT
+  // ============================================================
+
   "http://localhost:5173",
   "http://localhost:5174",
 
-  // Production frontend - Vercel
+  // ============================================================
+  // VERCEL PRODUCTION DOMAIN
+  // ============================================================
+
   "https://david-chukwu-charity-foundation.vercel.app",
 
-  // Custom production domain
+  // ============================================================
+  // NEW CUSTOM PRODUCTION DOMAIN
+  // ============================================================
+
+  "https://davidchukwucharityfoundation.org",
+  "https://www.davidchukwucharityfoundation.org",
+
+  // ============================================================
+  // OLD CUSTOM DOMAIN
+  // Kept temporarily for compatibility
+  // ============================================================
+
   "https://davidchukwu.org",
   "https://www.davidchukwu.org",
 
-  // Existing production frontend, if configured
+  // ============================================================
+  // ENVIRONMENT VARIABLE
+  // ============================================================
+
   process.env.CLIENT_URL,
 ].filter(Boolean);
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests without an Origin header
-      // such as Postman, server-to-server requests, etc.
+      // ========================================================
+      // REQUESTS WITHOUT ORIGIN
+      // Examples:
+      // Postman
+      // Server-to-server requests
+      // Health checks
+      // ========================================================
+
       if (!origin) {
         return callback(null, true);
       }
 
+      // ========================================================
+      // ALLOWED ORIGIN
+      // ========================================================
+
       if (allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
+
+      // ========================================================
+      // BLOCK UNAUTHORIZED ORIGIN
+      // ========================================================
 
       console.warn(
         `CORS blocked origin: ${origin}`
@@ -199,7 +233,6 @@ app.use(
 // Get Involved
 // ------------------------------------------------------------
 
-
 app.use(
   "/api/get-involved",
   require("./routes/getInvolvedRoutes")
@@ -250,7 +283,7 @@ app.use(
     );
 
     // --------------------------------------------------------
-    // CORS errors
+    // CORS ERRORS
     // --------------------------------------------------------
 
     if (
@@ -265,7 +298,7 @@ app.use(
     }
 
     // --------------------------------------------------------
-    // Multer errors
+    // MULTER ERRORS
     // --------------------------------------------------------
 
     if (
@@ -280,7 +313,7 @@ app.use(
     }
 
     // --------------------------------------------------------
-    // General errors
+    // GENERAL ERRORS
     // --------------------------------------------------------
 
     return res.status(
